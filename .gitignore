@@ -1,0 +1,25 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data and artefacts
+/data/raw/
+/data/processed/
+/models/
+/outputs/figures/
+/outputs/tables/
+
+# OS
+.DS_Store

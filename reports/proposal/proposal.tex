@@ -1,0 +1,112 @@
+\documentclass[sigconf,nonacm]{acmart}
+
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\pagestyle{plain}
+
+\usepackage{booktabs}
+
+\title{Consumption-Based Carbon Intensity Forecasting for Carbon-Aware Data Center Scheduling: A Capstone Proposal}
+
+\author{Nicol\'as Higuera Wilches}
+\affiliation{
+  \institution{IE University, School of Science and Technology}
+  \city{Madrid}
+  \country{Spain}
+}
+\email{nicolaswilches@icloud.com}
+
+\author{Bissan Ghaddar}
+\affiliation{
+  \institution{Advisor, IE University}
+  \city{Madrid}
+  \country{Spain}
+}
+
+\begin{document}
+
+\begin{abstract}
+We propose a Master's capstone Phase 1 project that develops an open, reproducible deep learning framework for short-horizon consumption-based carbon intensity forecasting, explicitly modeling cross-border electricity flows across five structurally diverse grid zones. The framework will be benchmarked head-to-head against Electricity Maps' operational 72-hour forecast, with per-region and per-failure-mode characterization to inform the carbon-aware data center scheduling that follows in subsequent phases. The contribution does not lie in introducing consumption-based forecasting as a target (operational systems already exist) but in opening a closed methodology, ablating the role of interconnector flows, characterizing where forecasts succeed and fail across heterogeneous grid compositions, and providing a reproducible benchmark.
+\end{abstract}
+
+\maketitle
+
+\section{Problem and Motivation}
+
+Data centers consume a growing share of global electricity, with demand projected to roughly double by 2026 driven by AI workloads. Their carbon footprint depends on \emph{when} and \emph{where} their loads run, because the carbon intensity of the supplying grid varies across hours, days, seasons, and geographies. Carbon-aware computing systems exploit this variation by shifting interruptible workloads (batch training, periodic indexing, deferrable analytics) to lower-carbon times and locations.
+
+This capstone investigates the foundational layer of such systems: \textbf{short-horizon forecasting of consumption-based carbon intensity}, the variable that determines what carbon a workload running in a given region at a given hour actually causes. Production-based intensity, the carbon emitted by electricity generated within the region, is what most academic forecasters target. But because regions trade electricity through interconnectors, the operationally correct target for a data center scheduler is consumption-based intensity, which accounts for the carbon embedded in imported power.
+
+\section{Literature Context}
+
+The carbon intensity forecasting subfield has matured rapidly. CarbonCast~\cite{maji2022carboncast} introduced a two-tier hierarchical CNN-LSTM architecture for multi-day forecasting, evaluated across six US and EU regions. EnsembleCI~\cite{yan2025ensembleci} extended this work via adaptive ensemble learning, reporting a 19.6 percent average MAPE improvement over CarbonCast across 11 grids. CarbonFlex~\cite{hanafy2025carbonflex} demonstrates how such forecasts feed into cloud cluster scheduling, achieving substantial simulated carbon reductions. A recent field demonstration at a Phoenix data center~\cite{colangelo2025phoenix} validates the operational potential of grid-interactive AI workloads.
+
+A single gap unifies these efforts: \textbf{they all forecast production-based intensity}. CarbonCast explicitly states (Section 2.3) that imports and exports are ignored for simplicity. The operational carbon footprint of distributed workloads, however, depends on consumption-based intensity. Electricity Maps productionised 72-hour flow-traced (consumption-based) forecasts in January 2025~\cite{electricitymaps2025forecast}, deployed in operational systems including Google's Carbon-Intelligent Computing Platform, but the methodology is closed-source. The UCSC Open Source CarbonCast project~\cite{ucscospre2025} publicly acknowledges the consumption-based gap, but proposes a systems-engineering wrapping rather than a methodological extension.
+
+\section{Proposed Contribution}
+
+We propose four concrete contributions, each addressing a different angle of the gap.
+
+\subsection{Open Architecture}
+We will publish an installable open-source deep learning forecaster for consumption-based carbon intensity, with full reproducibility (code, data pipeline, trained models, evaluation protocol). Electricity Maps' operational model is closed; ours will be open and inspectable.
+
+\subsection{Feature Ablation on Interconnector Flows}
+We will test, empirically and at scale, whether explicit modeling of cross-border flows improves consumption-based CI forecasts beyond a univariate baseline that uses only historical CI, weather, and calendar features. The ablation directly answers whether the methodological extension we propose is worth its complexity.
+
+\subsection{Per-Region Heterogeneity Atlas}
+We will characterize how forecast difficulty varies with grid composition and import dependence across five regions of deliberately heterogeneous structure. Singapore (gas-dominated, minimal interconnection) is a near-closed control. Finland (nuclear plus hydro, embedded in the Nordic synchronous area) is a high-import test case. Belgium sits in the dense central European mesh. US-MIDA-PJM and US-NY-NYIS provide moderate-exposure cases.
+
+\subsection{Head-to-Head Benchmark Against Operational Electricity Maps Forecasts}
+We will benchmark our open model against Electricity Maps' operational consumption-based forecast over a two-week live window, with per-horizon, per-region, and per-failure-mode characterization. The contribution is not "we beat the operational system" (we may not, on average) but a defensible characterization of where each approach wins, where each loses, and where both fail together.
+
+\section{Data Sources}
+
+\paragraph{Carbon intensity and electricity mix.} Electricity Maps API under academic license. Endpoints \texttt{/v3/carbon-intensity/past}, \texttt{/v3/carbon-intensity/forecast}, \texttt{/v3/power-breakdown/past}, and \texttt{/v4/electricity-flows/past}. Historical coverage from 2021-01-01 onwards at hourly granularity. All five target zones (US-MIDA-PJM, US-NY-NYIS, FI, BE, SG) are Tier A coverage and expose consumption-based intensity, production-based intensity, source-level generation breakdown, and per-partner-zone import and export flows as first-class fields. Real data access has been verified end-to-end.
+
+\paragraph{Weather.} Open-Meteo, in a hybrid configuration: ERA5 reanalysis (the ECMWF gold standard) via Open-Meteo's archive endpoint for historical training data, and GFS via Open-Meteo's \texttt{/v1/gfs} endpoint for operational forecasts. Variables match CarbonCast: u and v wind at 10m, temperature at 2m, dewpoint at 2m, downward short-wave radiation flux at the surface, and total precipitation at the surface. One coordinate per zone, set to the centroid of the zone bounding box from \texttt{electricitymap-contrib}.
+
+\paragraph{Splits.} Chronological dual-test:
+\begin{itemize}
+    \item Train: 2021-01-01 to 2025-12-31 (5 years).
+    \item Validation: 2026-01-01 to 2026-04-30 (4 months).
+    \item Test A (chronological hold-out): 2026-05-01 to 2026-05-31 (1 month, general accuracy).
+    \item Test B (head-to-head with EM): 2026-06-08 to 2026-06-21 (2-week live window).
+\end{itemize}
+
+Per-region and per-source normalization using train-fold statistics only.
+
+\section{Model Architecture}
+
+We adopt a CarbonCast-extended modular two-phase architecture.
+
+\paragraph{Tier 1, per generation source.} A feedforward ANN with three dense layers (50, 34, 24 hidden units, ReLU). Input: 168 hours of historical production for that source, calendar features (hour-of-day sin and cos, day-of-week, hour-of-year sin and cos, weekend flag, holiday flag), and 96-hour weather forecasts for renewable sources (solar, wind, hydro). Output: 96-hour source production forecast in a single forward pass via a 96-unit dense head.
+
+\paragraph{Tier 1 extension, per interconnector.} A feedforward ANN of equivalent shape forecasting import or export flow per partner zone for the next 96 hours. Input: 168 hours of historical flow on the interconnector, calendar features, and weather forecasts at both endpoint zones.
+
+\paragraph{Tier 2.} A CNN-LSTM combining all Tier 1 outputs with historical consumption-based CI and weather forecasts to produce the final 96-hour consumption-based CI forecast. Architecture: two 1D CNN layers (4 and 16 filters of size 4, with max-pooling between), an LSTM with 24 units, dropout of 0.1, and a 96-unit dense output head. Input: Tier 1 source production forecasts, Tier 1 flow forecasts, 168 hours of historical consumption-based CI, 168 hours of historical generation mix, 168 hours of historical partner-zone consumption-based CI, 96-hour weather forecasts, and calendar features.
+
+Both tiers train separately on RMSE loss. Output is produced in a single forward pass per tier; we avoid the iterative 24h-by-4 scheme used in CarbonCast to eliminate iteration-induced error compounding.
+
+A CarbonCast-faithful variant (production-based, no flow extension) will be built alongside as a reference baseline and de-risks the timeline by providing a usable artifact early in the project.
+
+\section{Evaluation Framework}
+
+\paragraph{Training loss.} RMSE, matching CarbonCast for direct comparability.
+
+\paragraph{Primary reporting metric.} MAPE, matching CarbonCast and EnsembleCI. Secondary readouts: MAE in gCO2eq/kWh (physical-unit interpretability) and RMSE (outlier-sensitivity check). All three computed per (model, horizon, region) cell.
+
+\paragraph{Per-horizon reporting.} 1, 6, 12, 24, 48, 72, and 96 hours. The Electricity Maps operational benchmark is scoped to the 1-72h range (EM publishes up to 72h). The 96h slice is reported against classical baselines only and characterises the open methodology's behaviour at the extrapolation boundary.
+
+\paragraph{Failure-mode analysis.} A full breakdown across six axes: per-horizon, per-region, per-time-of-day, per-day-of-week, per-season, and per-renewable-regime. Pairwise model comparisons via the Diebold-Mariano test for statistical significance.
+
+\paragraph{Baselines.}
+\begin{itemize}
+    \item Classical: seasonal naive, ARIMA, Prophet.
+    \item Deep learning: CarbonCast-faithful (production-based reference baseline) on identical regions.
+    \item Operational: Electricity Maps' 72-hour consumption-based forecast, captured live during the Test B window.
+\end{itemize}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}
