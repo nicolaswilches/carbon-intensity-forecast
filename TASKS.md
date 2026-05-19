@@ -17,19 +17,22 @@ Phase 1 deadline: 2026-07-03. Full weekly timeline in `memory/project_thesis.md`
 
 ## Week 1 (May 11-17): foundation
 
-- [ ] Init `pyproject.toml` with uv (pandas, numpy, tensorflow, keras, plotly, pyarrow, requests, holidays, python-dotenv, scipy)
-- [ ] Scaffold `src/carbon_forecast/{data,models,evaluation,plotting,utils}/` with `__init__.py` stubs
-- [ ] Build `src/carbon_forecast/data/em_client.py` with retry, idempotency, sandbox-mode detection
-- [ ] Build `src/carbon_forecast/data/weather_client.py` for Open-Meteo (archive + `/v1/gfs`)
-- [ ] Build `src/carbon_forecast/data/storage.py` Parquet helpers
-- [ ] Build `scripts/extract_historical.py`: monthly `/past-range` chunks across all 5 zones, 3 endpoints
-- [ ] Run historical EM extraction for 2021-01-01 to 2025-12-31
-- [ ] Run ERA5 weather pull (Open-Meteo archive) for the same window, one coordinate per zone
-- [ ] Author notebook `S01_extraction_validation.ipynb`: shape checks, sandbox-disclaimer check, sample plots
-- [ ] Author notebook `S02_descriptive_analysis.ipynb`: regional patterns, distributions, seasonality
-- [ ] Install Zotero with Better BibTeX, configure export path for `references.bib`
-- [ ] Initialise GitHub Projects kanban (Backlog / In Progress / Review / Done) mirroring this file
-- [ ] Track Prof. Ghaddar's proposal comments and respond on the Overleaf project
+- [x] Init `pyproject.toml` with uv
+- [x] Scaffold `src/carbon_forecast/{data,models,evaluation,plotting,utils}/`
+- [x] `em_client.py` with retry, sandbox detection, tests
+- [x] `weather_client.py` (archive + GFS), tests
+- [x] `storage.py`: paths, flatten functions, atomic Parquet I/O, tests
+- [x] `zones.py` with locked 5-zone metadata (first-cut centroids; TODO verify against electricitymap-contrib in Week 2)
+- [x] `extract.py` + `scripts/extract_historical.py` with idempotent skip, continue-on-error, dry-run
+- [x] Path convention amended to monthly Parquet (memory: project_thesis.md)
+- [x] Multi-coordinate weather (PJM) added as stretch experiment (memory: project_thesis.md)
+- [ ] Run historical EM extraction 2021-01 to 2025-12 (user runs locally, several hours)
+- [ ] Run ERA5 weather pull (same window)
+- [ ] Author `notebooks/S01_extraction_validation.ipynb`
+- [ ] Author `notebooks/S02_descriptive_analysis.ipynb`
+- [ ] Install Zotero with Better BibTeX, configure export to `references.bib`
+- [ ] Init GitHub Projects kanban mirroring this file
+- [ ] Track Prof. Ghaddar's proposal comments on Overleaf
 
 ## Weeks 2 to 8
 
