@@ -1,4 +1,5 @@
-"""Storage layer: raw JSON to tidy DataFrame, atomic Parquet I/O.
+"""
+Storage layer: raw JSONs to DataFrame, atomic Parquet I/O.
 
 Path conventions (amended 2026-05-19, monthly buckets):
 - EM historical:        data/raw/em/{zone}/{endpoint}/{year}-{month:02d}.parquet
@@ -27,9 +28,13 @@ import pandas as pd
 # --- path helpers ------------------------------------------------------------
 
 
-def em_history_path(zone: str, endpoint: str, year: int, month: int, root: Path) -> Path:
+def em_history_path(
+    zone: str, endpoint: str, year: int, month: int, root: Path
+) -> Path:
     """Path for a monthly EM historical Parquet file."""
-    return Path(root) / "raw" / "em" / zone / endpoint / f"{year:04d}-{month:02d}.parquet"
+    return (
+        Path(root) / "raw" / "em" / zone / endpoint / f"{year:04d}-{month:02d}.parquet"
+    )
 
 
 def em_forecast_path(zone: str, snapshot: datetime, root: Path) -> Path:
@@ -54,44 +59,48 @@ def processed_path(zone: str, root: Path) -> Path:
 
 
 def flatten_em_carbon_intensity(payload: dict[str, Any]) -> pd.DataFrame:
-    """Carbon-intensity history -> single-column DataFrame.
+    """
+    Carbon-intensity history -> single-column DataFrame.
 
     EM payload shape:
-      {"zone": "BE", "history": [
-        {"datetime": "...Z", "carbonIntensity": 120, "estimationMethod": ..., ...},
+        {"zone": "BE",
+        "history": [{"datetime": "...Z", "carbonIntensity": 120, "estimationMethod": ..., ...},
         ...
       ]}
     Output columns: carbon_intensity_gco2eq_kwh (Float64).
     """
-    history = payload.get("history") or []
+    history = payload.get("history") or []  #
     if not history:
-        return _empty_frame(["carbon_intensity_gco2eq_kwh"])
+        return _empty_frame(
+            ["carbon_intensity_gco2eq_kwh"]
+        )  # returns empty df with shape
 
     rows = []
     for record in history:
-        rows.append(
+        rows.append(  # appends a dictionary with the datime and the ci record
             {
                 "datetime": record["datetime"],
                 "carbon_intensity_gco2eq_kwh": record.get("carbonIntensity"),
             }
         )
-    return _finalize(pd.DataFrame(rows))
+    return _finalize(pd.DataFrame(rows))  # converts the list 'rows' into a dataframe
 
 
 def flatten_em_power_breakdown(payload: dict[str, Any]) -> pd.DataFrame:
-    """Power-breakdown history -> wide DataFrame (production and consumption mix).
+    """
+    Power-breakdown history -> wide DataFrame (production and consumption mix).
 
     EM payload exposes two source-keyed nested dicts per timestamp:
-      powerProductionBreakdown   -> prod_<source>_mw
-      powerConsumptionBreakdown  -> cons_<source>_mw
+      - powerProductionBreakdown   -> prod_<source>_mw
+      - powerConsumptionBreakdown  -> cons_<source>_mw
     Plus two top-level scalars carried through for cross-check:
-      powerImportTotal           -> import_total_mw
-      powerExportTotal           -> export_total_mw
+      - powerImportTotal           -> import_total_mw
+      - powerExportTotal           -> export_total_mw
 
     Partner-aggregated powerImportBreakdown / powerExportBreakdown are
-    intentionally NOT flattened here. Per-partner flow data is the job of
-    `flatten_em_power_flows`, which is the authoritative source for the
-    flow signal (Contribution 2 of the thesis). Keeping import/export
+    intentionally NOT flattened here. Per-partner flow data is the job
+    of `flatten_em_power_flows`, which is the authoritative source for
+    the flow signal (Contribution 2 of the thesis). Keeping import/export
     breakdown columns out of this table prevents downstream ambiguity
     about which endpoint a column came from.
     """
@@ -113,7 +122,8 @@ def flatten_em_power_breakdown(payload: dict[str, Any]) -> pd.DataFrame:
 
 
 def flatten_em_power_flows(payload: dict[str, Any]) -> pd.DataFrame:
-    """Power-flows history -> wide DataFrame with import_/export_ columns.
+    """
+    Power-flows history -> wide DataFrame with import_/export_ columns.
 
     EM payload shape (per locked decisions; exact field names verified
     on first real pull, fallback to a generic walk if EM renames):
@@ -184,7 +194,11 @@ def read_parquet(path: Path) -> pd.DataFrame:
         df["datetime"] = pd.to_datetime(df["datetime"], utc=True)
         df = df.set_index("datetime").sort_index()
     elif isinstance(df.index, pd.DatetimeIndex):
-        df.index = df.index.tz_convert("UTC") if df.index.tz is not None else df.index.tz_localize("UTC")
+        df.index = (
+            df.index.tz_convert("UTC")
+            if df.index.tz is not None
+            else df.index.tz_localize("UTC")
+        )
     return df
 
 
@@ -205,7 +219,7 @@ def list_months_present(zone: str, endpoint: str, root: Path) -> set[tuple[int, 
     return out
 
 
-# --- private helpers ---------------------------------------------------------
+# --- private helper functions
 
 
 def _add_nested(

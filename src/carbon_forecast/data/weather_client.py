@@ -60,6 +60,7 @@ class WeatherClient:
         self.timeout = timeout
         self.max_retries = max_retries
         self.backoff_base = backoff_base
+
         self._session = session if session is not None else requests.Session()
 
     # --- public endpoints ----------------------------------------------------
