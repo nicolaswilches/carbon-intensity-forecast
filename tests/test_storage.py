@@ -16,7 +16,7 @@ from carbon_forecast.data.storage import (
     em_history_path,
     flatten_em_carbon_intensity,
     flatten_em_power_breakdown,
-    flatten_em_power_flows,
+    flatten_em_electricity_flows,
     flatten_weather_hourly,
     list_months_present,
     processed_path,
@@ -118,7 +118,7 @@ def test_flatten_power_breakdown():
     assert row["cons_gas_mw"] == 80
     assert row["import_total_mw"] == 35
     assert row["export_total_mw"] == 5
-    # Partner-aggregated breakdown columns must NOT appear; that's power-flows territory.
+    # Partner-aggregated breakdown columns must NOT appear; that's electricity-flows territory.
     assert not any(c.startswith("import_") and c != "import_total_mw" for c in df.columns)
     assert not any(c.startswith("export_") and c != "export_total_mw" for c in df.columns)
 
@@ -130,25 +130,28 @@ def test_flatten_power_breakdown_empty():
 # --- flatten: power flows ----------------------------------------------------
 
 
-def test_flatten_power_flows():
+def test_flatten_electricity_flows():
+    # Real EM shape (verified 2026-05-19): nested 'import'/'export' dicts.
     payload = {
-        "history": [
+        "data": [
             {
                 "datetime": "2024-01-01T00:00:00Z",
-                "powerImports": {"FR": 25, "DE": 10},
-                "powerExports": {"NL": 5},
+                "import": {"DE": 469, "LU": 20},
+                "export": {"FR": 893, "GB": 923, "NL": 902},
             }
         ]
     }
-    df = flatten_em_power_flows(payload)
+    df = flatten_em_electricity_flows(payload)
     row = df.iloc[0]
-    assert row["import_fr_mw"] == 25
-    assert row["import_de_mw"] == 10
-    assert row["export_nl_mw"] == 5
+    assert row["import_de_mw"] == 469
+    assert row["import_lu_mw"] == 20
+    assert row["export_fr_mw"] == 893
+    assert row["export_gb_mw"] == 923
+    assert row["export_nl_mw"] == 902
 
 
-def test_flatten_power_flows_empty():
-    assert flatten_em_power_flows({"history": []}).empty
+def test_flatten_electricity_flows_empty():
+    assert flatten_em_electricity_flows({"data": []}).empty
 
 
 # --- flatten: weather --------------------------------------------------------

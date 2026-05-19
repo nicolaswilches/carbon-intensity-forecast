@@ -17,6 +17,7 @@ from carbon_forecast.data.extract import (
     extract_em_history,
     extract_weather_history,
     iter_months,
+    iter_sub_windows,
     month_window,
 )
 from carbon_forecast.data.weather_client import WeatherAPIError
@@ -82,17 +83,54 @@ def test_month_window_december_rollover():
     assert e == datetime(2025, 1, 1, tzinfo=timezone.utc)
 
 
+# --- iter_sub_windows -------------------------------------------------------
+
+
+def test_iter_sub_windows_january_2024_yields_four():
+    start = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2024, 2, 1, tzinfo=timezone.utc)
+    subs = list(iter_sub_windows(start, end, max_days=10))
+    assert subs == [
+        (start, datetime(2024, 1, 11, tzinfo=timezone.utc)),
+        (datetime(2024, 1, 11, tzinfo=timezone.utc), datetime(2024, 1, 21, tzinfo=timezone.utc)),
+        (datetime(2024, 1, 21, tzinfo=timezone.utc), datetime(2024, 1, 31, tzinfo=timezone.utc)),
+        (datetime(2024, 1, 31, tzinfo=timezone.utc), end),
+    ]
+    # All sub-windows respect the 10-day cap.
+    assert all((e - s).days <= 10 for s, e in subs)
+
+
+def test_iter_sub_windows_short_interval_one_chunk():
+    start = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2024, 1, 6, tzinfo=timezone.utc)
+    assert list(iter_sub_windows(start, end, max_days=10)) == [(start, end)]
+
+
+def test_iter_sub_windows_exact_max_days_one_chunk():
+    start = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    end = datetime(2024, 1, 11, tzinfo=timezone.utc)  # exactly 10 days
+    assert list(iter_sub_windows(start, end, max_days=10)) == [(start, end)]
+
+
+def test_iter_sub_windows_empty_interval():
+    t = datetime(2024, 1, 1, tzinfo=timezone.utc)
+    assert list(iter_sub_windows(t, t)) == []
+
+
 # --- extract_em_history ------------------------------------------------------
 
 
 def test_em_extract_writes_and_skips(tmp_path: Path, be: Zone):
+    # Each sub-window returns one canned record so we can verify concatenation.
     client = MagicMock()
-    client.get_carbon_intensity_past_range.side_effect = [
-        _ci_payload(["2024-01-01T00:00:00Z", "2024-01-01T01:00:00Z"]),
-        _ci_payload(["2024-02-01T00:00:00Z"]),
-    ]
+    counter = {"i": 0}
 
-    progress: list[str] = []
+    def fake_pull(zone, sub_start, sub_end):
+        counter["i"] += 1
+        return _ci_payload([sub_start.strftime("%Y-%m-%dT%H:%M:%SZ")])
+
+    client.get_carbon_intensity_past_range.side_effect = fake_pull
+
     r1 = extract_em_history(
         client,
         zones=[be],
@@ -100,18 +138,19 @@ def test_em_extract_writes_and_skips(tmp_path: Path, be: Zone):
         start=date(2024, 1, 1),
         end=date(2024, 2, 1),
         data_root=tmp_path,
-        on_progress=progress.append,
     )
     assert r1.months_pulled == 2
     assert r1.months_skipped == 0
-    assert r1.records_written == 3
     assert r1.months_failed == []
+    # January = 4 sub-windows, February (29 days, 2024 leap) = 3 sub-windows.
+    assert client.get_carbon_intensity_past_range.call_count == 7
+    # Total rows = 4 + 3 = 7 (one canned record per sub-window).
+    assert r1.records_written == 7
     assert (tmp_path / "raw/em/BE/carbon-intensity/past-range/2024-01.parquet").exists()
     assert (tmp_path / "raw/em/BE/carbon-intensity/past-range/2024-02.parquet").exists()
 
     # Re-run with same args: no API calls, both months skipped.
     client.get_carbon_intensity_past_range.reset_mock(return_value=False, side_effect=False)
-    client.get_carbon_intensity_past_range.return_value = _ci_payload([])
     r2 = extract_em_history(
         client,
         zones=[be],
@@ -126,12 +165,15 @@ def test_em_extract_writes_and_skips(tmp_path: Path, be: Zone):
 
 
 def test_em_extract_continues_on_failure(tmp_path: Path, be: Zone):
+    # Fail any sub-window whose start is in February; succeed otherwise.
     client = MagicMock()
-    client.get_carbon_intensity_past_range.side_effect = [
-        _ci_payload(["2024-01-01T00:00:00Z"]),
-        EMAPIError("500 boom"),
-        _ci_payload(["2024-03-01T00:00:00Z"]),
-    ]
+
+    def fake_pull(zone, sub_start, sub_end):
+        if sub_start.month == 2:
+            raise EMAPIError("500 boom")
+        return _ci_payload([sub_start.strftime("%Y-%m-%dT%H:%M:%SZ")])
+
+    client.get_carbon_intensity_past_range.side_effect = fake_pull
 
     report = extract_em_history(
         client,
@@ -141,7 +183,7 @@ def test_em_extract_continues_on_failure(tmp_path: Path, be: Zone):
         end=date(2024, 3, 1),
         data_root=tmp_path,
     )
-    assert report.months_pulled == 2
+    assert report.months_pulled == 2  # Jan and Mar succeed; Feb fails on first sub-window.
     assert len(report.months_failed) == 1
     failed = report.months_failed[0]
     assert failed[:4] == ("BE", "carbon-intensity/past-range", 2024, 2)
@@ -201,7 +243,8 @@ def test_em_extract_unknown_endpoint_raises(tmp_path: Path, be: Zone):
         )
 
 
-def test_em_extract_window_passed_to_client(tmp_path: Path, be: Zone):
+def test_em_extract_subwindows_cover_month(tmp_path: Path, be: Zone):
+    """Verify the month is pulled as multiple <=10-day sub-windows."""
     client = MagicMock()
     client.get_carbon_intensity_past_range.return_value = _ci_payload(
         ["2024-01-01T00:00:00Z"]
@@ -215,10 +258,15 @@ def test_em_extract_window_passed_to_client(tmp_path: Path, be: Zone):
         end=date(2024, 1, 1),
         data_root=tmp_path,
     )
-    args, _ = client.get_carbon_intensity_past_range.call_args
-    assert args[0] == "BE"
-    assert args[1] == datetime(2024, 1, 1, tzinfo=timezone.utc)
-    assert args[2] == datetime(2024, 2, 1, tzinfo=timezone.utc)
+    # January 2024 -> 4 sub-windows.
+    assert client.get_carbon_intensity_past_range.call_count == 4
+    calls = [c.args for c in client.get_carbon_intensity_past_range.call_args_list]
+    # First sub-window starts at month start; last sub-window ends at month end.
+    assert calls[0][1] == datetime(2024, 1, 1, tzinfo=timezone.utc)
+    assert calls[-1][2] == datetime(2024, 2, 1, tzinfo=timezone.utc)
+    # No sub-window exceeds 10 days.
+    for args in calls:
+        assert (args[2] - args[1]).days <= 10
 
 
 # --- extract_weather_history -------------------------------------------------

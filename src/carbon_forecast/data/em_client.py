@@ -25,7 +25,7 @@ SANDBOX_ESTIMATION_METHOD = "SANDBOX_MODE_DATA"
 
 ENDPOINT_CARBON_INTENSITY_PAST_RANGE = "carbon-intensity/past-range"
 ENDPOINT_POWER_BREAKDOWN_PAST_RANGE = "power-breakdown/past-range"
-ENDPOINT_POWER_FLOWS_PAST_RANGE = "power-flows/past-range"
+ENDPOINT_ELECTRICITY_FLOWS_PAST_RANGE = "electricity-flows/past-range"
 
 
 # Exception class for scenarios with non-retryable API failures
@@ -81,10 +81,10 @@ class EMClient:
     ) -> dict[str, Any]:
         return self._past_range(ENDPOINT_POWER_BREAKDOWN_PAST_RANGE, zone, start, end)
 
-    def get_power_flows_past_range( # power flows
+    def get_electricity_flows_past_range( # electricity flows
         self, zone: str, start: datetime, end: datetime
     ) -> dict[str, Any]:
-        return self._past_range(ENDPOINT_POWER_FLOWS_PAST_RANGE, zone, start, end)
+        return self._past_range(ENDPOINT_ELECTRICITY_FLOWS_PAST_RANGE, zone, start, end)
 
     # internal methods
 

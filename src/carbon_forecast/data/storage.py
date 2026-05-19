@@ -69,7 +69,7 @@ def flatten_em_carbon_intensity(payload: dict[str, Any]) -> pd.DataFrame:
       ]}
     Output columns: carbon_intensity_gco2eq_kwh (Float64).
     """
-    history = payload.get("history") or []  #
+    history = payload.get("data") or payload.get("history") or []  #
     if not history:
         return _empty_frame(
             ["carbon_intensity_gco2eq_kwh"]
@@ -99,12 +99,12 @@ def flatten_em_power_breakdown(payload: dict[str, Any]) -> pd.DataFrame:
 
     Partner-aggregated powerImportBreakdown / powerExportBreakdown are
     intentionally NOT flattened here. Per-partner flow data is the job
-    of `flatten_em_power_flows`, which is the authoritative source for
+    of `flatten_em_electricity_flows`, which is the authoritative source for
     the flow signal (Contribution 2 of the thesis). Keeping import/export
     breakdown columns out of this table prevents downstream ambiguity
     about which endpoint a column came from.
     """
-    history = payload.get("history") or []
+    history = payload.get("data") or payload.get("history") or []
     if not history:
         return _empty_frame([])
 
@@ -121,26 +121,26 @@ def flatten_em_power_breakdown(payload: dict[str, Any]) -> pd.DataFrame:
     return _finalize(pd.DataFrame(rows))
 
 
-def flatten_em_power_flows(payload: dict[str, Any]) -> pd.DataFrame:
+def flatten_em_electricity_flows(payload: dict[str, Any]) -> pd.DataFrame:
     """
-    Power-flows history -> wide DataFrame with import_/export_ columns.
+    Electricity-flows history -> wide DataFrame with import_/export_ columns.
 
-    EM payload shape (per locked decisions; exact field names verified
-    on first real pull, fallback to a generic walk if EM renames):
-      history items expose flat numeric fields keyed by partner zone, or
-      nested powerImports/powerExports dicts. Both shapes handled.
+    EM real shape (verified on first pull, 2026-05-19):
+      records expose nested dicts under 'import' and 'export', each mapping
+      partner zone -> MW. Partner keys are snake-cased on output
+      (US-MIDA-PJM -> us_mida_pjm).
     """
-    history = payload.get("history") or []
+    history = payload.get("data") or payload.get("history") or []
     if not history:
         return _empty_frame([])
 
     rows = []
     for record in history:
         row: dict[str, Any] = {"datetime": record["datetime"]}
-        if isinstance(record.get("powerImports"), dict):
-            _add_nested(row, record["powerImports"], prefix="import")
-        if isinstance(record.get("powerExports"), dict):
-            _add_nested(row, record["powerExports"], prefix="export")
+        if isinstance(record.get("import"), dict):
+            _add_nested(row, record["import"], prefix="import")
+        if isinstance(record.get("export"), dict):
+            _add_nested(row, record["export"], prefix="export")
         rows.append(row)
     return _finalize(pd.DataFrame(rows))
 

@@ -116,13 +116,13 @@ def test_each_endpoint_hits_correct_path():
 
     client.get_carbon_intensity_past_range("BE", start, end)
     client.get_power_breakdown_past_range("BE", start, end)
-    client.get_power_flows_past_range("BE", start, end)
+    client.get_electricity_flows_past_range("BE", start, end)
 
     called_urls = [call.args[0] for call in session.get.call_args_list]
     assert called_urls == [
         f"{DEFAULT_BASE_URL}/carbon-intensity/past-range",
         f"{DEFAULT_BASE_URL}/power-breakdown/past-range",
-        f"{DEFAULT_BASE_URL}/power-flows/past-range",
+        f"{DEFAULT_BASE_URL}/electricity-flows/past-range",
     ]
 
 

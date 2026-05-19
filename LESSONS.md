@@ -6,3 +6,5 @@
 - For free Overleaf, git, GitHub, and Dropbox sync are Premium-only. Use Y1: drag-drop with local repo as source of truth.
 - "Ablation" (a methodology: run with and without a component) and "stretch experiment" (a scope decision: run only if time allows) are orthogonal. Specify both axes when describing an experiment.
 - The `/grill-me` skill produces a robust decision log when paired with memory writes after each lock-in. Do not skip the memory writes; the conversation context is lost across sessions, the memory is not.
+- EM `/past-range` caps hourly windows at 10 days. Monthly chunks must be split into ≤10-day sub-windows and concatenated before write.
+- EM returns records under `data` (not `history`). Flow endpoint is `electricity-flows`, not `power-flows`. Flow records nest under `import`/`export` (lowercase, no `power` prefix). Verify response shape on first real pull before writing flatten logic.
