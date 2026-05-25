@@ -55,19 +55,37 @@ REGIONAL_PALETTE: dict[str, str] = {
 }
 
 
+# Canonical display order for energy sources. Baseload at the bottom of a
+# stacked area; continuous color progression cool -> warm. Diverges from
+# CarbonCast for legibility; see project_thesis.md amendment 2026-05-25.
+ENERGY_SOURCE_ORDER: tuple[str, ...] = (
+    "nuclear",
+    "battery_discharge",
+    "hydro",
+    "hydro_discharge",
+    "wind",
+    "biomass",
+    "solar",
+    "geothermal",
+    "gas",
+    "coal",
+    "oil",
+    "unknown",
+)
+
 ENERGY_PALETTE: dict[str, str] = {
-    "gas":               "#F0A000",
-    "coal":              "#404040",
-    "oil":               "#8B3A1E",
-    "nuclear":           "#A52A2A",
-    "wind":              "#3B7DD8",
-    "solar":             "#F4D03F",
-    "hydro":             "#2E8B8B",
-    "biomass":           "#3CB371",
-    "unknown":           "#B0B0B0",
-    "geothermal":        "#7E5C00",
-    "hydro_discharge":   "#5FAFAF",
-    "battery_discharge": "#9966CC",
+    "nuclear":           "#583169",
+    "battery_discharge": "#4A438E",
+    "hydro":             "#313D7D",
+    "hydro_discharge":   "#3B6A96",
+    "wind":              "#3BA2FF",
+    "biomass":           "#9EB52A",
+    "solar":             "#FFB300",
+    "geothermal":        "#FF6A00",
+    "gas":               "#8F594F",
+    "coal":              "#3B2626",
+    "oil":               "#241D1D",
+    "unknown":           "#A69C9C",
 }
 
 

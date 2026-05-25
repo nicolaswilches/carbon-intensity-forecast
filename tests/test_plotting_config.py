@@ -7,6 +7,7 @@ import plotly.io as pio
 
 from carbon_forecast.plotting.config import (
     ENERGY_PALETTE,
+    ENERGY_SOURCE_ORDER,
     FONT_FAMILY,
     GRID_COLOR,
     MODEL_PALETTE,
@@ -25,6 +26,22 @@ def test_regional_palette_has_five_zones():
 def test_energy_palette_has_carboncast_sources():
     must_include = {"gas", "coal", "oil", "nuclear", "wind", "solar", "hydro", "biomass"}
     assert must_include.issubset(set(ENERGY_PALETTE))
+
+
+def test_energy_source_order_matches_palette_keys():
+    # ENERGY_SOURCE_ORDER is the canonical display order; every entry must have a color
+    # in ENERGY_PALETTE, and vice versa.
+    assert set(ENERGY_SOURCE_ORDER) == set(ENERGY_PALETTE)
+
+
+def test_energy_source_order_starts_with_nuclear_baseload():
+    # User-chosen convention: nuclear sits at the bottom of stacked-area charts.
+    assert ENERGY_SOURCE_ORDER[0] == "nuclear"
+
+
+def test_energy_source_order_ends_with_unknown():
+    # Unclassified energy sits at the very top of stacks.
+    assert ENERGY_SOURCE_ORDER[-1] == "unknown"
 
 
 def test_model_palette_has_three_models():
