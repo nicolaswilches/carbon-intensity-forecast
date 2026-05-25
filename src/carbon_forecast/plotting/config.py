@@ -61,8 +61,8 @@ REGIONAL_PALETTE: dict[str, str] = {
 ENERGY_SOURCE_ORDER: tuple[str, ...] = (
     "nuclear",
     "battery_discharge",
-    "hydro",
     "hydro_discharge",
+    "hydro",
     "wind",
     "biomass",
     "solar",
@@ -74,18 +74,18 @@ ENERGY_SOURCE_ORDER: tuple[str, ...] = (
 )
 
 ENERGY_PALETTE: dict[str, str] = {
-    "nuclear":           "#583169",
-    "battery_discharge": "#4A438E",
-    "hydro":             "#313D7D",
-    "hydro_discharge":   "#3B6A96",
-    "wind":              "#3BA2FF",
-    "biomass":           "#9EB52A",
-    "solar":             "#FFB300",
-    "geothermal":        "#FF6A00",
-    "gas":               "#8F594F",
-    "coal":              "#3B2626",
-    "oil":               "#241D1D",
-    "unknown":           "#A69C9C",
+    "nuclear": "#493C6B",
+    "battery_discharge": "#655391",
+    "hydro": "#3E54B3",
+    "hydro_discharge": "#59679E",
+    "wind": "#60B2F0",
+    "biomass": "#C4D61E",
+    "solar": "#FFB300",
+    "geothermal": "#FF6A00",
+    "gas": "#FC7D6A",
+    "coal": "#785044",
+    "oil": "#2E201D",
+    "unknown": "#A69C9C",
 }
 
 
@@ -101,6 +101,56 @@ def apply_defaults() -> None:
     pio.templates.default = "plotly_white"
 
 
+def _title_case_word(w: str) -> str:
+    """Title-case one whitespace-delimited token, preserving acronyms and units.
+
+    Rules:
+    - A token whose alphabetic content has any uppercase letter beyond the
+      first is treated as an acronym or unit (UTC, MW, TWh, gCO2eq) and
+      returned unchanged.
+    - Otherwise, every first letter of an alphabetic run is uppercased
+      (so hyphens and parentheses act as word breaks), the rest lowercased.
+    """
+    if not w:
+        return w
+    alpha_only = "".join(c for c in w if c.isalpha())
+    if alpha_only and any(c.isupper() for c in alpha_only[1:]):
+        return w
+    out = []
+    capitalize_next = True
+    for c in w:
+        if c.isalpha():
+            out.append(c.upper() if capitalize_next else c.lower())
+            capitalize_next = False
+        else:
+            out.append(c)
+            capitalize_next = True
+    return "".join(out)
+
+
+def title_case(s: str) -> str:
+    """Title-case a free string while preserving acronyms and unit symbols.
+
+    Splits on whitespace and applies `_title_case_word` to each token.
+    Underscores are not touched here; callers wanting `snake_case ->
+    Title Case` should `.replace("_", " ")` first.
+    """
+    return " ".join(_title_case_word(w) for w in s.split())
+
+
+def _retitle_layout_labels(fig: go.Figure) -> None:
+    """Re-write every axis title and trace name to Title Case in place."""
+    for key in list(fig.layout):
+        if key.startswith(("xaxis", "yaxis")):
+            ax = fig.layout[key]
+            if ax.title is not None and ax.title.text:
+                ax.title.text = title_case(ax.title.text)
+    for trace in fig.data:
+        name = getattr(trace, "name", None)
+        if isinstance(name, str) and name:
+            trace.name = title_case(name.replace("_", " "))
+
+
 def style_fig(fig: go.Figure, title: str) -> go.Figure:
     """Apply the locked layout to a figure. Returns the figure for chaining.
 
@@ -109,7 +159,7 @@ def style_fig(fig: go.Figure, title: str) -> go.Figure:
     """
     fig.update_layout(
         title=dict(
-            text=f"<b>{title}</b>",
+            text=f"<b>{title_case(title)}</b>",
             font=dict(family=FONT_FAMILY, size=18),
             x=PLOT_AREA_LEFT_PAPER,
             xanchor="left",
@@ -139,4 +189,5 @@ def style_fig(fig: go.Figure, title: str) -> go.Figure:
         ),
         margin=dict(t=MARGIN_T, r=MARGIN_R, b=MARGIN_B, l=MARGIN_L),
     )
+    _retitle_layout_labels(fig)
     return fig

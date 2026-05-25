@@ -16,6 +16,7 @@ from carbon_forecast.plotting.config import (
     REGIONAL_PALETTE,
     apply_defaults,
     style_fig,
+    title_case,
 )
 
 
@@ -44,6 +45,59 @@ def test_energy_source_order_ends_with_unknown():
     assert ENERGY_SOURCE_ORDER[-1] == "unknown"
 
 
+def test_hydro_discharge_listed_before_hydro():
+    # User convention: discharge sits below hydro proper in the stack.
+    idx_disc = ENERGY_SOURCE_ORDER.index("hydro_discharge")
+    idx_hydro = ENERGY_SOURCE_ORDER.index("hydro")
+    assert idx_disc < idx_hydro
+
+
+# --- title_case helper ------------------------------------------------------
+
+
+def test_title_case_simple_lowercase():
+    assert title_case("hydro discharge") == "Hydro Discharge"
+
+
+def test_title_case_preserves_acronyms_and_units():
+    assert title_case("Hour (UTC)") == "Hour (UTC)"
+    assert title_case("Mean MW") == "Mean MW"
+    assert title_case("Annual TWh") == "Annual TWh"
+    assert title_case("gCO2eq/kWh stays mixed") == "gCO2eq/kWh Stays Mixed"
+
+
+def test_title_case_handles_hyphenated_words():
+    assert title_case("cross-border flows") == "Cross-Border Flows"
+
+
+def test_title_case_handles_parenthesised_lowercase():
+    assert title_case("production (hourly, mw)") == "Production (Hourly, Mw)"
+
+
+def test_title_case_leaves_numbers_alone():
+    assert title_case("January 2024 summary") == "January 2024 Summary"
+
+
+# --- style_fig auto-title-cases ---------------------------------------------
+
+
+def test_style_fig_title_cased_automatically():
+    fig = go.Figure()
+    style_fig(fig, "annual gross flows per zone")
+    assert fig.layout.title.text == "<b>Annual Gross Flows Per Zone</b>"
+
+
+def test_style_fig_retitles_axis_labels_and_trace_names():
+    fig = go.Figure()
+    fig.update_xaxes(title_text="hour of day (utc)")
+    fig.update_yaxes(title_text="mean carbon intensity")
+    fig.add_trace(go.Scatter(x=[1, 2], y=[3, 4], name="hydro_discharge"))
+    style_fig(fig, "x")
+    assert fig.layout.xaxis.title.text == "Hour Of Day (Utc)"
+    assert fig.layout.yaxis.title.text == "Mean Carbon Intensity"
+    assert fig.data[0].name == "Hydro Discharge"
+
+
 def test_model_palette_has_three_models():
     assert set(MODEL_PALETTE) == {"open", "em_operational", "carboncast_faithful"}
 
@@ -57,7 +111,8 @@ def test_apply_defaults_sets_plotly_white():
 def test_style_fig_wraps_title_in_bold():
     fig = go.Figure()
     style_fig(fig, "My title")
-    assert fig.layout.title.text == "<b>My title</b>"
+    # Title is also Title-Cased automatically.
+    assert fig.layout.title.text == "<b>My Title</b>"
 
 
 def test_style_fig_applies_locked_font_and_dimensions():
