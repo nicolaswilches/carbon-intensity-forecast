@@ -27,6 +27,7 @@ dev = [
     "jupyter>=1.0",
     "ipykernel>=6.29",
     "nbformat>=5.10",
+    "nbstripout>=0.9.1",
 ]
 
 [build-system]
@@ -39,3 +40,4 @@ packages = ["src/carbon_forecast"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra --strict-markers"
+

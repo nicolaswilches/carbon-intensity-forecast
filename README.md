@@ -10,6 +10,10 @@ Phase 1 capstone, MSc Data Science and Business Analytics, IE University. Adviso
 uv sync --extra dev
 cp .env.example .env  # then fill in EM_API_KEY
 set -a && source .env && set +a
+
+# Strip notebook outputs at commit time. Keeps .ipynb files tiny in git
+# history while leaving your local working copy untouched. Run once per clone.
+uv run nbstripout --install --attributes .gitattributes
 ```
 
 ## Layout
