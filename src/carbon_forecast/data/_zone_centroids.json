@@ -1,0 +1,26 @@
+{
+  "centroids": {
+    "BE": {
+      "latitude": 50.4959,
+      "longitude": 4.4478
+    },
+    "FI": {
+      "latitude": 64.9406,
+      "longitude": 26.0599
+    },
+    "SG": {
+      "latitude": 1.3472,
+      "longitude": 103.8034
+    },
+    "US-MIDA-PJM": {
+      "latitude": 38.9085,
+      "longitude": -82.1222
+    },
+    "US-NY-NYIS": {
+      "latitude": 42.8003,
+      "longitude": -75.9254
+    }
+  },
+  "method": "axis-aligned bounding-box centroid of upstream zone polygon",
+  "source": "https://raw.githubusercontent.com/electricitymaps/electricitymap-contrib/master/geo/world.geojson"
+}

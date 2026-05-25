@@ -1,8 +1,9 @@
 """Zone metadata: Electricity Maps keys and single representative coordinates.
 
-Locked decision: one coordinate per zone, picked as the centroid of the EM
-zone bounding box (electricitymap-contrib). Coordinates below are first-cut
-estimates; verify against the canonical bounding boxes before Week 2.
+Locked decision: one coordinate per zone, picked as the axis-aligned
+bounding-box centroid of the upstream EM zone polygon (from
+electricitymap-contrib's `geo/world.geojson`). Coordinates live in
+`_zone_centroids.json`, refreshed by `scripts/refresh_zone_centroids.py`.
 
 The single-centroid choice is deliberate (CarbonCast/EnsembleCI lineage).
 Accuracy is expected to degrade with zone size and weather heterogeneity;
@@ -11,7 +12,12 @@ multi-coordinate aggregation on US-MIDA-PJM is a named stretch experiment.
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from pathlib import Path
+
+
+_CENTROIDS_CACHE = Path(__file__).resolve().parent / "_zone_centroids.json"
 
 
 @dataclass(frozen=True)
@@ -22,16 +28,35 @@ class Zone:
     display_name: str
 
 
-# TODO(week-2): verify each (latitude, longitude) against electricitymap-contrib
-# bounding-box centroids. https://github.com/electricitymaps/electricitymap-contrib
-ZONES: tuple[Zone, ...] = (
-    Zone("BE", 50.5, 4.5, "Belgium"),
-    Zone("FI", 64.0, 26.0, "Finland"),
-    Zone("SG", 1.35, 103.85, "Singapore"),
-    Zone("US-MIDA-PJM", 40.0, -77.0, "PJM Interconnection"),
-    Zone("US-NY-NYIS", 43.0, -75.0, "New York ISO"),
-)
+_ZONE_DISPLAY_NAMES: dict[str, str] = {
+    "BE":          "Belgium",
+    "FI":          "Finland",
+    "SG":          "Singapore",
+    "US-MIDA-PJM": "PJM Interconnection",
+    "US-NY-NYIS":  "New York ISO",
+}
 
+
+def _load_zones() -> tuple[Zone, ...]:
+    if not _CENTROIDS_CACHE.exists():
+        raise RuntimeError(
+            f"missing centroid cache at {_CENTROIDS_CACHE}. "
+            "Run `uv run python scripts/refresh_zone_centroids.py` to regenerate."
+        )
+    payload = json.loads(_CENTROIDS_CACHE.read_text(encoding="utf-8"))
+    centroids = payload["centroids"]
+    out = []
+    for key, display in _ZONE_DISPLAY_NAMES.items():
+        if key not in centroids:
+            raise RuntimeError(
+                f"zone {key!r} missing from centroid cache; refresh the cache."
+            )
+        c = centroids[key]
+        out.append(Zone(em_key=key, latitude=c["latitude"], longitude=c["longitude"], display_name=display))
+    return tuple(out)
+
+
+ZONES: tuple[Zone, ...] = _load_zones()
 _ZONES_BY_KEY: dict[str, Zone] = {z.em_key: z for z in ZONES}
 
 
