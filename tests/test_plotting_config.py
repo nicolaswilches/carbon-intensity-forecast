@@ -123,6 +123,20 @@ def test_style_fig_applies_locked_font_and_dimensions():
     assert fig.layout.height == PLOT_H
 
 
+def test_style_fig_respects_custom_width_and_height():
+    from carbon_forecast.plotting.config import MARGIN_L
+
+    fig = go.Figure()
+    style_fig(fig, "x", width=1800, height=600)
+    assert fig.layout.width == 1800
+    assert fig.layout.height == 600
+    # Critical: title.x and legend.x derive from the *actual* width so the
+    # left edges of title, legend, and plot area stay aligned at any size.
+    expected_left = MARGIN_L / 1800
+    assert fig.layout.title.x == expected_left
+    assert fig.layout.legend.x == expected_left
+
+
 def test_style_fig_uses_grid_color_on_y_axis():
     fig = go.Figure()
     style_fig(fig, "x")

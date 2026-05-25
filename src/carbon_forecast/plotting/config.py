@@ -151,24 +151,34 @@ def _retitle_layout_labels(fig: go.Figure) -> None:
             trace.name = title_case(name.replace("_", " "))
 
 
-def style_fig(fig: go.Figure, title: str) -> go.Figure:
+def style_fig(
+    fig: go.Figure,
+    title: str,
+    *,
+    width: int = PLOT_W,
+    height: int = PLOT_H,
+) -> go.Figure:
     """Apply the locked layout to a figure. Returns the figure for chaining.
 
-    Title is rendered bold via HTML; do not pre-wrap in `<b>...</b>` —
-    this helper does it.
+    Title is rendered bold via HTML; do not pre-wrap in `<b>...</b>`.
+    `width` and `height` are keyword-only. Pass them here rather than
+    via `fig.update_layout(...)` after style_fig: the left-edge of the
+    title and legend is computed as `MARGIN_L / width`, so a later width
+    override would break alignment between title, legend, and plot area.
     """
+    left_paper = MARGIN_L / width
     fig.update_layout(
         title=dict(
             text=f"<b>{title_case(title)}</b>",
             font=dict(family=FONT_FAMILY, size=18),
-            x=PLOT_AREA_LEFT_PAPER,
+            x=left_paper,
             xanchor="left",
             y=0.92,
             yanchor="top",
         ),
         font=dict(family=FONT_FAMILY, size=12),
-        width=PLOT_W,
-        height=PLOT_H,
+        width=width,
+        height=height,
         xaxis=dict(
             title=dict(font=dict(size=14)),
             tickfont=dict(size=12),
@@ -184,7 +194,7 @@ def style_fig(fig: go.Figure, title: str) -> go.Figure:
             yanchor="bottom",
             y=1.05,
             xanchor="left",
-            x=PLOT_AREA_LEFT_PAPER,
+            x=left_paper,
             font=dict(size=12),
         ),
         margin=dict(t=MARGIN_T, r=MARGIN_R, b=MARGIN_B, l=MARGIN_L),
