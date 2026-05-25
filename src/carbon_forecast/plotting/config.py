@@ -33,6 +33,18 @@ PLOT_H: int = 500
 GRID_COLOR: str = "rgba(0,0,0,0.1)"
 FONT_FAMILY: str = "Arial"
 
+# Layout margins, used to compute the paper-coord left edge that title and
+# legend share with the plot area. Single source of truth: change here and
+# everything else stays aligned.
+MARGIN_L: int = 70
+MARGIN_R: int = 40
+MARGIN_T: int = 130
+MARGIN_B: int = 60
+
+# Paper-coord x of the plot area's left edge. Title.x and legend.x use it
+# so all three (title, legend, axes) share a left edge.
+PLOT_AREA_LEFT_PAPER: float = MARGIN_L / PLOT_W
+
 
 REGIONAL_PALETTE: dict[str, str] = {
     "BE":          "#0072B2",  # blue
@@ -81,6 +93,10 @@ def style_fig(fig: go.Figure, title: str) -> go.Figure:
         title=dict(
             text=f"<b>{title}</b>",
             font=dict(family=FONT_FAMILY, size=18),
+            x=PLOT_AREA_LEFT_PAPER,
+            xanchor="left",
+            y=0.92,
+            yanchor="top",
         ),
         font=dict(family=FONT_FAMILY, size=12),
         width=PLOT_W,
@@ -98,10 +114,11 @@ def style_fig(fig: go.Figure, title: str) -> go.Figure:
         legend=dict(
             orientation="h",
             yanchor="bottom",
-            y=1.02,
+            y=1.05,
             xanchor="left",
-            x=0,
+            x=PLOT_AREA_LEFT_PAPER,
             font=dict(size=12),
         ),
+        margin=dict(t=MARGIN_T, r=MARGIN_R, b=MARGIN_B, l=MARGIN_L),
     )
     return fig

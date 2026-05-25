@@ -57,13 +57,61 @@ def test_style_fig_uses_grid_color_on_y_axis():
     assert fig.layout.yaxis.gridcolor == GRID_COLOR
 
 
-def test_style_fig_legend_anchored_top_left():
+def test_style_fig_legend_aligned_with_plot_area():
+    from carbon_forecast.plotting.config import PLOT_AREA_LEFT_PAPER
+
     fig = go.Figure()
     style_fig(fig, "x")
     legend = fig.layout.legend
     assert legend.orientation == "h"
     assert legend.xanchor == "left"
-    assert legend.x == 0
+    # Legend left edge sits on the plot area left edge (same paper-x as title).
+    assert legend.x == PLOT_AREA_LEFT_PAPER
+    # Legend sits just above the plot area, well below the title row.
+    assert 1.0 < legend.y < 1.1
+
+
+def test_style_fig_title_aligned_with_plot_area():
+    from carbon_forecast.plotting.config import PLOT_AREA_LEFT_PAPER
+
+    fig = go.Figure()
+    style_fig(fig, "x")
+    title = fig.layout.title
+    # Title left edge sits on the plot area left edge.
+    assert title.xanchor == "left"
+    assert title.x == PLOT_AREA_LEFT_PAPER
+    # Title anchored to the top of the figure with breathing room above.
+    assert title.yanchor == "top"
+    assert title.y is not None and title.y >= 0.85
+
+
+def test_style_fig_title_and_legend_do_not_overlap():
+    """Title bottom must sit above legend top in paper coords."""
+    from carbon_forecast.plotting.config import PLOT_H, MARGIN_T
+
+    fig = go.Figure()
+    style_fig(fig, "x")
+    plot_top_paper = 1 - MARGIN_T / PLOT_H
+    plot_height_paper = plot_top_paper - (fig.layout.margin.b / PLOT_H)
+
+    # Title bottom in paper coords (approx: title.y - font_size / PLOT_H).
+    title_font_paper = fig.layout.title.font.size / PLOT_H
+    title_bottom_paper = fig.layout.title.y - title_font_paper
+
+    # Legend top in paper coords (approx).
+    legend_bottom_paper = plot_top_paper + (fig.layout.legend.y - 1.0) * plot_height_paper
+    legend_font_paper = fig.layout.legend.font.size / PLOT_H
+    legend_top_paper = legend_bottom_paper + legend_font_paper
+
+    # Title's bottom must clear legend's top by at least 4% of figure height.
+    assert title_bottom_paper - legend_top_paper > 0.04
+
+
+def test_style_fig_top_margin_leaves_room_for_title_and_legend():
+    fig = go.Figure()
+    style_fig(fig, "x")
+    # Top margin holds the title plus the legend strip above the plot area.
+    assert fig.layout.margin.t >= 120
 
 
 def test_style_fig_returns_same_figure():
