@@ -33,15 +33,30 @@ PLOT_H: int = 500
 GRID_COLOR: str = "rgba(0,0,0,0.1)"
 FONT_FAMILY: str = "Arial"
 
+# Shared canvas: warm off-white behind the whole figure and the plot area,
+# near-black for all text. Applied by style_fig to every chart.
+BG_COLOR: str = "#F7F0E4"
+TEXT_COLOR: str = "#1F1F1F"
+
 # Title sits this many pixels below the figure's top edge. Expressed in
 # pixels (not a paper fraction) so the buffer between title and plot stays
 # constant across figures of different heights.
 TITLE_TOP_PAD_PX: int = 28
 
+# Title and subtitle font sizes. Subtitle is 25% smaller than the title and
+# not bold. Editable per chart via style_fig(..., subtitle="...").
+TITLE_SIZE: int = 20
+SUBTITLE_SIZE: int = int(TITLE_SIZE * 0.75)
+
+# Subplot titles (the per-panel labels like "BE") sit flush against the top
+# of each panel by default. Lift them this many pixels so they do not crowd
+# the chart.
+SUBPLOT_TITLE_YSHIFT_PX: int = 12
+
 # Minimum line width for line traces. Plotly draws the legend swatch at the
 # trace's line width, so thin lines give invisible legend swatches. style_fig
 # bumps any thinner line up to this so legend colors are always legible.
-LINE_WIDTH: float = 1.5
+LINE_WIDTH: float = 1.0
 
 # Layout margins, used to compute the paper-coord left edge that title and
 # legend share with the plot area. Single source of truth: change here and
@@ -109,7 +124,7 @@ MODEL_PALETTE: dict[str, str] = {
 # everywhere CI is drawn as a line, so it is instantly recognizable across
 # charts. Warm orange in the geothermal family but slightly deeper, so it
 # stays distinct from geothermal (#FF6A00) if both ever share a chart.
-CI_COLOR: str = "#E8590C"
+CI_COLOR: str = "#E34C17"
 
 # Net cross-border flow bars are colored by sign: net import (positive) reads
 # warm/red, net export (negative) reads cool/blue.
@@ -186,36 +201,52 @@ def _finalize_axes(fig: go.Figure) -> None:
         if isinstance(trace, go.Scatter) and (trace.mode is None or "lines" in trace.mode):
             if trace.line.width is None or trace.line.width < LINE_WIDTH:
                 trace.line.width = LINE_WIDTH
+    # Lift subplot titles (make_subplots / facet labels are annotations) off
+    # the top of their panels so they do not crowd the chart.
+    for ann in fig.layout.annotations:
+        if ann.text:
+            ann.yshift = (ann.yshift or 0) + SUBPLOT_TITLE_YSHIFT_PX
 
 
 def style_fig(
     fig: go.Figure,
     title: str,
     *,
+    subtitle: str | None = None,
     width: int = PLOT_W,
     height: int = PLOT_H,
 ) -> go.Figure:
     """Apply the locked layout to a figure. Returns the figure for chaining.
 
     Title is rendered bold via HTML; do not pre-wrap in `<b>...</b>`.
+    `subtitle`, if given, renders below the title (not bold, 25% smaller)
+    verbatim (no Title-Casing) so it can hold a free-form descriptive line.
     `width` and `height` are keyword-only. Pass them here rather than
     via `fig.update_layout(...)` after style_fig: the left-edge of the
     title and legend is computed as `MARGIN_L / width`, so a later width
     override would break alignment between title, legend, and plot area.
     """
     left_paper = MARGIN_L / width
+    title_spec = dict(
+        text = f"<b>{title_case(title)}</b>",
+        font = dict(family=FONT_FAMILY, size=TITLE_SIZE, color=TEXT_COLOR),
+        xref = "container",
+        x = left_paper,
+        xanchor = "left",
+        yref = "container",
+        y = 1 - TITLE_TOP_PAD_PX / height,
+        yanchor = "top",
+    )
+    if subtitle:
+        title_spec["subtitle"] = dict(
+            text = subtitle,
+            font = dict(family=FONT_FAMILY, size=SUBTITLE_SIZE, color=TEXT_COLOR),
+        )
     fig.update_layout(
-        title = dict(
-            text = f"<b>{title_case(title)}</b>",
-            font = dict(family=FONT_FAMILY, size=20),
-            xref = "container",
-            x = left_paper,
-            xanchor = "left",
-            yref = "container",
-            y = 1 - TITLE_TOP_PAD_PX / height,
-            yanchor = "top",
-        ),
-        font = dict(family=FONT_FAMILY, size=12),
+        title = title_spec,
+        font = dict(family=FONT_FAMILY, size=12, color=TEXT_COLOR),
+        paper_bgcolor = BG_COLOR,
+        plot_bgcolor = BG_COLOR,
         width = width,
         height = height,
         xaxis = dict(

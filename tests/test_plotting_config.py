@@ -177,6 +177,51 @@ def test_style_fig_uses_grid_color_on_y_axis():
     assert fig.layout.yaxis.gridcolor == GRID_COLOR
 
 
+def test_style_fig_subtitle_optional_and_styled():
+    from carbon_forecast.plotting.config import SUBTITLE_SIZE, TEXT_COLOR
+
+    no_sub = go.Figure()
+    style_fig(no_sub, "x")
+    assert no_sub.layout.title.subtitle.text is None
+
+    with_sub = go.Figure()
+    style_fig(with_sub, "x", subtitle="a free-form line")
+    sub = with_sub.layout.title.subtitle
+    # Verbatim (not Title-Cased), smaller font, project text color.
+    assert sub.text == "a free-form line"
+    assert sub.font.size == SUBTITLE_SIZE
+    assert sub.font.color == TEXT_COLOR
+
+
+def test_subtitle_size_is_25pct_under_title():
+    from carbon_forecast.plotting.config import SUBTITLE_SIZE, TITLE_SIZE
+
+    assert SUBTITLE_SIZE == int(TITLE_SIZE * 0.75)
+
+
+def test_style_fig_lifts_subplot_titles():
+    from plotly.subplots import make_subplots
+
+    from carbon_forecast.plotting.config import SUBPLOT_TITLE_YSHIFT_PX
+
+    fig = make_subplots(rows=2, cols=1, subplot_titles=("BE", "FI"))
+    style_fig(fig, "x")
+    # Both subplot-title annotations were lifted off their panels.
+    yshifts = [a.yshift for a in fig.layout.annotations if a.text in ("BE", "FI")]
+    assert yshifts == [SUBPLOT_TITLE_YSHIFT_PX, SUBPLOT_TITLE_YSHIFT_PX]
+
+
+def test_style_fig_applies_canvas_and_text_colors():
+    from carbon_forecast.plotting.config import BG_COLOR, TEXT_COLOR
+
+    fig = go.Figure()
+    style_fig(fig, "x")
+    assert fig.layout.paper_bgcolor == BG_COLOR
+    assert fig.layout.plot_bgcolor == BG_COLOR
+    assert fig.layout.font.color == TEXT_COLOR
+    assert fig.layout.title.font.color == TEXT_COLOR
+
+
 def test_style_fig_legend_aligned_with_plot_area():
     fig = go.Figure()
     style_fig(fig, "x")
