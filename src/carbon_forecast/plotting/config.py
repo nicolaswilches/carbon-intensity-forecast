@@ -27,7 +27,7 @@ import plotly.graph_objects as go
 import plotly.io as pio
 
 
-PLOT_W: int = 900
+PLOT_W: int = 1000
 PLOT_H: int = 500
 
 GRID_COLOR: str = "rgba(0,0,0,0.1)"
@@ -36,7 +36,7 @@ FONT_FAMILY: str = "Arial"
 # Layout margins, used to compute the paper-coord left edge that title and
 # legend share with the plot area. Single source of truth: change here and
 # everything else stays aligned.
-MARGIN_L: int = 70
+MARGIN_L: int = 40
 MARGIN_R: int = 40
 MARGIN_T: int = 130
 MARGIN_B: int = 60
@@ -47,9 +47,9 @@ PLOT_AREA_LEFT_PAPER: float = MARGIN_L / PLOT_W
 
 
 REGIONAL_PALETTE: dict[str, str] = {
-    "BE":          "#0072B2",  # blue
-    "FI":          "#56B4E9",  # sky blue
-    "SG":          "#E69F00",  # orange
+    "BE": "#0072B2",  # blue
+    "FI": "#56B4E9",  # sky blue
+    "SG": "#E69F00",  # orange
     "US-MIDA-PJM": "#009E73",  # green
     "US-NY-NYIS":  "#D55E00",  # vermillion
 }
@@ -90,8 +90,8 @@ ENERGY_PALETTE: dict[str, str] = {
 
 
 MODEL_PALETTE: dict[str, str] = {
-    "open":                "#0072B2",  # blue
-    "em_operational":      "#E69F00",  # orange
+    "open": "#0072B2",  # blue
+    "em_operational": "#E69F00",  # orange
     "carboncast_faithful": "#7F7F7F",  # neutral gray
 }
 
@@ -138,13 +138,24 @@ def title_case(s: str) -> str:
     return " ".join(_title_case_word(w) for w in s.split())
 
 
-def _retitle_layout_labels(fig: go.Figure) -> None:
-    """Re-write every axis title and trace name to Title Case in place."""
+def _finalize_axes(fig: go.Figure) -> None:
+    """Style and retitle every axis, and Title-Case every trace name, in place.
+
+    Iterates all axes (xaxis, xaxis2, ... yaxis, yaxis2, ...) so multi-row
+    subplots get the same tick font, grid policy, and Title-Cased titles as
+    a single-plot figure, not just the first subplot.
+    """
     for key in list(fig.layout):
-        if key.startswith(("xaxis", "yaxis")):
+        if key.startswith("xaxis"):
             ax = fig.layout[key]
+            ax.update(tickfont=dict(size=12), showgrid=False)
             if ax.title is not None and ax.title.text:
-                ax.title.text = title_case(ax.title.text)
+                ax.title.update(text=title_case(ax.title.text), font=dict(size=14))
+        elif key.startswith("yaxis"):
+            ax = fig.layout[key]
+            ax.update(tickfont=dict(size=12), gridcolor=GRID_COLOR)
+            if ax.title is not None and ax.title.text:
+                ax.title.update(text=title_case(ax.title.text), font=dict(size=14))
     for trace in fig.data:
         name = getattr(trace, "name", None)
         if isinstance(name, str) and name:
@@ -168,36 +179,36 @@ def style_fig(
     """
     left_paper = MARGIN_L / width
     fig.update_layout(
-        title=dict(
-            text=f"<b>{title_case(title)}</b>",
-            font=dict(family=FONT_FAMILY, size=18),
-            x=left_paper,
-            xanchor="left",
-            y=0.92,
-            yanchor="top",
+        title = dict(
+            text = f"<b>{title_case(title)}</b>",
+            font = dict(family=FONT_FAMILY, size=20),
+            x = left_paper,
+            xanchor = "left",
+            y = 0.92,
+            yanchor = "top",
         ),
-        font=dict(family=FONT_FAMILY, size=12),
-        width=width,
-        height=height,
-        xaxis=dict(
-            title=dict(font=dict(size=14)),
-            tickfont=dict(size=12),
-            showgrid=False,
+        font = dict(family=FONT_FAMILY, size=12),
+        width = width,
+        height = height,
+        xaxis = dict(
+            title = dict(font=dict(size = 14)),
+            tickfont = dict(size = 12),
+            showgrid = False,
         ),
-        yaxis=dict(
-            title=dict(font=dict(size=14)),
-            tickfont=dict(size=12),
-            gridcolor=GRID_COLOR,
+        yaxis = dict(
+            title = dict(font=dict(size = 14)),
+            tickfont = dict(size = 12),
+            gridcolor = GRID_COLOR,
         ),
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.05,
-            xanchor="left",
-            x=left_paper,
-            font=dict(size=12),
+        legend = dict(
+            orientation = "h",
+            yanchor = "bottom",
+            y = 1.01,
+            xanchor = "left",
+            x = left_paper,
+            font = dict(size = 12),
         ),
-        margin=dict(t=MARGIN_T, r=MARGIN_R, b=MARGIN_B, l=MARGIN_L),
+        margin = dict(t = MARGIN_T, r = MARGIN_R, b = MARGIN_B, l = MARGIN_L),
     )
-    _retitle_layout_labels(fig)
+    _finalize_axes(fig)
     return fig

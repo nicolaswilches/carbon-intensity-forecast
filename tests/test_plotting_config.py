@@ -98,6 +98,20 @@ def test_style_fig_retitles_axis_labels_and_trace_names():
     assert fig.data[0].name == "Hydro Discharge"
 
 
+def test_style_fig_styles_every_subplot_axis():
+    from plotly.subplots import make_subplots
+
+    fig = make_subplots(rows=3, cols=1)
+    fig.update_yaxes(title_text="mw", row=2, col=1)
+    style_fig(fig, "x")
+    # Grid color and tick font reach axes beyond the first subplot.
+    assert fig.layout.yaxis2.gridcolor == GRID_COLOR
+    assert fig.layout.yaxis3.gridcolor == GRID_COLOR
+    assert fig.layout.xaxis2.showgrid is False
+    # Titles on non-first axes are still Title-Cased.
+    assert fig.layout.yaxis2.title.text == "Mw"
+
+
 def test_model_palette_has_three_models():
     assert set(MODEL_PALETTE) == {"open", "em_operational", "carboncast_faithful"}
 
