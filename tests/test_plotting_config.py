@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import plotly.graph_objects as go
 import plotly.io as pio
+import pytest
 
 from carbon_forecast.plotting.config import (
     ENERGY_PALETTE,
@@ -144,11 +145,11 @@ def test_style_fig_respects_custom_width_and_height():
     style_fig(fig, "x", width=1800, height=600)
     assert fig.layout.width == 1800
     assert fig.layout.height == 600
-    # Critical: title.x and legend.x derive from the *actual* width so the
-    # left edges of title, legend, and plot area stay aligned at any size.
-    expected_left = MARGIN_L / 1800
-    assert fig.layout.title.x == expected_left
-    assert fig.layout.legend.x == expected_left
+    # Title.x is in container coords -> MARGIN_L/width lands on the plot-area
+    # left edge. Legend.x is in paper coords -> 0 is the plot-area left edge.
+    # Both therefore sit on the same vertical line at any width.
+    assert fig.layout.title.x == MARGIN_L / 1800
+    assert fig.layout.legend.x == 0
 
 
 def test_style_fig_uses_grid_color_on_y_axis():
@@ -158,31 +159,59 @@ def test_style_fig_uses_grid_color_on_y_axis():
 
 
 def test_style_fig_legend_aligned_with_plot_area():
-    from carbon_forecast.plotting.config import PLOT_AREA_LEFT_PAPER
-
     fig = go.Figure()
     style_fig(fig, "x")
     legend = fig.layout.legend
     assert legend.orientation == "h"
     assert legend.xanchor == "left"
-    # Legend left edge sits on the plot area left edge (same paper-x as title).
-    assert legend.x == PLOT_AREA_LEFT_PAPER
+    # Legend.x is in paper coords; 0 is the plot-area left edge, matching the
+    # container-based title.x.
+    assert legend.x == 0
     # Legend sits just above the plot area, well below the title row.
     assert 1.0 < legend.y < 1.1
 
 
 def test_style_fig_title_aligned_with_plot_area():
-    from carbon_forecast.plotting.config import PLOT_AREA_LEFT_PAPER
+    from carbon_forecast.plotting.config import MARGIN_L, PLOT_W
 
     fig = go.Figure()
     style_fig(fig, "x")
     title = fig.layout.title
-    # Title left edge sits on the plot area left edge.
+    # Title in container coords; MARGIN_L/PLOT_W lands on the plot-area left edge.
+    assert title.xref == "container"
     assert title.xanchor == "left"
-    assert title.x == PLOT_AREA_LEFT_PAPER
-    # Title anchored to the top of the figure with breathing room above.
+    assert title.x == MARGIN_L / PLOT_W
     assert title.yanchor == "top"
+    assert title.yref == "container"
     assert title.y is not None and title.y >= 0.85
+
+
+def test_style_fig_title_buffer_is_height_invariant():
+    from carbon_forecast.plotting.config import TITLE_TOP_PAD_PX
+
+    # Title top must sit the same pixel distance below the figure top at any
+    # height, so the title never creeps into the plot area on tall figures.
+    short = go.Figure()
+    style_fig(short, "x", height=500)
+    tall = go.Figure()
+    style_fig(tall, "x", height=1500)
+    assert short.layout.title.y == 1 - TITLE_TOP_PAD_PX / 500
+    assert tall.layout.title.y == 1 - TITLE_TOP_PAD_PX / 1500
+    # Pixel offset from the top is identical regardless of figure height.
+    assert (1 - short.layout.title.y) * 500 == pytest.approx(TITLE_TOP_PAD_PX)
+    assert (1 - tall.layout.title.y) * 1500 == pytest.approx(TITLE_TOP_PAD_PX)
+
+
+def test_style_fig_thickens_thin_line_swatches():
+    from carbon_forecast.plotting.config import LINE_WIDTH
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=[1, 2], y=[3, 4], mode="lines", line=dict(width=1), name="thin"))
+    fig.add_trace(go.Scatter(x=[1, 2], y=[3, 4], mode="lines", line=dict(width=4), name="thick"))
+    style_fig(fig, "x")
+    # Thin line bumped up to the minimum; already-thick line left alone.
+    assert fig.data[0].line.width == LINE_WIDTH
+    assert fig.data[1].line.width == 4
 
 
 def test_style_fig_title_and_legend_do_not_overlap():
@@ -208,10 +237,12 @@ def test_style_fig_title_and_legend_do_not_overlap():
 
 
 def test_style_fig_top_margin_leaves_room_for_title_and_legend():
+    from carbon_forecast.plotting.config import TITLE_TOP_PAD_PX
+
     fig = go.Figure()
     style_fig(fig, "x")
-    # Top margin holds the title plus the legend strip above the plot area.
-    assert fig.layout.margin.t >= 120
+    # Top margin must hold the title (pad + glyph height) plus the legend strip.
+    assert fig.layout.margin.t >= TITLE_TOP_PAD_PX + 40
 
 
 def test_style_fig_returns_same_figure():

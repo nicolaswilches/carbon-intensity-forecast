@@ -33,13 +33,23 @@ PLOT_H: int = 500
 GRID_COLOR: str = "rgba(0,0,0,0.1)"
 FONT_FAMILY: str = "Arial"
 
+# Title sits this many pixels below the figure's top edge. Expressed in
+# pixels (not a paper fraction) so the buffer between title and plot stays
+# constant across figures of different heights.
+TITLE_TOP_PAD_PX: int = 28
+
+# Minimum line width for line traces. Plotly draws the legend swatch at the
+# trace's line width, so thin lines give invisible legend swatches. style_fig
+# bumps any thinner line up to this so legend colors are always legible.
+LINE_WIDTH: float = 2.5
+
 # Layout margins, used to compute the paper-coord left edge that title and
 # legend share with the plot area. Single source of truth: change here and
 # everything else stays aligned.
-MARGIN_L: int = 40
-MARGIN_R: int = 40
-MARGIN_T: int = 130
-MARGIN_B: int = 60
+MARGIN_L: int = 100
+MARGIN_R: int = 80
+MARGIN_T: int = 100
+MARGIN_B: int = 80
 
 # Paper-coord x of the plot area's left edge. Title.x and legend.x use it
 # so all three (title, legend, axes) share a left edge.
@@ -160,6 +170,11 @@ def _finalize_axes(fig: go.Figure) -> None:
         name = getattr(trace, "name", None)
         if isinstance(name, str) and name:
             trace.name = title_case(name.replace("_", " "))
+        # Thicken thin line swatches so the legend color is visible. Only
+        # Scatter traces carry a top-level `.line`; Bar/Heatmap do not.
+        if isinstance(trace, go.Scatter) and (trace.mode is None or "lines" in trace.mode):
+            if trace.line.width is None or trace.line.width < LINE_WIDTH:
+                trace.line.width = LINE_WIDTH
 
 
 def style_fig(
@@ -182,9 +197,11 @@ def style_fig(
         title = dict(
             text = f"<b>{title_case(title)}</b>",
             font = dict(family=FONT_FAMILY, size=20),
+            xref = "container",
             x = left_paper,
             xanchor = "left",
-            y = 0.92,
+            yref = "container",
+            y = 1 - TITLE_TOP_PAD_PX / height,
             yanchor = "top",
         ),
         font = dict(family=FONT_FAMILY, size=12),
@@ -205,7 +222,7 @@ def style_fig(
             yanchor = "bottom",
             y = 1.01,
             xanchor = "left",
-            x = left_paper,
+            x = 0,
             font = dict(size = 12),
         ),
         margin = dict(t = MARGIN_T, r = MARGIN_R, b = MARGIN_B, l = MARGIN_L),
