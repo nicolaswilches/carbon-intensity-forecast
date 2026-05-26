@@ -117,6 +117,25 @@ def test_model_palette_has_three_models():
     assert set(MODEL_PALETTE) == {"open", "em_operational", "carboncast_faithful"}
 
 
+def test_ci_and_flow_colors_are_valid_hex():
+    import re
+
+    from carbon_forecast.plotting.config import (
+        CI_COLOR,
+        FLOW_EXPORT_COLOR,
+        FLOW_IMPORT_COLOR,
+    )
+
+    hex_re = re.compile(r"^#[0-9A-Fa-f]{6}$")
+    assert hex_re.match(CI_COLOR)
+    assert hex_re.match(FLOW_IMPORT_COLOR)
+    assert hex_re.match(FLOW_EXPORT_COLOR)
+    # CI must be distinct from geothermal so they never read as the same series.
+    assert CI_COLOR != ENERGY_PALETTE["geothermal"]
+    # Import and export hues must differ so the sign split is legible.
+    assert FLOW_IMPORT_COLOR != FLOW_EXPORT_COLOR
+
+
 def test_apply_defaults_sets_plotly_white():
     pio.templates.default = "plotly"  # reset to a non-target value
     apply_defaults()

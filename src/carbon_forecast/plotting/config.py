@@ -41,14 +41,14 @@ TITLE_TOP_PAD_PX: int = 28
 # Minimum line width for line traces. Plotly draws the legend swatch at the
 # trace's line width, so thin lines give invisible legend swatches. style_fig
 # bumps any thinner line up to this so legend colors are always legible.
-LINE_WIDTH: float = 2.5
+LINE_WIDTH: float = 1.5
 
 # Layout margins, used to compute the paper-coord left edge that title and
 # legend share with the plot area. Single source of truth: change here and
 # everything else stays aligned.
 MARGIN_L: int = 100
 MARGIN_R: int = 80
-MARGIN_T: int = 100
+MARGIN_T: int = 120
 MARGIN_B: int = 80
 
 # Paper-coord x of the plot area's left edge. Title.x and legend.x use it
@@ -104,6 +104,17 @@ MODEL_PALETTE: dict[str, str] = {
     "em_operational": "#E69F00",  # orange
     "carboncast_faithful": "#7F7F7F",  # neutral gray
 }
+
+# Carbon intensity is the project's headline series. Use this one color
+# everywhere CI is drawn as a line, so it is instantly recognizable across
+# charts. Warm orange in the geothermal family but slightly deeper, so it
+# stays distinct from geothermal (#FF6A00) if both ever share a chart.
+CI_COLOR: str = "#E8590C"
+
+# Net cross-border flow bars are colored by sign: net import (positive) reads
+# warm/red, net export (negative) reads cool/blue.
+FLOW_IMPORT_COLOR: str = "#C0504D"  # importing, red hue
+FLOW_EXPORT_COLOR: str = "#3B6A96"  # exporting, blue hue
 
 
 def apply_defaults() -> None:
