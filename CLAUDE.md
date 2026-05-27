@@ -6,7 +6,7 @@ Inherits from `ds/projects/CLAUDE.md` (workspace conventions: uv, Jupyter sessio
 
 ## Status
 
-Grilling phase complete; decisions locked. Week 1 of implementation begins now: data extraction, project scaffolding, descriptive analysis. Proposal already on Overleaf and shared with Prof. Ghaddar.
+Week 1 complete: data pipeline, full 2021-2025 extraction across 5 zones (1,200 Parquet files), S01 validation, S02 descriptive analysis, and the plotting design system in `src/carbon_forecast/plotting/config.py`. Week 2 next: E2 (CarbonCast-faithful) reproduction. Proposal on Overleaf and shared with Prof. Ghaddar.
 
 ## Locked thesis (frozen 2026-05-10 via /grill-me)
 
