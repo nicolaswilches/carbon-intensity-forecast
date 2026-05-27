@@ -125,6 +125,37 @@ def apply_defaults() -> None:
     pio.templates.default = "plotly_white"
 
 
+def _lerp_hex(c1: str, c2: str, t: float) -> str:
+    """Linear interpolation between two #RRGGBB colors at fraction t in [0, 1]."""
+    a = tuple(int(c1.lstrip("#")[i:i + 2], 16) for i in (0, 2, 4))
+    b = tuple(int(c2.lstrip("#")[i:i + 2], 16) for i in (0, 2, 4))
+    r, g, bl = (round(a[j] + (b[j] - a[j]) * t) for j in range(3))
+    return f"#{r:02X}{g:02X}{bl:02X}"
+
+
+def discrete_percentile_colorscale(
+    n_bins: int = 20,
+    low_anchor: str | None = None,
+    high: str = CI_COLOR,
+) -> list[list]:
+    """Build a discrete plotly colorscale of `n_bins` equal bands.
+
+    Each band is a flat color, ramping from `low_anchor` (a hue just above the
+    canvas background by default) to `high` (the carbon-intensity orange). Used
+    on a 0..100 percentile axis so each band spans 100/n_bins percentile points
+    (20 bins -> one hue per 5 percentile). The lowest band sits just above
+    BG_COLOR; the highest is exactly `high`.
+    """
+    if low_anchor is None:
+        low_anchor = _lerp_hex(BG_COLOR, high, 0.08)
+    colors = [_lerp_hex(low_anchor, high, k / (n_bins - 1)) for k in range(n_bins)]
+    scale: list[list] = []
+    for k in range(n_bins):
+        scale.append([k / n_bins, colors[k]])
+        scale.append([(k + 1) / n_bins, colors[k]])
+    return scale
+
+
 def _title_case_word(w: str) -> str:
     """
     Title-case one whitespace-delimited token, preserving acronyms and units.

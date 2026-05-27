@@ -117,6 +117,35 @@ def test_model_palette_has_three_models():
     assert set(MODEL_PALETTE) == {"open", "em_operational", "carboncast_faithful"}
 
 
+def test_discrete_percentile_colorscale_shape_and_endpoints():
+    from carbon_forecast.plotting.config import (
+        BG_COLOR,
+        CI_COLOR,
+        _lerp_hex,
+        discrete_percentile_colorscale,
+    )
+
+    scale = discrete_percentile_colorscale(n_bins=20)
+    # 20 flat bands -> 40 stops, spanning exactly 0..1.
+    assert len(scale) == 40
+    assert scale[0][0] == 0.0
+    assert scale[-1][0] == 1.0
+    # Highest band is exactly the CI color; lowest is the near-background anchor.
+    assert scale[-1][1] == CI_COLOR
+    assert scale[0][1] == _lerp_hex(BG_COLOR, CI_COLOR, 0.08)
+    # Each band is flat: the two stops of a band share a color.
+    for k in range(0, 40, 2):
+        assert scale[k][1] == scale[k + 1][1]
+
+
+def test_lerp_hex_endpoints_and_midpoint():
+    from carbon_forecast.plotting.config import _lerp_hex
+
+    assert _lerp_hex("#000000", "#FFFFFF", 0.0) == "#000000"
+    assert _lerp_hex("#000000", "#FFFFFF", 1.0) == "#FFFFFF"
+    assert _lerp_hex("#000000", "#FFFFFF", 0.5) == "#808080"
+
+
 def test_ci_and_flow_colors_are_valid_hex():
     import re
 
