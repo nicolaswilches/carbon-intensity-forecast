@@ -1,13 +1,14 @@
-"""Project-wide plot configuration.
+"""
+Project-wide plot configuration.
 
 Locked design language (project_thesis.md, with style refinements logged in
 memory/feedback_style.md):
+
 - Template: plotly_white
-- Font: Arial. Title 18pt bold, axis titles 14pt, ticks 12pt, legend 12pt.
+- Font: Arial. Title 20pt bold, subplot titles 12pt, axis titles 14pt,
+  ticks 12pt, legend 12pt.
 - Grid: light gray horizontal only (rgba(0,0,0,0.1)). No vertical grid.
 - Legend: horizontal, anchored to the top-left of the plot area.
-- Three categorical palettes: regional (5 zones), energy source
-  (CarbonCast-aligned), model comparison.
 
 Usage:
 
@@ -21,53 +22,40 @@ Usage:
     fig.show()
 """
 
+# libraries and imports
 from __future__ import annotations
 
 import plotly.graph_objects as go
 import plotly.io as pio
 
 
-PLOT_W: int = 1000
-PLOT_H: int = 500
+# Initial configuration
+# dimensions
+PLOT_W: int = 1000 # default width
+PLOT_H: int = 500 # default height 
 
-GRID_COLOR: str = "rgba(0,0,0,0.1)"
-FONT_FAMILY: str = "Arial"
+# colors
+FONT_FAMILY: str = "Arial"  # font
+GRID_COLOR: str = "rgba(0,0,0,0.1)" # grid color
+BG_COLOR: str = "#F7F0E4" # background color
+TEXT_COLOR: str = "#1F1F1F" # font color
 
-# Shared canvas: warm off-white behind the whole figure and the plot area,
-# near-black for all text. Applied by style_fig to every chart.
-BG_COLOR: str = "#F7F0E4"
-TEXT_COLOR: str = "#1F1F1F"
+# text sizes and spacing
+TITLE_SIZE: int = 18  # title font size
+TITLE_TOP_OFFSET: int = 45 # title offset from top border
+SUBTITLE_SIZE: int = 15 # subtitle font size
+SUBPLOT_TITLE_SIZE: int = 12 # subplot title font size
+AXIS_TITLE_SIZE: int = 12 # x/y axis title font size
+SUBPLOT_TITLE_YSHIFT_PX: int = 10 # subplot title shift in pixels
+LINE_WIDTH: float = 1.2 # line width for line charts
 
-# Title sits this many pixels below the figure's top edge. Expressed in
-# pixels (not a paper fraction) so the buffer between title and plot stays
-# constant across figures of different heights.
-TITLE_TOP_PAD_PX: int = 28
-
-# Title and subtitle font sizes. Subtitle is 25% smaller than the title and
-# not bold. Editable per chart via style_fig(..., subtitle="...").
-TITLE_SIZE: int = 20
-SUBTITLE_SIZE: int = int(TITLE_SIZE * 0.75)
-
-# Subplot titles (the per-panel labels like "BE") sit flush against the top
-# of each panel by default. Lift them this many pixels so they do not crowd
-# the chart.
-SUBPLOT_TITLE_YSHIFT_PX: int = 12
-
-# Minimum line width for line traces. Plotly draws the legend swatch at the
-# trace's line width, so thin lines give invisible legend swatches. style_fig
-# bumps any thinner line up to this so legend colors are always legible.
-LINE_WIDTH: float = 1.0
-
-# Layout margins, used to compute the paper-coord left edge that title and
-# legend share with the plot area. Single source of truth: change here and
-# everything else stays aligned.
+# margins
 MARGIN_L: int = 100
 MARGIN_R: int = 80
-MARGIN_T: int = 120
+MARGIN_T: int = 150 # top margin of the chart area 
 MARGIN_B: int = 80
 
-# Paper-coord x of the plot area's left edge. Title.x and legend.x use it
-# so all three (title, legend, axes) share a left edge.
+
 PLOT_AREA_LEFT_PAPER: float = MARGIN_L / PLOT_W
 
 
@@ -138,7 +126,8 @@ def apply_defaults() -> None:
 
 
 def _title_case_word(w: str) -> str:
-    """Title-case one whitespace-delimited token, preserving acronyms and units.
+    """
+    Title-case one whitespace-delimited token, preserving acronyms and units.
 
     Rules:
     - A token whose alphabetic content has any uppercase letter beyond the
@@ -175,23 +164,26 @@ def title_case(s: str) -> str:
 
 
 def _finalize_axes(fig: go.Figure) -> None:
-    """Style and retitle every axis, and Title-Case every trace name, in place.
+    """
+    Style and retitle every axis, and Title-Case every trace name, in place.
 
     Iterates all axes (xaxis, xaxis2, ... yaxis, yaxis2, ...) so multi-row
     subplots get the same tick font, grid policy, and Title-Cased titles as
     a single-plot figure, not just the first subplot.
     """
+
     for key in list(fig.layout):
         if key.startswith("xaxis"):
             ax = fig.layout[key]
             ax.update(tickfont=dict(size=12), showgrid=False)
             if ax.title is not None and ax.title.text:
-                ax.title.update(text=title_case(ax.title.text), font=dict(size=14))
+                ax.title.update(text=title_case(ax.title.text), font=dict(size=AXIS_TITLE_SIZE))
         elif key.startswith("yaxis"):
             ax = fig.layout[key]
             ax.update(tickfont=dict(size=12), gridcolor=GRID_COLOR)
             if ax.title is not None and ax.title.text:
-                ax.title.update(text=title_case(ax.title.text), font=dict(size=14))
+                ax.title.update(text=title_case(ax.title.text), font=dict(size=AXIS_TITLE_SIZE))
+
     for trace in fig.data:
         name = getattr(trace, "name", None)
         if isinstance(name, str) and name:
@@ -199,12 +191,18 @@ def _finalize_axes(fig: go.Figure) -> None:
         # Thicken thin line swatches so the legend color is visible. Only
         # Scatter traces carry a top-level `.line`; Bar/Heatmap do not.
         if isinstance(trace, go.Scatter) and (trace.mode is None or "lines" in trace.mode):
-            if trace.line.width is None or trace.line.width < LINE_WIDTH:
+            if trace.line.width is None:
                 trace.line.width = LINE_WIDTH
     # Lift subplot titles (make_subplots / facet labels are annotations) off
     # the top of their panels so they do not crowd the chart.
+
     for ann in fig.layout.annotations:
         if ann.text:
+            ann.font.update(
+                family=FONT_FAMILY,
+                size=SUBPLOT_TITLE_SIZE,
+                color=TEXT_COLOR,
+            )
             ann.yshift = (ann.yshift or 0) + SUBPLOT_TITLE_YSHIFT_PX
 
 
@@ -216,58 +214,69 @@ def style_fig(
     width: int = PLOT_W,
     height: int = PLOT_H,
 ) -> go.Figure:
-    """Apply the locked layout to a figure. Returns the figure for chaining.
-
-    Title is rendered bold via HTML; do not pre-wrap in `<b>...</b>`.
-    `subtitle`, if given, renders below the title (not bold, 25% smaller)
-    verbatim (no Title-Casing) so it can hold a free-form descriptive line.
-    `width` and `height` are keyword-only. Pass them here rather than
-    via `fig.update_layout(...)` after style_fig: the left-edge of the
-    title and legend is computed as `MARGIN_L / width`, so a later width
-    override would break alignment between title, legend, and plot area.
     """
+    Apply the locked layout to a figure. Returns the figure for chaining.
+
+    - Title is rendered bold via HTML; do not pre-wrap in `<b>...</b>`.
+    - `subtitle`, if given, renders below the title.
+    - verbatim (no Title-Casing) so it can hold a free-form descriptive line.
+    - `width` and `height` are keyword-only. Pass them here rather than
+      via `fig.update_layout(...)` after style_fig: the left-edge of the
+      title and legend is computed as `MARGIN_L / width`, so a later width
+      override would break alignment between title, legend, and plot area.
+    """
+
     left_paper = MARGIN_L / width
+
     title_spec = dict(
         text = f"<b>{title_case(title)}</b>",
-        font = dict(family=FONT_FAMILY, size=TITLE_SIZE, color=TEXT_COLOR),
+        font = dict(family = FONT_FAMILY, size = TITLE_SIZE, color = TEXT_COLOR),
         xref = "container",
         x = left_paper,
         xanchor = "left",
         yref = "container",
-        y = 1 - TITLE_TOP_PAD_PX / height,
+        y = 1 - TITLE_TOP_OFFSET / height,
         yanchor = "top",
     )
+
     if subtitle:
-        title_spec["subtitle"] = dict(
-            text = subtitle,
-            font = dict(family=FONT_FAMILY, size=SUBTITLE_SIZE, color=TEXT_COLOR),
+        title_spec["text"] = (
+            f"<span style='line-height: 1.0;'><b>{title_case(title)}</b></span><br>"
+            f"<span style='font-family: {FONT_FAMILY}; font-size: {SUBTITLE_SIZE}px; color: {TEXT_COLOR}; font-weight: normal;'>{subtitle}</span>"
         )
+
+    subtitle_shift = 15 if subtitle else 0
+    legend_top_offset = subtitle_shift + 70
+    margin_t = MARGIN_T + subtitle_shift
+
     fig.update_layout(
-        title = title_spec,
-        font = dict(family=FONT_FAMILY, size=12, color=TEXT_COLOR),
-        paper_bgcolor = BG_COLOR,
-        plot_bgcolor = BG_COLOR,
-        width = width,
-        height = height,
-        xaxis = dict(
-            title = dict(font=dict(size = 14)),
-            tickfont = dict(size = 12),
-            showgrid = False,
+        title=title_spec,
+        font=dict(family=FONT_FAMILY, size=12, color=TEXT_COLOR),
+        paper_bgcolor=BG_COLOR,
+        plot_bgcolor=BG_COLOR,
+        width=width,
+        height=height,
+        xaxis=dict(
+            title=dict(font=dict(size=AXIS_TITLE_SIZE)),
+            tickfont=dict(size=10),
+            showgrid=False,
         ),
-        yaxis = dict(
-            title = dict(font=dict(size = 14)),
-            tickfont = dict(size = 12),
-            gridcolor = GRID_COLOR,
+        yaxis=dict(
+            title=dict(font=dict(size=AXIS_TITLE_SIZE)),
+            tickfont=dict(size=12),
+            gridcolor=GRID_COLOR,
         ),
-        legend = dict(
-            orientation = "h",
-            yanchor = "bottom",
-            y = 1.01,
-            xanchor = "left",
-            x = 0,
-            font = dict(size = 12),
+        legend=dict(
+            orientation="h",
+            xref="container",
+            yref="container",
+            xanchor="left",
+            yanchor="top",
+            x = left_paper,
+            y = 1 - legend_top_offset / height,
+            font=dict(size=12),
         ),
-        margin = dict(t = MARGIN_T, r = MARGIN_R, b = MARGIN_B, l = MARGIN_L),
+        margin=dict(t=margin_t, r=MARGIN_R, b=MARGIN_B, l=MARGIN_L),
     )
     _finalize_axes(fig)
     return fig

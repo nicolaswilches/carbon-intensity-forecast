@@ -164,11 +164,10 @@ def test_style_fig_respects_custom_width_and_height():
     style_fig(fig, "x", width=1800, height=600)
     assert fig.layout.width == 1800
     assert fig.layout.height == 600
-    # Title.x is in container coords -> MARGIN_L/width lands on the plot-area
-    # left edge. Legend.x is in paper coords -> 0 is the plot-area left edge.
-    # Both therefore sit on the same vertical line at any width.
+    # Title and legend both use container coords at MARGIN_L/width, so they
+    # share the plot-area left edge at any width.
     assert fig.layout.title.x == MARGIN_L / 1800
-    assert fig.layout.legend.x == 0
+    assert fig.layout.legend.x == MARGIN_L / 1800
 
 
 def test_style_fig_uses_grid_color_on_y_axis():
@@ -177,26 +176,29 @@ def test_style_fig_uses_grid_color_on_y_axis():
     assert fig.layout.yaxis.gridcolor == GRID_COLOR
 
 
-def test_style_fig_subtitle_optional_and_styled():
-    from carbon_forecast.plotting.config import SUBTITLE_SIZE, TEXT_COLOR
+def test_style_fig_subtitle_embedded_in_title_text():
+    from carbon_forecast.plotting.config import SUBTITLE_SIZE
 
+    # No subtitle: title text is just the bold, Title-Cased title.
     no_sub = go.Figure()
-    style_fig(no_sub, "x")
-    assert no_sub.layout.title.subtitle.text is None
+    style_fig(no_sub, "my title")
+    assert no_sub.layout.title.text == "<b>My Title</b>"
 
+    # With subtitle: rendered as a second HTML line (verbatim, not Title-Cased)
+    # inside the title text, at the subtitle font size.
     with_sub = go.Figure()
-    style_fig(with_sub, "x", subtitle="a free-form line")
-    sub = with_sub.layout.title.subtitle
-    # Verbatim (not Title-Cased), smaller font, project text color.
-    assert sub.text == "a free-form line"
-    assert sub.font.size == SUBTITLE_SIZE
-    assert sub.font.color == TEXT_COLOR
+    style_fig(with_sub, "my title", subtitle="a free-form line")
+    text = with_sub.layout.title.text
+    assert "<b>My Title</b>" in text
+    assert "<br>" in text
+    assert "a free-form line" in text
+    assert f"{SUBTITLE_SIZE}px" in text
 
 
-def test_subtitle_size_is_25pct_under_title():
+def test_subtitle_size_smaller_than_title():
     from carbon_forecast.plotting.config import SUBTITLE_SIZE, TITLE_SIZE
 
-    assert SUBTITLE_SIZE == int(TITLE_SIZE * 0.75)
+    assert SUBTITLE_SIZE < TITLE_SIZE
 
 
 def test_style_fig_lifts_subplot_titles():
@@ -223,16 +225,18 @@ def test_style_fig_applies_canvas_and_text_colors():
 
 
 def test_style_fig_legend_aligned_with_plot_area():
+    from carbon_forecast.plotting.config import MARGIN_L, PLOT_W
+
     fig = go.Figure()
     style_fig(fig, "x")
     legend = fig.layout.legend
     assert legend.orientation == "h"
     assert legend.xanchor == "left"
-    # Legend.x is in paper coords; 0 is the plot-area left edge, matching the
-    # container-based title.x.
-    assert legend.x == 0
-    # Legend sits just above the plot area, well below the title row.
-    assert 1.0 < legend.y < 1.1
+    # Legend uses container coords at MARGIN_L/width, matching the title.
+    assert legend.xref == "container"
+    assert legend.x == MARGIN_L / PLOT_W
+    # Legend sits in the top margin (container y just under 1).
+    assert 0.5 < legend.y < 1.0
 
 
 def test_style_fig_title_aligned_with_plot_area():
@@ -251,7 +255,7 @@ def test_style_fig_title_aligned_with_plot_area():
 
 
 def test_style_fig_title_buffer_is_height_invariant():
-    from carbon_forecast.plotting.config import TITLE_TOP_PAD_PX
+    from carbon_forecast.plotting.config import TITLE_TOP_OFFSET
 
     # Title top must sit the same pixel distance below the figure top at any
     # height, so the title never creeps into the plot area on tall figures.
@@ -259,21 +263,21 @@ def test_style_fig_title_buffer_is_height_invariant():
     style_fig(short, "x", height=500)
     tall = go.Figure()
     style_fig(tall, "x", height=1500)
-    assert short.layout.title.y == 1 - TITLE_TOP_PAD_PX / 500
-    assert tall.layout.title.y == 1 - TITLE_TOP_PAD_PX / 1500
+    assert short.layout.title.y == 1 - TITLE_TOP_OFFSET / 500
+    assert tall.layout.title.y == 1 - TITLE_TOP_OFFSET / 1500
     # Pixel offset from the top is identical regardless of figure height.
-    assert (1 - short.layout.title.y) * 500 == pytest.approx(TITLE_TOP_PAD_PX)
-    assert (1 - tall.layout.title.y) * 1500 == pytest.approx(TITLE_TOP_PAD_PX)
+    assert (1 - short.layout.title.y) * 500 == pytest.approx(TITLE_TOP_OFFSET)
+    assert (1 - tall.layout.title.y) * 1500 == pytest.approx(TITLE_TOP_OFFSET)
 
 
-def test_style_fig_thickens_thin_line_swatches():
+def test_style_fig_sets_default_line_width_when_unset():
     from carbon_forecast.plotting.config import LINE_WIDTH
 
     fig = go.Figure()
-    fig.add_trace(go.Scatter(x=[1, 2], y=[3, 4], mode="lines", line=dict(width=1), name="thin"))
-    fig.add_trace(go.Scatter(x=[1, 2], y=[3, 4], mode="lines", line=dict(width=4), name="thick"))
+    fig.add_trace(go.Scatter(x=[1, 2], y=[3, 4], mode="lines", name="unset"))
+    fig.add_trace(go.Scatter(x=[1, 2], y=[3, 4], mode="lines", line=dict(width=4), name="explicit"))
     style_fig(fig, "x")
-    # Thin line bumped up to the minimum; already-thick line left alone.
+    # Unset line width gets the project default; an explicit width is preserved.
     assert fig.data[0].line.width == LINE_WIDTH
     assert fig.data[1].line.width == 4
 
@@ -301,12 +305,16 @@ def test_style_fig_title_and_legend_do_not_overlap():
 
 
 def test_style_fig_top_margin_leaves_room_for_title_and_legend():
-    from carbon_forecast.plotting.config import TITLE_TOP_PAD_PX
+    from carbon_forecast.plotting.config import MARGIN_T
 
     fig = go.Figure()
     style_fig(fig, "x")
-    # Top margin must hold the title (pad + glyph height) plus the legend strip.
-    assert fig.layout.margin.t >= TITLE_TOP_PAD_PX + 40
+    # Without a subtitle the top margin is exactly MARGIN_T (room for title + legend).
+    assert fig.layout.margin.t == MARGIN_T
+    # And with a subtitle it grows to make room for the extra line.
+    fig2 = go.Figure()
+    style_fig(fig2, "x", subtitle="s")
+    assert fig2.layout.margin.t > MARGIN_T
 
 
 def test_style_fig_returns_same_figure():
