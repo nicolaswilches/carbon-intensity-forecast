@@ -6,7 +6,7 @@ Inherits from `ds/projects/CLAUDE.md` (workspace conventions: uv, Jupyter sessio
 
 ## Status
 
-Week 1 complete: data pipeline, full 2021-2025 extraction across 5 zones (1,200 Parquet files), S01 validation, S02 descriptive analysis, and the plotting design system in `src/carbon_forecast/plotting/config.py`. Week 2 next: E2 (CarbonCast-faithful) reproduction. Proposal on Overleaf and shared with Prof. Ghaddar.
+Week 2 complete (2026-06-08, catch-up day): E2 (CarbonCast-faithful, production-based CI) built end-to-end and running. Tiers in `src/carbon_forecast/models/` (tier1_source, tier1_flow, tier2_cnnlstm, carboncast_faithful orchestrator with out-of-fold Tier 1); data foundation (processor, normalize, windowing, utils/calendar); `notebooks/S04_e2_results.ipynb` built (full run pending). Live Test B collection on launchd: 25 zones/tick (5 modeled + 20 partners). Week 1 prior: pipeline, 2021-2025 extraction, S01/S02, plotting design system. Week 3 next: E3 extension (flow ANN into Tier 1, retarget Tier 2 to consumption-based CI, partner-CI features). Full status snapshot in `memory/project_state.md`.
 
 ## Locked thesis (frozen 2026-05-10 via /grill-me)
 
