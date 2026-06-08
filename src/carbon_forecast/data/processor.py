@@ -128,8 +128,11 @@ def build_processed(zone: str, data_root: Path | str = "data") -> pd.DataFrame:
     flows = _load_endpoint(zone, "electricity-flows/past-range", data_root)
     weather = _derive_wind_uv(_load_weather(zone, data_root))
 
+    # A source absent from EM's breakdown means zero generation, not missing
+    # data, so NaN -> 0. This also keeps sparse sources (e.g. battery_discharge)
+    # from voiding every model window under drop_na.
     prod_cols = [c for c in power.columns if c.startswith("prod_") and c.endswith("_mw")]
-    prod = power[prod_cols]
+    prod = power[prod_cols].fillna(0.0)
 
     df = pd.DataFrame(index=ci.index)
     df["cons_based_ci"] = ci["carbon_intensity_gco2eq_kwh"]
