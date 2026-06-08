@@ -44,6 +44,8 @@ Collection-first because Test B window (Jun 8-21) is a live, non-recoverable clo
 
 - [x] Test B forecast collector: em_client forecast method, storage snapshot flatten/paths, scripts/collect_forecasts.py, launchd 6h schedule (installed + kickstart-verified)
 - [!] EM CI forecast horizon is 24h not 72h on academic key; power-breakdown forecast 401. Contribution 4 narrows to 1-24h. Flag to Prof. Ghaddar; consider EM support email (memory: project_em_forecast_horizon.md)
+- [x] Partner-zone CI forecasts (E3 input, not backfillable) added to collect_forecasts.py: 20 external partners auto-derived from flow columns, CI-forecast-only. Same launchd job
+- [ ] Partner-zone CI history (E3 input, backfillable): add 20 partner zones to historical past-range extraction. Not urgent
 - [x] Data-processing pipeline (prerequisite for all tiers): utils/calendar, data/processor (CarbonCast Table 1 EFs), data/normalize (train-only), windowing. All 5 zones materialized to data/processed/{zone}.parquet (43824h each)
 
 ## Week 2 (compressed into today): E2 reproduction

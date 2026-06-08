@@ -44,6 +44,36 @@ DEFAULT_FORECAST_DAYS = 4
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_ROOT = PROJECT_ROOT / "data"
 
+OUR_ZONES = {z.em_key for z in ZONES}
+
+
+def _flow_key_to_em_zone(flow_key: str) -> str:
+    """Flow column keys are snake-cased EM zone keys: se_se3 -> SE-SE3."""
+    return flow_key.upper().replace("_", "-")
+
+
+def enumerate_partner_zones(data_root: Path) -> list[str]:
+    """External partner zones whose CI feeds E3, derived from flow columns.
+
+    Reads the latest electricity-flows file per modeled zone (cheap), collects
+    the import_/export_ partner keys, maps them to EM zone keys, and drops our
+    own zones. These are snapshotted CI-forecast-only (no weather): E3 borrows
+    EM's published partner forecast rather than re-forecasting partner CI.
+    """
+    from carbon_forecast.data import storage
+
+    partners: set[str] = set()
+    for zone_key in OUR_ZONES:
+        base = Path(data_root) / "raw" / "em" / zone_key / "electricity-flows" / "past-range"
+        files = sorted(base.glob("*.parquet"))
+        if not files:
+            continue
+        for col in storage.read_parquet(files[-1]).columns:
+            for pre in ("import_", "export_"):
+                if col.startswith(pre) and col.endswith("_mw") and col != f"{pre}total_mw":
+                    partners.add(_flow_key_to_em_zone(col[len(pre):-len("_mw")]))
+    return sorted(partners - OUR_ZONES)
+
 
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
@@ -71,6 +101,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "--dry-run",
         action="store_true",
         help="fetch and log shapes but write nothing to disk",
+    )
+    p.add_argument(
+        "--no-partners",
+        action="store_true",
+        help="skip partner-zone CI forecast capture (E3 inputs)",
     )
     return p
 
@@ -118,6 +153,19 @@ def _collect_zone(
     storage.write_parquet_atomic(wx_df, wx_path)
 
 
+def _collect_partner_ci(
+    em: EMClient, zone_key: str, snapshot: datetime, data_root: Path, dry_run: bool
+) -> None:
+    """Snapshot a partner zone's CI forecast only (no weather). Raises on failure."""
+    ci_payload = em.get_carbon_intensity_forecast(zone_key)
+    ci_df = storage.flatten_em_carbon_intensity_forecast(ci_payload)
+    ci_df["snapshot_utc"] = snapshot
+    logger.info("%-14s partner CI forecast: %d rows", zone_key, len(ci_df))
+    if dry_run:
+        return
+    storage.write_parquet_atomic(ci_df, storage.em_forecast_path(zone_key, snapshot, data_root))
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(
         level=logging.INFO,
@@ -131,11 +179,10 @@ def main(argv: list[str] | None = None) -> int:
     # One capture time for the whole tick, so all zones share a snapshot key.
     snapshot = datetime.now(timezone.utc).replace(microsecond=0)
 
+    partners = [] if args.no_partners else enumerate_partner_zones(args.data_root)
     logger.info(
-        "collecting forecasts at %s for %d zones (dry_run=%s)",
-        snapshot.isoformat(),
-        len(args.zones),
-        args.dry_run,
+        "collecting at %s: %d modeled zones + %d partner zones (dry_run=%s)",
+        snapshot.isoformat(), len(args.zones), len(partners), args.dry_run,
     )
 
     failures: list[tuple[str, str]] = []
@@ -149,8 +196,15 @@ def main(argv: list[str] | None = None) -> int:
             logger.exception("zone %s failed: %s", zone_key, exc)
             failures.append((zone_key, str(exc)))
 
-    ok = len(args.zones) - len(failures)
-    logger.info("done: %d/%d zones captured", ok, len(args.zones))
+    for partner in partners:
+        try:
+            _collect_partner_ci(em, partner, snapshot, args.data_root, args.dry_run)
+        except Exception as exc:
+            logger.exception("partner %s failed: %s", partner, exc)
+            failures.append((partner, str(exc)))
+
+    total = len(args.zones) + len(partners)
+    logger.info("done: %d/%d zones+partners captured", total - len(failures), total)
     if failures:
         for zone_key, msg in failures:
             logger.error("FAILED %s: %s", zone_key, msg)
