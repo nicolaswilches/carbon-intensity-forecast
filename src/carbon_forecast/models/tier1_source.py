@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 
 from carbon_forecast.data.normalize import Normalizer
-from carbon_forecast.data.windowing import WindowedDataset, make_windows
+from carbon_forecast.data.windowing import WindowedDataset, make_windows_segmented
 from carbon_forecast.utils.calendar import CALENDAR_FEATURES
 
 # Sources that receive weather covariates (CarbonCast: renewables only).
@@ -92,7 +92,7 @@ def feature_plan(source: str, frame_cols: list[str]) -> tuple[str, list[str], li
 
 def _window(frame: pd.DataFrame, source: str, cfg: Tier1Config, stride: int) -> WindowedDataset:
     target_col, history_cols, future_cols = feature_plan(source, list(frame.columns))
-    return make_windows(
+    return make_windows_segmented(
         frame,
         history_cols=history_cols,
         target_cols=[target_col],
@@ -106,38 +106,37 @@ def _window(frame: pd.DataFrame, source: str, cfg: Tier1Config, stride: int) -> 
 
 def train_source_model(
     train_frame: pd.DataFrame,
-    val_frame: pd.DataFrame,
+    val_frame: pd.DataFrame | None,
     source: str,
     cfg: Tier1Config | None = None,
     verbose: int = 1,
 ) -> Tier1Artifacts:
-    """Fit one source ANN. Normalizer is fit on train_frame only."""
+    """Fit one source ANN. Normalizer is fit on train_frame only.
+
+    val_frame=None trains a fixed cfg.epochs budget with no validation or early
+    stopping; used for out-of-fold models whose only job is to emit realistically
+    imperfect forecasts, not to be optimally selected.
+    """
     cfg = cfg or Tier1Config()
     target_col, history_cols, future_cols = feature_plan(source, list(train_frame.columns))
 
-    # Train-only standardization, applied to both folds before windowing.
+    # Train-only standardization, applied before windowing.
     normalizer = Normalizer.fit(train_frame)
-    train_n = normalizer.transform(train_frame)
-    val_n = normalizer.transform(val_frame)
-
-    train_ds = _window(train_n, source, cfg, cfg.stride)
-    val_ds = _window(val_n, source, cfg, cfg.val_stride)
-
+    train_ds = _window(normalizer.transform(train_frame), source, cfg, cfg.stride)
     Xtr, ytr = train_ds.flat_inputs(), train_ds.y[..., 0]
-    Xva, yva = val_ds.flat_inputs(), val_ds.y[..., 0]
+
+    fit_kwargs: dict = dict(epochs=cfg.epochs, batch_size=cfg.batch_size, verbose=verbose)
+    if val_frame is not None:
+        val_ds = _window(normalizer.transform(val_frame), source, cfg, cfg.val_stride)
+        fit_kwargs["validation_data"] = (val_ds.flat_inputs(), val_ds.y[..., 0])
+        fit_kwargs["callbacks"] = [
+            keras.callbacks.EarlyStopping(
+                monitor="val_loss", patience=cfg.patience, restore_best_weights=True
+            )
+        ]
 
     model = build_source_ann(Xtr.shape[1], cfg.horizon)
-    es = keras.callbacks.EarlyStopping(
-        monitor="val_loss", patience=cfg.patience, restore_best_weights=True
-    )
-    hist = model.fit(
-        Xtr, ytr,
-        validation_data=(Xva, yva),
-        epochs=cfg.epochs,
-        batch_size=cfg.batch_size,
-        callbacks=[es],
-        verbose=verbose,
-    )
+    hist = model.fit(Xtr, ytr, **fit_kwargs)
     return Tier1Artifacts(
         model=model, normalizer=normalizer, source=source, target_col=target_col,
         history_cols=history_cols, future_cols=future_cols, config=cfg,

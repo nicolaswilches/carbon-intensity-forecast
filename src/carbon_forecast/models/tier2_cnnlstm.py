@@ -143,16 +143,24 @@ def train_tier2(
     val_frame: pd.DataFrame,
     cfg: Tier2Config | None = None,
     normalizer: Normalizer | None = None,
+    train_future_source: np.ndarray | None = None,
+    val_future_source: np.ndarray | None = None,
     verbose: int = 1,
 ) -> Tier2Artifacts:
-    """Fit the Tier 2 CNN-LSTM. Normalizer fit on train_frame if not provided."""
+    """Fit the Tier 2 CNN-LSTM. Normalizer fit on train_frame if not provided.
+
+    train_future_source / val_future_source: optional (N, horizon, n_sources)
+    Tier 1 production forecasts for the future block. The orchestrator passes
+    out-of-fold forecasts for train and final-model forecasts for val; when
+    None, the perfect-forecast placeholder (actual future production) is used.
+    """
     cfg = cfg or Tier2Config()
     normalizer = normalizer or Normalizer.fit(train_frame)
     train_n = normalizer.transform(train_frame)
     val_n = normalizer.transform(val_frame)
 
-    Xtr, ytr, _, channels = assemble_sequences(train_n, cfg, cfg.stride)
-    Xva, yva, _, _ = assemble_sequences(val_n, cfg, cfg.val_stride)
+    Xtr, ytr, _, channels = assemble_sequences(train_n, cfg, cfg.stride, train_future_source)
+    Xva, yva, _, _ = assemble_sequences(val_n, cfg, cfg.val_stride, val_future_source)
 
     model = build_cnn_lstm(Xtr.shape[1], Xtr.shape[2], cfg)
     es = keras.callbacks.EarlyStopping(

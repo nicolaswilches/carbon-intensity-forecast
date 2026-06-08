@@ -53,7 +53,7 @@ Collection-first because Test B window (Jun 8-21) is a live, non-recoverable clo
 - [x] Tier 1 source ANN (per-source feedforward, 168h input, 96h dense head). Clip >=0, MAE/RMSE eval. Smoke-trained BE wind
 - [x] Tier 1 flow ANN (per-interconnector, signed net flow, no clip). Smoke-trained BE<->FR
 - [x] Tier 2 CNN-LSTM (Conv1D 4->pool->Conv1D 16->LSTM 24->dropout->Dense 96). Unified 264-step seq (168 past + 96 future) with is_future flag. Smoke-trained BE, MAPE valid here
-- [ ] E2 orchestrator (CarbonCast-faithful): train source ANNs -> generate forecasts -> train Tier 2. Handle in-sample-forecast leakage (out-of-fold)
+- [x] E2 orchestrator (carboncast_faithful.py): out-of-fold Tier 1 forecasts (leave-one-year-out) for Tier 2 training + final models for inference. Segmented windowing for gapped folds. Smoke-trained BE end-to-end
 - [ ] Notebook S04 (E2 results)
 
 ## Weeks 3 to 8

@@ -76,6 +76,53 @@ def _windows(arr: np.ndarray, size: int) -> np.ndarray:
     return np.moveaxis(sw, -1, 1)
 
 
+def make_windows_segmented(frame: pd.DataFrame, **kwargs) -> WindowedDataset:
+    """Like make_windows but tolerant of gaps: split the frame into contiguous
+    hourly runs, window each, and concatenate.
+
+    Needed for out-of-fold training, where leaving out a middle year (e.g. 2023)
+    makes the training frame non-contiguous. Windows never span a gap. For an
+    already-contiguous frame this returns exactly what make_windows would.
+    """
+    lookback = kwargs.get("lookback", 168)
+    horizon = kwargs.get("horizon", 96)
+    idx = frame.index
+    if not idx.is_monotonic_increasing:
+        frame = frame.sort_index()
+        idx = frame.index
+    diffs = idx[1:] - idx[:-1]
+    breaks = list(np.where(diffs != pd.Timedelta(hours=1))[0] + 1)
+    bounds = [0] + breaks + [len(frame)]
+
+    parts: list[WindowedDataset] = []
+    for a, b in zip(bounds[:-1], bounds[1:]):
+        seg = frame.iloc[a:b]
+        if len(seg) >= lookback + horizon:
+            parts.append(make_windows(seg, **kwargs))
+    if not parts:
+        raise ValueError("no contiguous segment long enough for a single window.")
+
+    X_fut = (
+        np.concatenate([p.X_fut for p in parts], axis=0)
+        if parts[0].X_fut is not None else None
+    )
+    origins = parts[0].origins
+    for p in parts[1:]:
+        origins = origins.append(p.origins)
+    first = parts[0]
+    return WindowedDataset(
+        X_hist=np.concatenate([p.X_hist for p in parts], axis=0),
+        X_fut=X_fut,
+        y=np.concatenate([p.y for p in parts], axis=0),
+        origins=origins,
+        history_cols=first.history_cols,
+        future_cols=first.future_cols,
+        target_cols=first.target_cols,
+        lookback=first.lookback,
+        horizon=first.horizon,
+    )
+
+
 def make_windows(
     frame: pd.DataFrame,
     *,
