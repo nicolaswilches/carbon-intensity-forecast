@@ -38,7 +38,15 @@ Phase 1 deadline: 2026-07-03. Full weekly timeline in `memory/project_thesis.md`
 - [ ] Track Prof. Ghaddar's proposal comments on Overleaf (user-side, carried)
 - [ ] Fill S01 + S02 findings cells from observed figures (carried)
 
-## Week 2 (May 18-24): E2 reproduction
+## CONTINGENCY (catch-up from Jun 8, ~3 weeks behind; deadline Jul 3)
+
+Collection-first because Test B window (Jun 8-21) is a live, non-recoverable clock.
+
+- [x] Test B forecast collector: em_client forecast method, storage snapshot flatten/paths, scripts/collect_forecasts.py, launchd 6h schedule (installed + kickstart-verified)
+- [!] EM CI forecast horizon is 24h not 72h on academic key; power-breakdown forecast 401. Contribution 4 narrows to 1-24h. Flag to Prof. Ghaddar; consider EM support email (memory: project_em_forecast_horizon.md)
+- [x] Data-processing pipeline (prerequisite for all tiers): utils/calendar, data/processor (CarbonCast Table 1 EFs), data/normalize (train-only), windowing. All 5 zones materialized to data/processed/{zone}.parquet (43824h each)
+
+## Week 2 (compressed into today): E2 reproduction
 
 - [ ] Tier 1 source ANN (per-source feedforward, 168h input, 96h dense head)
 - [ ] Tier 1 flow ANN (per-interconnector)
