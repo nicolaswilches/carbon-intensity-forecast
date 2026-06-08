@@ -27,6 +27,11 @@ ENDPOINT_CARBON_INTENSITY_PAST_RANGE = "carbon-intensity/past-range"
 ENDPOINT_POWER_BREAKDOWN_PAST_RANGE = "power-breakdown/past-range"
 ENDPOINT_ELECTRICITY_FLOWS_PAST_RANGE = "electricity-flows/past-range"
 
+# Operational forecast endpoint (Test B head-to-head, Contribution 4).
+# Academic key returns a ~24h CI horizon, hourly, consumption-based; the
+# power-breakdown forecast endpoint is not licensed on this key.
+ENDPOINT_CARBON_INTENSITY_FORECAST = "carbon-intensity/forecast"
+
 
 # Exception class for scenarios with non-retryable API failures
 class EMAPIError(RuntimeError):
@@ -85,6 +90,17 @@ class EMClient:
         self, zone: str, start: datetime, end: datetime
     ) -> dict[str, Any]:
         return self._past_range(ENDPOINT_ELECTRICITY_FLOWS_PAST_RANGE, zone, start, end)
+
+    def get_carbon_intensity_forecast( # operational CI forecast (live snapshot)
+        self, zone: str
+    ) -> dict[str, Any]:
+        """Latest operational CI forecast for a zone.
+
+        No time window: EM returns the forecast from the current hour out to
+        the licensed horizon (24h on the academic key). Same retry, sandbox,
+        and auth handling as the past-range calls.
+        """
+        return self._get(ENDPOINT_CARBON_INTENSITY_FORECAST, {"zone": zone})
 
     # internal methods
 

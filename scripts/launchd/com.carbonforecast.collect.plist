@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Test B forecast collector, 6-hourly (Jun 8-21 head-to-head window).
+
+  Versioned copy. Install with:
+    cp scripts/launchd/com.carbonforecast.collect.plist ~/Library/LaunchAgents/
+    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.carbonforecast.collect.plist
+  Uninstall after Jun 21:
+    launchctl bootout gui/$(id -u)/com.carbonforecast.collect
+    rm ~/Library/LaunchAgents/com.carbonforecast.collect.plist
+
+  Note: fires at local hours 00/06/12/18. On a sleeping laptop a missed
+  slot runs once on wake; keep the Mac awake/plugged in during the window,
+  or move this job to an always-on host to avoid gaps.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.carbonforecast.collect</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/uv</string>
+        <string>run</string>
+        <string>python</string>
+        <string>scripts/collect_forecasts.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/nicolaswilches/ds/projects/carbon-intensity-forecast</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Hour</key><integer>0</integer><key>Minute</key><integer>5</integer></dict>
+        <dict><key>Hour</key><integer>6</integer><key>Minute</key><integer>5</integer></dict>
+        <dict><key>Hour</key><integer>12</integer><key>Minute</key><integer>5</integer></dict>
+        <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>5</integer></dict>
+    </array>
+
+    <key>RunAtLoad</key>
+    <false/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/nicolaswilches/ds/projects/carbon-intensity-forecast/logs/collect_forecasts.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/nicolaswilches/ds/projects/carbon-intensity-forecast/logs/collect_forecasts.err.log</string>
+</dict>
+</plist>

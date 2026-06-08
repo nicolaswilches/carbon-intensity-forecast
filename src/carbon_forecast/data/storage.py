@@ -50,6 +50,18 @@ def weather_archive_path(zone: str, year: int, month: int, root: Path) -> Path:
     return Path(root) / "raw" / "weather" / zone / f"{year:04d}-{month:02d}.parquet"
 
 
+def weather_forecast_path(zone: str, snapshot: datetime, root: Path) -> Path:
+    """Path for a single GFS weather-forecast snapshot. snapshot must be tz-aware UTC.
+
+    Captured alongside each EM forecast snapshot so the open model can be
+    replayed offline on the exact inputs it would have seen at snapshot time.
+    """
+    if snapshot.tzinfo is None:
+        raise ValueError("snapshot must be timezone-aware (UTC).")
+    iso = snapshot.astimezone(tz=snapshot.tzinfo).strftime("%Y%m%dT%H%M%SZ")
+    return Path(root) / "raw" / "weather" / "forecasts" / zone / f"{iso}.parquet"
+
+
 def processed_path(zone: str, root: Path) -> Path:
     """Path for the processed, modeling-ready Parquet of a zone."""
     return Path(root) / "processed" / f"{zone}.parquet"
@@ -84,6 +96,40 @@ def flatten_em_carbon_intensity(payload: dict[str, Any]) -> pd.DataFrame:
             }
         )
     return _finalize(pd.DataFrame(rows))  # converts the list 'rows' into a dataframe
+
+
+def flatten_em_carbon_intensity_forecast(payload: dict[str, Any]) -> pd.DataFrame:
+    """
+    Operational CI forecast snapshot -> DataFrame indexed by target datetime.
+
+    EM payload shape:
+        {"zone": "BE",
+         "forecast": [{"datetime": "...Z", "carbonIntensity": 141}, ...],
+         "updatedAt": "...Z", "temporalGranularity": "hourly"}
+
+    Output columns:
+      - carbon_intensity_gco2eq_kwh (Float64): forecast value per target hour.
+      - updated_at (UTC): EM model-run timestamp, identical across the rows of
+        one snapshot. Lets a concatenation of snapshots be grouped by model run.
+
+    The capture/snapshot time itself is carried by the filename
+    (`em_forecast_path`); the collector attaches it as a column before writing.
+    """
+    forecast = payload.get("forecast") or payload.get("data") or []
+    if not forecast:
+        return _empty_frame(["carbon_intensity_gco2eq_kwh", "updated_at"])
+
+    updated_at = pd.to_datetime(payload.get("updatedAt"), utc=True, errors="coerce")
+    rows = []
+    for record in forecast:
+        rows.append(
+            {
+                "datetime": record["datetime"],
+                "carbon_intensity_gco2eq_kwh": record.get("carbonIntensity"),
+                "updated_at": updated_at,
+            }
+        )
+    return _finalize(pd.DataFrame(rows))
 
 
 def flatten_em_power_breakdown(payload: dict[str, Any]) -> pd.DataFrame:
