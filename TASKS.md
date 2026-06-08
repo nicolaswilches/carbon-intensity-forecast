@@ -48,8 +48,8 @@ Collection-first because Test B window (Jun 8-21) is a live, non-recoverable clo
 
 ## Week 2 (compressed into today): E2 reproduction
 
-- [ ] Tier 1 source ANN (per-source feedforward, 168h input, 96h dense head)
-- [ ] Tier 1 flow ANN (per-interconnector)
+- [x] Tier 1 source ANN (per-source feedforward, 168h input, 96h dense head). Clip >=0, MAE/RMSE eval. Smoke-trained BE wind
+- [x] Tier 1 flow ANN (per-interconnector, signed net flow, no clip). Smoke-trained BE<->FR
 - [ ] Tier 2 CNN-LSTM
 - [ ] E2 orchestrator (CarbonCast-faithful), train + validate on Jan-Apr 2026
 - [ ] Notebook S04 (E2 results)
