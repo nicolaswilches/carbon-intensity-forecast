@@ -188,3 +188,16 @@ def evaluate_ci(art: E2Artifacts, frame: pd.DataFrame) -> dict[str, float]:
     """End-to-end E2 accuracy: MAPE (primary), MAE, RMSE on production-based CI."""
     fs = _inference_future_source(art, frame, stride=1)
     return t2.evaluate_ci(art.tier2, frame, future_source=fs)
+
+
+def predict_with_truth(
+    art: E2Artifacts, frame: pd.DataFrame
+) -> tuple[np.ndarray, np.ndarray, pd.DatetimeIndex]:
+    """Return (preds, y_true, origins), each (N, 96) in gCO2eq/kWh, for
+    per-horizon analysis (degradation curves, failure modes)."""
+    fs = _inference_future_source(art, frame, stride=1)
+    preds, origins = t2.predict_ci(art.tier2, frame, future_source=fs)
+    frame_n = art.tier2.normalizer.transform(frame)
+    _, y_norm, _, _ = t2.assemble_sequences(frame_n, art.tier2.config, 1, fs)
+    y_true = art.tier2.normalizer.inverse_transform(y_norm, art.tier2.target_col)
+    return preds, y_true, origins
