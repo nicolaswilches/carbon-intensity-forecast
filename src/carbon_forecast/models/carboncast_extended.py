@@ -29,6 +29,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
+import keras
 import numpy as np
 import pandas as pd
 
@@ -184,7 +185,13 @@ def train_e3(
     zone: str,
     cfg: E3Config | None = None,
     verbose: int = 1,
+    seed: int | None = 0,
 ) -> E3Artifacts:
+    # Seed Python/NumPy/TF once at the orchestrator entry so the whole sequence of
+    # Tier 1 (source + flow) and Tier 2 fits is reproducible. Pass distinct seeds
+    # to quantify residual variance across runs.
+    if seed is not None:
+        keras.utils.set_random_seed(seed)
     cfg = cfg or E3Config()
     source_cols = source_columns(train_frame)
     flow_cols = flow_columns(train_frame)
