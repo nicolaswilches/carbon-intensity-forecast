@@ -56,6 +56,23 @@ Collection-first because Test B window (Jun 8-21) is a live, non-recoverable clo
 - [x] E2 orchestrator (carboncast_faithful.py): out-of-fold Tier 1 forecasts (leave-one-year-out) for Tier 2 training + final models for inference. Segmented windowing for gapped folds. Smoke-trained BE end-to-end
 - [x] Notebook S04 (E2 results): imports orchestrator, loads processed parquets (Colab-portable), full-settings train, MAPE/MAE/RMSE, per-horizon degradation curve. Built; full run pending (BE-first then 5 zones)
 
-## Weeks 3 to 8
+## Week 3 (in progress from 2026-06-09): E3 extension
+
+- [x] Run E2 baseline S04 (BE, proxy split): MAPE 35.16%, MAE 70.93, RMSE 91.34 (14.4 min CPU). 5-zone run still a Colab job
+- [x] Partner-CI history extraction: 20 partner zones, carbon-intensity/past-range 2021-2025 (1200/1200 months, 876k rows). extract_historical.py gained synthetic CI-only zone resolution + endpoint filter
+- [x] Processor: per-partner net_flow_*_mw + partner_ci_* columns (gap-filled, coverage-aware). 5 frames re-materialized
+- [x] Tier 2 generalized: config-driven target_col + dynamic_cols; future override is first-K channels (partner CI held as actuals = strategy A). E2 path regression-safe (106 tests pass)
+- [x] Tier 1 flow: segmented windowing + val=None support, so it joins the OOF machinery like sources
+- [x] E3 orchestrator carboncast_extended.py: source+flow Tier 1 (OOF+final) -> consumption-based Tier 2; partner CI via strategy A (train actuals) / persistence (inference). Smoke-tested BE end-to-end
+- [x] Notebook S03 (feature engineering): cons-vs-prod gap, import dependence, partner-CI/gap corr 0.83 (BE), feature association, lookback ACF. Executed + findings filled
+- [x] First E3 full BE run (proxy split): cons-based CI MAPE 42.59%, MAE 64.07, RMSE 79.05 (18.7 min). Lower MAE/RMSE than E2 on the harder cons-based target; MAPE not directly comparable (different targets). h96 MAPE spike to investigate
+- [x] S05 E3 results notebook with full 1-96 per-horizon curve (MAPE + MAE, 2-panel). Diagnostic: error peaks at SHORT horizon (~h6), not h96; the "h96 spike" was a 5-point sampling artifact. Late-horizon rise is real (in MAE too) but secondary
+- [x] Seed Tier 1 + Tier 2 (keras.utils.set_random_seed at orchestrator entry, default seed=0). Bit-exact reproducible on CPU
+- [!] Variance large EVEN seeded: BE E3 3-seed MAPE 37.11 ± 4.95 (33.26-44.09), MAE 61.62 ± 3.51, RMSE 78.34 ± 3.35. Seed 0 (the default) is the unlucky high draw. Implication: tuning/comparison deltas < ~5 MAPE pts are noise; must seed-average. Variance reduction (more seeds / ensemble) now a WEEK 4 task
+- [ ] Week 4: add persistence/last-value CI feature to Tier 2 (short-horizon h1-h6 is worst; future CI channel is zeroed with no anchor)
+- [ ] E3 5-zone run (Colab); compare vs E2 per zone (after seeding)
+- [ ] Partner-CI forecast hook for Test B head-to-head (EM published partner forecast); persistence is the default elsewhere
+
+## Weeks 4 to 8
 
 See `memory/project_thesis.md` "Weekly timeline" section. Stretch experiments and Plan-B rules are also there.
