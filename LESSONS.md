@@ -9,3 +9,5 @@
 - EM `/past-range` caps hourly windows at 10 days. Monthly chunks must be split into ≤10-day sub-windows and concatenated before write.
 - EM returns records under `data` (not `history`). Flow endpoint is `electricity-flows`, not `power-flows`. Flow records nest under `import`/`export` (lowercase, no `power` prefix). Verify response shape on first real pull before writing flatten logic.
 - Plotly heatmaps treat string x/y as categories: duplicate labels (e.g. day letters M,T,W,T,F,S,S) collapse into one column. Use numeric positions for x/y and map display labels via `tickvals`/`ticktext`.
+- A failing nbstripout clean filter aborts the whole `git add` and silently leaves earlier-listed files unstaged. After committing notebooks, run `git show --stat <sha>` to confirm every intended file landed. Keep nbstripout installed in the venv (`uv sync --extra dev`); a missing module makes the filter fail.
+- launchd/cron jobs should call `.venv/bin/python` directly, not `uv run python`: `uv run` re-resolves the env per invocation and needs network, so a transient DNS failure silently skips a tick.
