@@ -14,6 +14,11 @@
   Note: fires at local hours 00/06/12/18. On a sleeping laptop a missed
   slot runs once on wake; keep the Mac awake/plugged in during the window,
   or move this job to an always-on host to avoid gaps.
+
+  Runs the venv Python directly (not `uv run`): `uv run` re-resolves the env
+  per invocation and needs network to rebuild, which silently skipped the
+  Jun 11 12:05 tick on a transient DNS failure. Direct venv Python has no
+  such dependency. Re-point if the venv path changes.
 -->
 <plist version="1.0">
 <dict>
@@ -22,9 +27,7 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/opt/homebrew/bin/uv</string>
-        <string>run</string>
-        <string>python</string>
+        <string>/Users/nicolaswilches/ds/projects/carbon-intensity-forecast/.venv/bin/python</string>
         <string>scripts/collect_forecasts.py</string>
     </array>
 
