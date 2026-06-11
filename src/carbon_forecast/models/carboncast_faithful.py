@@ -24,6 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+import keras
 import numpy as np
 import pandas as pd
 
@@ -128,7 +129,11 @@ def train_e2(
     zone: str,
     cfg: E2Config | None = None,
     verbose: int = 1,
+    seed: int | None = 0,
 ) -> E2Artifacts:
+    # Seed Python/NumPy/TF once so the full Tier 1 -> Tier 2 sequence is reproducible.
+    if seed is not None:
+        keras.utils.set_random_seed(seed)
     cfg = cfg or E2Config()
     source_cols = source_columns(train_frame)
     if verbose:
@@ -161,7 +166,7 @@ def train_e2(
         print(f"[E2:{zone}] training Tier 2 (train fs {fs_train.shape}, val fs {fs_val.shape})")
     tier2 = t2.train_tier2(
         train_frame, val_frame, cfg.tier2, normalizer=t2norm,
-        train_future_source=fs_train, val_future_source=fs_val,
+        train_future_dynamic=fs_train, val_future_dynamic=fs_val,
         verbose=2 if verbose else 0,
     )
     return E2Artifacts(
@@ -181,13 +186,13 @@ def _inference_future_source(art: E2Artifacts, frame: pd.DataFrame, stride: int)
 def predict_ci(art: E2Artifacts, frame: pd.DataFrame) -> tuple[np.ndarray, pd.DatetimeIndex]:
     """Full chain: final Tier 1 -> Tier 2 -> 96h production-based CI (gCO2eq/kWh)."""
     fs = _inference_future_source(art, frame, stride=1)
-    return t2.predict_ci(art.tier2, frame, future_source=fs)
+    return t2.predict_ci(art.tier2, frame, future_dynamic=fs)
 
 
 def evaluate_ci(art: E2Artifacts, frame: pd.DataFrame) -> dict[str, float]:
     """End-to-end E2 accuracy: MAPE (primary), MAE, RMSE on production-based CI."""
     fs = _inference_future_source(art, frame, stride=1)
-    return t2.evaluate_ci(art.tier2, frame, future_source=fs)
+    return t2.evaluate_ci(art.tier2, frame, future_dynamic=fs)
 
 
 def predict_with_truth(
@@ -196,7 +201,7 @@ def predict_with_truth(
     """Return (preds, y_true, origins), each (N, 96) in gCO2eq/kWh, for
     per-horizon analysis (degradation curves, failure modes)."""
     fs = _inference_future_source(art, frame, stride=1)
-    preds, origins = t2.predict_ci(art.tier2, frame, future_source=fs)
+    preds, origins = t2.predict_ci(art.tier2, frame, future_dynamic=fs)
     frame_n = art.tier2.normalizer.transform(frame)
     _, y_norm, _, _ = t2.assemble_sequences(frame_n, art.tier2.config, 1, fs)
     y_true = art.tier2.normalizer.inverse_transform(y_norm, art.tier2.target_col)
