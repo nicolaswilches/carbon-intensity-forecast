@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 
 from carbon_forecast.data.normalize import Normalizer
-from carbon_forecast.data.windowing import WindowedDataset, make_windows
+from carbon_forecast.data.windowing import WindowedDataset, make_windows_segmented
 from carbon_forecast.models.tier1_source import (
     WEATHER_FORECAST_COLS,
     build_source_ann,
@@ -96,7 +96,7 @@ def feature_plan_flow(partner: str, frame_cols: list[str]) -> tuple[str, list[st
 
 def _window(frame: pd.DataFrame, partner: str, cfg: Tier1FlowConfig, stride: int) -> WindowedDataset:
     target_col, history_cols, future_cols = feature_plan_flow(partner, list(frame.columns))
-    return make_windows(
+    return make_windows_segmented(
         frame,
         history_cols=history_cols,
         target_cols=[target_col],
@@ -110,40 +110,38 @@ def _window(frame: pd.DataFrame, partner: str, cfg: Tier1FlowConfig, stride: int
 
 def train_flow_model(
     train_frame: pd.DataFrame,
-    val_frame: pd.DataFrame,
+    val_frame: pd.DataFrame | None,
     partner: str,
     cfg: Tier1FlowConfig | None = None,
     verbose: int = 1,
 ) -> Tier1FlowArtifacts:
     """Fit one interconnector ANN. Net-flow columns are derived first; the
-    Normalizer is fit on train_frame only."""
+    Normalizer is fit on train_frame only.
+
+    val_frame=None trains a fixed cfg.epochs budget with no validation or early
+    stopping; used for out-of-fold models (mirrors the source ANN convention).
+    """
     cfg = cfg or Tier1FlowConfig()
     train_frame = add_net_flows(train_frame, [partner])
-    val_frame = add_net_flows(val_frame, [partner])
     target_col, history_cols, future_cols = feature_plan_flow(partner, list(train_frame.columns))
 
     normalizer = Normalizer.fit(train_frame)
-    train_n = normalizer.transform(train_frame)
-    val_n = normalizer.transform(val_frame)
-
-    train_ds = _window(train_n, partner, cfg, cfg.stride)
-    val_ds = _window(val_n, partner, cfg, cfg.val_stride)
-
+    train_ds = _window(normalizer.transform(train_frame), partner, cfg, cfg.stride)
     Xtr, ytr = train_ds.flat_inputs(), train_ds.y[..., 0]
-    Xva, yva = val_ds.flat_inputs(), val_ds.y[..., 0]
+
+    fit_kwargs: dict = dict(epochs=cfg.epochs, batch_size=cfg.batch_size, verbose=verbose)
+    if val_frame is not None:
+        val_n = normalizer.transform(add_net_flows(val_frame, [partner]))
+        val_ds = _window(val_n, partner, cfg, cfg.val_stride)
+        fit_kwargs["validation_data"] = (val_ds.flat_inputs(), val_ds.y[..., 0])
+        fit_kwargs["callbacks"] = [
+            keras.callbacks.EarlyStopping(
+                monitor="val_loss", patience=cfg.patience, restore_best_weights=True
+            )
+        ]
 
     model = build_source_ann(Xtr.shape[1], cfg.horizon)
-    es = keras.callbacks.EarlyStopping(
-        monitor="val_loss", patience=cfg.patience, restore_best_weights=True
-    )
-    hist = model.fit(
-        Xtr, ytr,
-        validation_data=(Xva, yva),
-        epochs=cfg.epochs,
-        batch_size=cfg.batch_size,
-        callbacks=[es],
-        verbose=verbose,
-    )
+    hist = model.fit(Xtr, ytr, **fit_kwargs)
     return Tier1FlowArtifacts(
         model=model, normalizer=normalizer, partner=partner, target_col=target_col,
         history_cols=history_cols, future_cols=future_cols, config=cfg,

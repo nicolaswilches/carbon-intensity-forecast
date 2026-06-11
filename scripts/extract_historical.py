@@ -25,9 +25,32 @@ from carbon_forecast.data.extract import (
     extract_weather_history,
 )
 from carbon_forecast.data.weather_client import WeatherClient
-from carbon_forecast.data.zones import ZONES, get_zone
+from carbon_forecast.data.zones import ZONES, Zone, get_zone
 
 logger = logging.getLogger("extract_historical")
+
+
+def _resolve_zones(keys: list[str], source: str) -> list[Zone]:
+    """Resolve EM zone keys to Zone objects.
+
+    The five modeled zones resolve via the centroid cache. Partner zones (E3
+    CI inputs) are not in the cache and carry no coordinates; for EM-only pulls
+    they resolve to a synthetic CI-only Zone (extract_em_history uses em_key
+    alone). A weather pull on such a zone has no coordinates, so it is rejected.
+    """
+    resolved: list[Zone] = []
+    for key in keys:
+        try:
+            resolved.append(get_zone(key))
+        except KeyError:
+            if source != "em":
+                raise SystemExit(
+                    f"zone {key!r} has no centroid; weather extraction needs "
+                    f"coordinates. Use --source em for partner CI-only pulls."
+                )
+            resolved.append(Zone(em_key=key, latitude=float("nan"),
+                                 longitude=float("nan"), display_name=key))
+    return resolved
 
 
 def _parse_month(s: str) -> date:
@@ -90,7 +113,7 @@ def main(argv: list[str] | None = None) -> int:
         format="%(asctime)s %(levelname)s %(message)s",
     )
 
-    zones = [get_zone(z) for z in args.zones]
+    zones = _resolve_zones(args.zones, args.source)
 
     if args.source in ("em", "both"):
         em_client = EMClient()

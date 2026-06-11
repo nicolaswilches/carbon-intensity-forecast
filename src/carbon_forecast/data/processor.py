@@ -10,7 +10,8 @@ and features:
   - cons_based_ci: EM's reported consumption-based CI, carried through as the
     E3 target.
   - per-source production (prod_*_mw), total generation, renewable share.
-  - per-partner net flow and net total flow.
+  - per-partner net flow (net_flow_*_mw) and net total flow.
+  - per-partner carbon intensity (partner_ci_*), an E3 consumption-based feature.
   - weather: u/v wind derived from speed/direction, plus the raw GFS variables.
   - calendar features (zone-local) from utils.calendar.
 
@@ -69,6 +70,38 @@ def _load_endpoint(zone: str, endpoint: str, data_root: Path) -> pd.DataFrame:
     frames = [storage.read_parquet(f) for f in files]
     df = pd.concat(frames).sort_index()
     return df[~df.index.duplicated(keep="last")]
+
+
+def _flow_key_to_em_zone(flow_key: str) -> str:
+    """Flow column key (e.g. 'ca_qc') -> EM zone key (e.g. 'CA-QC')."""
+    return flow_key.upper().replace("_", "-")
+
+
+def flow_partner_keys(flows: pd.DataFrame) -> list[str]:
+    """Partner flow keys present in import_/export_ columns (excludes totals)."""
+    keys: set[str] = set()
+    for c in flows.columns:
+        for pre in ("import_", "export_"):
+            if c.startswith(pre) and c.endswith("_mw") and c != f"{pre}total_mw":
+                keys.add(c[len(pre):-len("_mw")])
+    return sorted(keys)
+
+
+def _load_partner_ci(partner_em_key: str, data_root: Path) -> pd.Series | None:
+    """Concatenate a partner zone's carbon-intensity history, or None if absent.
+
+    Partner CI is an E3 consumption-based feature: imported electricity carries
+    the exporting zone's carbon intensity. History is backfilled separately
+    (CI-only) for the flow partners of the five modeled zones.
+    """
+    base = Path(data_root) / "raw" / "em" / partner_em_key / "carbon-intensity" / "past-range"
+    files = sorted(base.glob("*.parquet"))
+    if not files:
+        return None
+    frames = [storage.read_parquet(f) for f in files]
+    df = pd.concat(frames).sort_index()
+    df = df[~df.index.duplicated(keep="last")]
+    return df["carbon_intensity_gco2eq_kwh"]
 
 
 def _load_weather(zone: str, data_root: Path) -> pd.DataFrame:
@@ -156,6 +189,25 @@ def build_processed(zone: str, data_root: Path | str = "data") -> pd.DataFrame:
     imports = flows[[c for c in flows.columns if c.startswith("import_")]].sum(axis=1)
     exports = flows[[c for c in flows.columns if c.startswith("export_")]].sum(axis=1)
     df["net_import_total_mw"] = imports - exports
+
+    # E3 cross-border features: per-partner signed net flow (import - export,
+    # missing leg = 0) and the partner's carbon intensity. Net flow is the Tier 1
+    # flow ANN target; partner CI is the consumption-based channel. Partner CI is
+    # gap-filled (ffill/bfill) so it never voids a model window; partners with no
+    # backfilled CI history are simply omitted.
+    for p in flow_partner_keys(flows):
+        imp = flows[f"import_{p}_mw"].fillna(0.0) if f"import_{p}_mw" in flows else 0.0
+        exp = flows[f"export_{p}_mw"].fillna(0.0) if f"export_{p}_mw" in flows else 0.0
+        df[f"net_flow_{p}_mw"] = imp - exp
+        partner_ci = _load_partner_ci(_flow_key_to_em_zone(p), data_root)
+        if partner_ci is None:
+            logger.info("no CI history for partner %s; omitting partner_ci_%s", p, p)
+            continue
+        aligned = partner_ci.reindex(df.index).ffill().bfill()
+        if aligned.notna().any():
+            df[f"partner_ci_{p}"] = aligned
+        else:
+            logger.warning("partner %s CI empty after align; omitting", p)
 
     # Weather (incl. derived u/v) and calendar features.
     df = df.join(weather, how="left")
