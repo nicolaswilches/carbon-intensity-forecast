@@ -69,7 +69,11 @@ Collection-first because Test B window (Jun 8-21) is a live, non-recoverable clo
 - [x] S05 E3 results notebook with full 1-96 per-horizon curve (MAPE + MAE, 2-panel). Diagnostic: error peaks at SHORT horizon (~h6), not h96; the "h96 spike" was a 5-point sampling artifact. Late-horizon rise is real (in MAE too) but secondary
 - [x] Seed Tier 1 + Tier 2 (keras.utils.set_random_seed at orchestrator entry, default seed=0). Bit-exact reproducible on CPU
 - [!] Variance large EVEN seeded: BE E3 3-seed MAPE 37.11 ± 4.95 (33.26-44.09), MAE 61.62 ± 3.51, RMSE 78.34 ± 3.35. Seed 0 (the default) is the unlucky high draw. Implication: tuning/comparison deltas < ~5 MAPE pts are noise; must seed-average. Variance reduction (more seeds / ensemble) now a WEEK 4 task
-- [ ] Week 4: add persistence/last-value CI feature to Tier 2 (short-horizon h1-h6 is worst; future CI channel is zeroed with no anchor)
+- [x] Last-value persistence feature: tested seed-averaged, NO improvement (within noise). Parked behind a toggle (off)
+- [x] 5-zone seed-averaged on PROXY split: SG 1.36, PJM 7.15, NYIS 14.54, FI 25.66, BE 37.11 (MAPE). Strong per-region heterogeneity; variance is BE-specific
+- [x] Extracted 2026 Jan-May (modeled + partners); switched S04/S05 to real split (train 21-25, val 26 Jan-Apr, Test A May)
+- [!] BE unstable on real split (Test A): training diverges to NaN on some seeds; non-NaN seeds ~54-67 MAPE (vs 37 proxy). Data is clean (checked). FIX: add gradient clipping (clipnorm) to optimizer, then re-run BE
+- [~] 4-zone real-split Test A run (FI/SG/PJM/NYIS) seed-averaged in progress; BE deferred to stability fix
 - [ ] E3 5-zone run (Colab); compare vs E2 per zone (after seeding)
 - [ ] Partner-CI forecast hook for Test B head-to-head (EM published partner forecast); persistence is the default elsewhere
 

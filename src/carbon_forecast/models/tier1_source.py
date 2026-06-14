@@ -76,7 +76,9 @@ def build_source_ann(input_dim: int, horizon: int = 96) -> keras.Model:
         + [keras.layers.Dense(horizon)],
         name="tier1_source_ann",
     )
-    model.compile(optimizer=keras.optimizers.Adam(), loss=_rmse)
+    # clipnorm guards against the occasional seed whose gradients blow up and
+    # diverge (seen on BE/FI under the real split); stable seeds are unaffected.
+    model.compile(optimizer=keras.optimizers.Adam(clipnorm=1.0), loss=_rmse)
     return model
 
 

@@ -60,6 +60,9 @@ class Tier2Config:
     # Forecastable channels (actual past / forecast future). None auto-detects
     # the per-source production columns, i.e. the E2 set.
     dynamic_cols: list[str] | None = None
+    # Seed the future-block CI channel with the last observed CI (held flat)
+    # instead of zero, as a persistence anchor. Off keeps the original behavior.
+    seed_future_with_persistence: bool = False
 
 
 @dataclass
@@ -92,7 +95,7 @@ def build_cnn_lstm(timesteps: int, n_features: int, cfg: Tier2Config) -> keras.M
         ],
         name="tier2_cnn_lstm",
     )
-    model.compile(optimizer=keras.optimizers.Adam(), loss=_rmse)
+    model.compile(optimizer=keras.optimizers.Adam(clipnorm=1.0), loss=_rmse)
     return model
 
 
@@ -154,9 +157,14 @@ def assemble_sequences(
     if future_dynamic is not None:
         k = future_dynamic.shape[-1]
         fut_core[:, :, :k] = future_dynamic.astype(np.float32)
-    ci_zero = np.zeros((n, cfg.horizon, 1), np.float32)
+    if cfg.seed_future_with_persistence:
+        # Last observed CI (past block's final step, channel 0) held flat as a
+        # persistence anchor for the future block.
+        ci_seed = np.repeat(ds.X_hist[:, -1:, 0:1], cfg.horizon, axis=1).astype(np.float32)
+    else:
+        ci_seed = np.zeros((n, cfg.horizon, 1), np.float32)
     is_fut = np.ones((n, cfg.horizon, 1), np.float32)
-    future = np.concatenate([ci_zero, fut_core, is_fut], axis=2)
+    future = np.concatenate([ci_seed, fut_core, is_fut], axis=2)
 
     X = np.concatenate([past, future], axis=1)  # (N, 264, F)
     y = ds.y[..., 0]
