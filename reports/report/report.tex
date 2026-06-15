@@ -131,7 +131,7 @@ Year & Finland & Belgium & Singapore & PJM & NYIS \\
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{eda_ci_evolution.pdf}
-\caption{Per-region annual consumption-based carbon intensity, 2021 to 2026.}
+\caption{Daily-average consumption-based carbon intensity per region, 2021 to 2026.}
 \label{fig:ci-evolution}
 \end{figure*}
 Three distinct trajectories. Finland falls sharply (161 to roughly 70 to 84), a
@@ -160,7 +160,7 @@ slowly rising 6\% to 10\%.
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{eda_mix_evolution.pdf}
-\caption{Generation-mix share by year (nuclear / renewable / fossil / other), per region.}
+\caption{Generation-mix share by year as 100\% stacked columns (nuclear / renewable / fossil / other), per region.}
 \label{fig:mix-evolution}
 \end{figure*}
 
@@ -209,7 +209,7 @@ Finland     & 101 & 86  & 54 & 29--288  & +0.93 \\
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{eda_distribution.pdf}
-\caption{Consumption-based carbon intensity distribution per region (violin, mean line shown).}
+\caption{Consumption-based carbon intensity distribution per region (overlaid histograms).}
 \label{fig:distribution}
 \end{figure*}
 This explains the percentage-error pattern in the results. Singapore is tight and
@@ -236,9 +236,18 @@ NYIS & 19h / 3h & Jul / Apr \\
 \end{table}
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{eda_temporal.pdf}
-\caption{Average consumption-based carbon intensity by hour of day (local) and by month, per region.}
-\label{fig:temporal}
+\includegraphics[width=\textwidth]{eda_temporal_hour_dow.pdf}
+\caption{Consumption-based carbon intensity by hour of day (local) and day of week,
+per region. Color is each region's own carbon-intensity percentile.}
+\label{fig:temporal-hd}
+\end{figure*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{eda_temporal_month_year.pdf}
+\caption{Consumption-based carbon intensity by month and year, per region. Color is
+each region's own carbon-intensity percentile.}
+\label{fig:temporal-my}
 \end{figure*}
 A clear split by climate and structure. The European zones peak in winter
 (heating), with Finland strongly seasonal and almost no daily cycle, consistent
