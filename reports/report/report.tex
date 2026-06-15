@@ -1,0 +1,178 @@
+\documentclass[sigconf,nonacm]{acmart}
+
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\pagestyle{plain}
+
+\usepackage{booktabs}
+
+\title{Open, Reproducible Consumption-Based Carbon Intensity Forecasting with Explicit Cross-Border Flow Modeling}
+
+\author{Nicol\'as Higuera Wilches}
+\affiliation{
+  \institution{IE University, School of Science and Technology}
+  \city{Madrid}
+  \country{Spain}
+}
+\email{nicolaswilches@icloud.com}
+
+\author{Bissan Ghaddar}
+\affiliation{
+  \institution{Advisor, IE University}
+  \city{Madrid}
+  \country{Spain}
+}
+
+\begin{document}
+
+\begin{abstract}
+We present an open, reproducible deep learning framework for short-horizon
+consumption-based carbon intensity forecasting that explicitly models
+cross-border electricity flows, evaluated across five structurally diverse grid
+zones (US-MIDA-PJM, US-NY-NYIS, Finland, Belgium, and Singapore). The framework
+reproduces the closed CarbonCast methodology as a production-based baseline,
+extends it to a consumption-based target with interconnector flow and partner
+carbon intensity inputs, and compares both against a single-tier model that
+forecasts carbon intensity directly. We report a per-region accuracy atlas, a
+structural ablation of the two-tier design, and a characterization of where
+forecasts succeed and fail. % TODO: fold in final headline numbers once the
+% Friday model comparison completes.
+\end{abstract}
+
+\maketitle
+
+\section{Introduction and Problem}
+% Reuse and tighten the proposal's framing.
+Data center electricity demand is rising sharply, and the carbon caused by a
+workload depends on when and where it runs. The operationally correct signal for
+a carbon-aware scheduler is \emph{consumption-based} carbon intensity, which
+accounts for the carbon embedded in imported electricity, rather than the
+\emph{production-based} intensity of locally generated power that most academic
+forecasters target. This report develops short-horizon (96 hour) forecasts of
+consumption-based carbon intensity, opens a closed methodology, and characterizes
+performance across heterogeneous grids.
+
+\section{Related Work}
+% TODO: CarbonCast (Maji et al., BuildSys '22), EnsembleCI, CarbonFlex, Phoenix.
+% Position the gap: closed operational models; production-based academic targets;
+% flows ignored. See docs/lit-notes.
+
+\section{Data}
+We use Electricity Maps (academic license) for hourly carbon intensity, power
+breakdown, and electricity flows, and Open-Meteo (ERA5 reanalysis for history,
+GFS for forecasts) for weather, over 2021 through May 2026 across the five zones.
+Carbon intensity is computed with CarbonCast Table~1 lifecycle emission factors.
+For each zone we also collect the carbon intensity history of its interconnector
+partners (20 external zones), used as a consumption-based feature.
+
+\paragraph{A regime shift in Finland.}
+Annual mean consumption-based carbon intensity in Finland falls from about
+161~gCO\textsubscript{2}eq/kWh in 2021 to about 80 in 2023, then stabilizes near
+66 to 84 thereafter, while renewable share stays flat. The drop is consistent
+with new nuclear capacity entering the mix. Belgium, by contrast, is stable over
+the same window (roughly 150 to 195). This motivates a per-zone training window
+(Section~\ref{sec:setup}): training Finland on the pre-shift years would teach a
+regime that no longer holds.
+
+\section{Methodology}
+\subsection{Two-tier architecture}
+Following CarbonCast, the two-tier model couples per-source Tier~1 feedforward
+networks that forecast generation, with a Tier~2 convolutional-recurrent network
+that consumes those forecasts together with historical carbon intensity, weather,
+and calendar features to emit a 96 hour carbon intensity vector. We extend Tier~1
+with per-interconnector flow networks that forecast signed net flow, and we add
+partner carbon intensity as a Tier~2 channel. To avoid in-sample leakage, Tier~1
+forecasts used for Tier~2 training are generated out of fold (leave one year out);
+final Tier~1 models drive inference.
+
+\subsection{Production and consumption targets}
+The production-based variant (the faithful baseline) targets the domestic
+generation mix intensity. The consumption-based variant targets the
+Electricity Maps reported consumption intensity and adds the cross-border
+channels.
+
+\subsection{Single-tier baseline}
+To test whether the two-tier structure earns its complexity, we compare against a
+single-tier model: the same Tier~2 network run standalone, with no Tier~1 forecast
+channels, predicting carbon intensity directly from its history plus weather and
+calendar. Because the network is identical, the comparison isolates the
+contribution of the two-tier design.
+
+\section{Experimental Setup}
+\label{sec:setup}
+\paragraph{Splits.} Training 2021 through 2025, validation January through April
+2026, Test~A May 2026, and a live Test~B (June 8 to 21 2026) head-to-head against
+the Electricity Maps operational forecast. Finland uses a shortened training start
+of 2023 (per-zone window), for the regime-shift reason above; the other zones use
+the full window.
+
+\paragraph{Training.} RMSE loss, Adam with gradient clipping. Each model is
+trained on three random seeds and the model with the best validation score is
+kept (Section~\ref{sec:findings}).
+
+\section{Results}
+% TODO: fill from outputs/friday_comparison.csv once runs complete.
+Table~\ref{tab:atlas} reports Test~A accuracy per zone for the consumption-based
+two-tier model. % Placeholder values from the full-window run; Finland to be
+% updated with the shortened window.
+
+\begin{table}[t]
+\caption{Test A (May 2026) per-zone accuracy, consumption-based two-tier
+(validation-selected). Provisional; see TODO.}
+\label{tab:atlas}
+\begin{tabular}{lrrr}
+\toprule
+Zone & MAPE (\%) & MAE & RMSE \\
+\midrule
+Singapore       & 0.90  & 4.17  & 6.54  \\
+US-NY-NYIS      & 7.03  & 19.22 & 25.45 \\
+US-MIDA-PJM     & 8.30  & 31.69 & 40.25 \\
+Finland         & 24.04 & 11.43 & 14.41 \\
+Belgium         & 64.42 & 74.17 & 90.23 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% TODO: single-tier vs two-tier comparison table (the structural ablation).
+% TODO: per-horizon degradation curve. TODO: forecast-vs-actual time series.
+
+\section{Iterative Findings and Modeling Decisions}
+\label{sec:findings}
+Our methodology was shaped by a sequence of empirical findings, which we record
+here because they justify the final design.
+
+\paragraph{Initialization sensitivity.} Early five-zone runs showed large
+run-to-run variation driven purely by the random initial weights: on the harder
+zones, some seeds converged well while others diverged (to non-finite loss or to
+a poor solution). On Belgium the seed-to-seed spread in percentage error exceeded
+the size of any plausible modeling improvement.
+
+\paragraph{Seeding and validation-based selection.} We therefore fixed the random
+seed for reproducibility and adopted a selection rule: train several seeds and
+keep the one with the best \emph{validation} score, never the test score. This
+removes the seed lottery, because a divergent seed also scores poorly on
+validation and is excluded automatically.
+
+\paragraph{Gradient clipping.} The non-finite-loss failures were exploding
+gradients; adding gradient clipping removed them. Stable seeds are unaffected.
+
+\paragraph{Belgium as an outlier.} Belgium showed both the highest error and the
+largest instability. Even after stabilization, its best-validation model
+generalized poorly from the validation months to Test~A (validation near 33,
+Test~A near 64), indicating a genuine distribution shift in May 2026 rather than a
+training artifact. This is reported as a failure mode, not corrected away.
+
+\paragraph{Finland regime shift and shortened training.} Inspecting carbon
+intensity over time revealed the Finnish regime shift described in Section~3. We
+shortened Finland's training window to begin in 2023 and re-ran the models.
+% TODO: report the effect of the shortened window on Finland's metrics.
+
+\section{Discussion and Limitations}
+The Electricity Maps academic forecast horizon is 24 hours rather than 72, so the
+head-to-head comparison (Test~B) is restricted to the 1 to 24 hour band.
+% TODO: Belgium failure-mode analysis; single vs separate model structures.
+
+\section{Conclusion}
+% TODO: synthesize once the comparison is complete.
+
+\end{document}

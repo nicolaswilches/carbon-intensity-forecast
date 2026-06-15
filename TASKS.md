@@ -56,6 +56,14 @@ Collection-first because Test B window (Jun 8-21) is a live, non-recoverable clo
 - [x] E2 orchestrator (carboncast_faithful.py): out-of-fold Tier 1 forecasts (leave-one-year-out) for Tier 2 training + final models for inference. Segmented windowing for gapped folds. Smoke-trained BE end-to-end
 - [x] Notebook S04 (E2 results): imports orchestrator, loads processed parquets (Colab-portable), full-settings train, MAPE/MAE/RMSE, per-horizon degradation curve. Built; full run pending (BE-first then 5 zones)
 
+## DEADLINE Friday 2026-06-19 (advisor, see memory/advisor_directives.md)
+
+- [ ] Single-tier CI baseline = Tier 2 standalone (no Tier 1 channels), real split, val-selected, 5 zones. Run for BOTH targets (prod + cons)
+- [ ] Production two-tier (E2) real-split 5-zone, val-selected (E3 already done)
+- [ ] Comparison table: single-tier vs two-tier, prod + cons -> does the two-tier structure contribute?
+- [ ] Start the report (data + methodology sections from existing work)
+- Post-Friday: shorter FI training window; separate BE model + diagnose what BE misses
+
 ## Week 3 (in progress from 2026-06-09): E3 extension
 
 - [x] Run E2 baseline S04 (BE, proxy split): MAPE 35.16%, MAE 70.93, RMSE 91.34 (14.4 min CPU). 5-zone run still a Colab job
