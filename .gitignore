@@ -30,3 +30,5 @@ __pycache__/
 # Large model/prediction artifacts (reproducible from seeds; do not bloat the repo)
 outputs/models/
 outputs/preds/
+outputs/models_single_*/
+outputs/preds_single_*/
