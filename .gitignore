@@ -26,3 +26,7 @@ __pycache__/
 
 # Local run logs
 /logs/
+
+# Large model/prediction artifacts (reproducible from seeds; do not bloat the repo)
+outputs/models/
+outputs/preds/

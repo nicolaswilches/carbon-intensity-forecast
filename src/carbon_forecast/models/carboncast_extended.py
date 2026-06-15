@@ -26,8 +26,10 @@ forecast-overridden channels lead and partner CI can fall back to actuals.
 
 from __future__ import annotations
 
+import pickle
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from pathlib import Path
 
 import keras
 import numpy as np
@@ -295,3 +297,49 @@ def predict_with_truth(
     _, y_norm, _, _ = t2.assemble_sequences(frame_n, art.tier2.config, 1, fs)
     y_true = art.tier2.normalizer.inverse_transform(y_norm, art.tier2.target_col)
     return preds, y_true, origins
+
+
+# --- persistence (save / load trained artifacts) --------------------------
+
+def save_e3(art: E3Artifacts, path: str | Path) -> Path:
+    """Persist a trained E3 model so it never has to be retrained.
+
+    Keras models are written as .keras files; everything else (normalizers,
+    configs, column lists, per-model metadata with the model field nulled) is
+    pickled. Reload with load_e3.
+    """
+    p = Path(path)
+    p.mkdir(parents=True, exist_ok=True)
+    art.tier2.model.save(p / "tier2.keras")
+    for name, a in art.final_source_models.items():
+        a.model.save(p / f"source__{name}.keras")
+    for partner, a in art.final_flow_models.items():
+        a.model.save(p / f"flow__{partner}.keras")
+    meta = dict(
+        zone=art.zone, source_cols=art.source_cols, flow_cols=art.flow_cols,
+        partner_ci_cols=art.partner_ci_cols, dynamic_cols=art.dynamic_cols,
+        normalizer=art.normalizer, config=art.config,
+        source={n: replace(a, model=None) for n, a in art.final_source_models.items()},
+        flow={pt: replace(a, model=None) for pt, a in art.final_flow_models.items()},
+        tier2=replace(art.tier2, model=None),
+    )
+    with open(p / "meta.pkl", "wb") as f:
+        pickle.dump(meta, f)
+    return p
+
+
+def load_e3(path: str | Path) -> E3Artifacts:
+    """Reload an E3 model saved by save_e3 (models loaded uncompiled, for inference)."""
+    p = Path(path)
+    with open(p / "meta.pkl", "rb") as f:
+        meta = pickle.load(f)
+    source = {n: replace(a, model=keras.models.load_model(p / f"source__{n}.keras", compile=False))
+              for n, a in meta["source"].items()}
+    flow = {pt: replace(a, model=keras.models.load_model(p / f"flow__{pt}.keras", compile=False))
+            for pt, a in meta["flow"].items()}
+    tier2 = replace(meta["tier2"], model=keras.models.load_model(p / "tier2.keras", compile=False))
+    return E3Artifacts(
+        zone=meta["zone"], final_source_models=source, final_flow_models=flow, tier2=tier2,
+        normalizer=meta["normalizer"], source_cols=meta["source_cols"], flow_cols=meta["flow_cols"],
+        partner_ci_cols=meta["partner_ci_cols"], dynamic_cols=meta["dynamic_cols"], config=meta["config"],
+    )
