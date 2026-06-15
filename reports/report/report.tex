@@ -5,6 +5,10 @@
 \pagestyle{plain}
 
 \usepackage{booktabs}
+\usepackage{graphicx}
+% Figures live in the repo's outputs/figures (relative to this file). Multiple
+% candidates so it resolves whether the compile root is this dir or the repo root.
+\graphicspath{{../../outputs/figures/}{outputs/figures/}{figures/}}
 
 \newcommand{\figph}[1]{\par\noindent\textit{[Figure placeholder: #1]}\par}
 
@@ -124,7 +128,12 @@ Year & Finland & Belgium & Singapore & PJM & NYIS \\
 \bottomrule
 \end{tabular}
 \end{table}
-\figph{per-region annual consumption-based carbon intensity, 2021 to 2026}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{eda_ci_evolution.pdf}
+\caption{Per-region annual consumption-based carbon intensity, 2021 to 2026.}
+\label{fig:ci-evolution}
+\end{figure*}
 Three distinct trajectories. Finland falls sharply (161 to roughly 70 to 84), a
 regime shift discussed below. Singapore is flat and high (about 490), a
 near-islanded gas grid. New York rises (260 to 308), the only zone trending
@@ -148,7 +157,12 @@ slowly rising 6\% to 10\%.
 \item \textbf{US-NY-NYIS:} nuclear declines (26\% to 20\%), fossil rises (47\% to
 52\%), renewables flat near 25\%. This explains the rising intensity.
 \end{itemize}
-\figph{stacked-area generation mix by year, per region}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{eda_mix_evolution.pdf}
+\caption{Generation-mix share by year (nuclear / renewable / fossil / other), per region.}
+\label{fig:mix-evolution}
+\end{figure*}
 
 \subsection{Net energy flow (imports and exports)}
 \begin{table}[h]
@@ -163,7 +177,12 @@ Year & Finland & Belgium & Singapore & PJM & NYIS \\
 \bottomrule
 \end{tabular}
 \end{table}
-\figph{net import share of consumption by year, per region}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{eda_net_import.pdf}
+\caption{Net import as a share of consumption by year, per region (positive = net importer).}
+\label{fig:net-import}
+\end{figure*}
 Belgium swings from net exporter ($-9\%$) to heavy net importer ($+30\%$),
 tracking its nuclear phase-out. Finland stays a net importer but leans on imports
 less as domestic nuclear grows (33\% to 17\%). PJM and NYIS are steady net
@@ -187,7 +206,12 @@ Finland     & 101 & 86  & 54 & 29--288  & +0.93 \\
 \bottomrule
 \end{tabular}
 \end{table}
-\figph{carbon intensity distribution per region (violin or histogram)}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{eda_distribution.pdf}
+\caption{Consumption-based carbon intensity distribution per region (violin, mean line shown).}
+\label{fig:distribution}
+\end{figure*}
 This explains the percentage-error pattern in the results. Singapore is tight and
 high, so small relative error is easy, while Finland and Belgium are low and
 right-skewed, so the same absolute error becomes a large percentage. The
@@ -210,7 +234,12 @@ NYIS & 19h / 3h & Jul / Apr \\
 \bottomrule
 \end{tabular}
 \end{table}
-\figph{average carbon intensity by hour of day and by month, per region}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{eda_temporal.pdf}
+\caption{Average consumption-based carbon intensity by hour of day (local) and by month, per region.}
+\label{fig:temporal}
+\end{figure*}
 A clear split by climate and structure. The European zones peak in winter
 (heating), with Finland strongly seasonal and almost no daily cycle, consistent
 with baseload nuclear plus hydro. The US zones peak in summer (cooling), with
@@ -234,7 +263,13 @@ temperature       & -0.42 & -0.58 & -0.63 & -0.01 & 0.22 \\
 \bottomrule
 \end{tabular}
 \end{table}
-\figph{scatterplots of the strongest feature versus carbon intensity, per region}
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{eda_correlation.pdf}
+\caption{Pearson correlation of each feature with consumption-based carbon intensity, per region.}
+\label{fig:correlation}
+\end{figure*}
+% TODO: optional per-region feature-vs-CI scatterplots to complement the heatmap.
 Consistent and interpretable signal. Production intensity is the dominant
 predictor everywhere (0.86 to 1.00). Partner carbon intensity is strong (0.71 to
 0.81) in every connected grid and weak only in islanded Singapore (0.38),
@@ -335,6 +370,14 @@ Belgium     & 64.42 & 74.17 & 90.23 \\
 Four of five zones forecast well. Finland's percentage looks high but its absolute
 error is small (11.4 on a low-carbon grid), so the percentage is
 denominator-inflated. Belgium is the genuine hard case.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{results_atlas_cons_twotier.pdf}
+\caption{Per-region Test A accuracy (MAPE) for the consumption-based two-tier
+model, validation-selected. Provisional.}
+\label{fig:atlas}
+\end{figure}
 % TODO: single-tier vs two-tier comparison; feature ablation; per-horizon curve;
 % forecast-vs-actual time series.
 

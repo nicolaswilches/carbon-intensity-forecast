@@ -18,8 +18,8 @@ __pycache__/
 /data/raw/
 /data/processed/
 /models/
-/outputs/figures/
 /outputs/tables/
+# outputs/figures/ is tracked: report figures must sync to Overleaf.
 
 # OS
 .DS_Store

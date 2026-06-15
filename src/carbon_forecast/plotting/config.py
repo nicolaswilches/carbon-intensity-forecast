@@ -35,9 +35,11 @@ PLOT_W: int = 1000 # default width
 PLOT_H: int = 500 # default height 
 
 # colors
-FONT_FAMILY: str = "Arial"  # font
+# Match the report body font (acmart sigconf uses Linux Libertine). The chain
+# falls back to an available serif for static export if Libertine is not installed.
+FONT_FAMILY: str = "Linux Libertine O, Libertinus Serif, Times New Roman, serif"
 GRID_COLOR: str = "rgba(0,0,0,0.1)" # grid color
-BG_COLOR: str = "#F7F0E4" # background color
+BG_COLOR: str = "#FFFFFF" # background color (white, matches the report page)
 TEXT_COLOR: str = "#1F1F1F" # font color
 
 # text sizes and spacing
@@ -52,8 +54,16 @@ LINE_WIDTH: float = 1.2 # line width for line charts
 # margins
 MARGIN_L: int = 100
 MARGIN_R: int = 80
-MARGIN_T: int = 150 # top margin of the chart area 
+MARGIN_T: int = 150 # top margin of the chart area
 MARGIN_B: int = 80
+
+# Report figure geometry. acmart sigconf: single column ~3.34in (~241pt),
+# full text width ~7.02in (~506pt). Figures are sized so that, included at
+# \columnwidth or \textwidth, line and tick text stay legible. Single-column
+# figures go in `figure`; full-width go in `figure*`.
+FIG_W_COLUMN: int = 470   # px; include at width=\columnwidth
+FIG_W_FULL: int = 980     # px; include at width=\textwidth (figure*)
+FIG_H_DEFAULT: int = 320  # px; default single-row height
 
 
 PLOT_AREA_LEFT_PAPER: float = MARGIN_L / PLOT_W
@@ -310,4 +320,44 @@ def style_fig(
         margin=dict(t=margin_t, r=MARGIN_R, b=MARGIN_B, l=MARGIN_L),
     )
     _finalize_axes(fig)
+    return fig
+
+
+def style_report_fig(
+    fig: go.Figure,
+    *,
+    span: str = "column",
+    height: int | None = None,
+    xlabel: str | None = None,
+    ylabel: str | None = None,
+    legend: bool = True,
+) -> go.Figure:
+    """Lean styling for figures embedded in the report.
+
+    No in-figure title (the LaTeX \\caption carries it). White background, report
+    serif font, compact margins, and a width tied to the acmart geometry:
+    span="column" fits \\columnwidth, span="full" fits \\textwidth. Pass `height`
+    for tall small-multiples. Export to PDF for the report.
+    """
+    width = FIG_W_FULL if span == "full" else FIG_W_COLUMN
+    height = height or FIG_H_DEFAULT
+    fig.update_layout(
+        title=None,
+        font=dict(family=FONT_FAMILY, size=13, color=TEXT_COLOR),
+        paper_bgcolor="#FFFFFF",
+        plot_bgcolor="#FFFFFF",
+        width=width,
+        height=height,
+        margin=dict(t=(36 if legend else 14), r=18, b=46, l=60),
+        showlegend=legend,
+    )
+    if legend:
+        fig.update_layout(legend=dict(
+            orientation="h", x=0, xanchor="left", y=1.02, yanchor="bottom",
+            font=dict(size=11),
+        ))
+    fig.update_xaxes(showgrid=False, tickfont=dict(size=11),
+                     title=dict(text=xlabel, font=dict(size=12)))
+    fig.update_yaxes(gridcolor=GRID_COLOR, tickfont=dict(size=11),
+                     title=dict(text=ylabel, font=dict(size=12)))
     return fig

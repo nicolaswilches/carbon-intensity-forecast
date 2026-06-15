@@ -28,6 +28,7 @@ dev = [
     "ipykernel>=6.29",
     "nbformat>=5.10",
     "nbstripout>=0.9.1",
+    "kaleido>=0.2.1",
 ]
 
 [build-system]
