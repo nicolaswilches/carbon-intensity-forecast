@@ -14,9 +14,11 @@
 
 \usepackage{xcolor}
 % Year-over-year change tags: decrease (red), increase (blue), no change (gray).
-\newcommand{\yd}[1]{\,\textcolor{red}{(#1\%)}}
-\newcommand{\yu}[1]{\,\textcolor{blue}{(+#1\%)}}
-\newcommand{\yz}{\,\textcolor{gray}{(0\%)}}
+\definecolor{yoydown}{HTML}{AD2828}
+\definecolor{yoyup}{HTML}{2E6DB4}
+\newcommand{\yd}[1]{\,{\small\textcolor{yoydown}{(#1\%)}}}
+\newcommand{\yu}[1]{\,{\small\textcolor{yoyup}{(+#1\%)}}}
+\newcommand{\yz}{\,{\small\textcolor{gray}{(0\%)}}}
 
 \title{Open, Reproducible Consumption-Based Carbon Intensity Forecasting with Explicit Cross-Border Flow Modeling}
 
