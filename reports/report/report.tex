@@ -396,8 +396,41 @@ denominator-inflated. Belgium is the genuine hard case.
 model, validation-selected. Provisional.}
 \label{fig:atlas}
 \end{figure}
-% TODO: single-tier vs two-tier comparison; feature ablation; per-horizon curve;
-% forecast-vs-actual time series.
+\subsection{Structural ablation: single-tier versus two-tier}
+Table~\ref{tab:structural} compares the two-tier model against a single-tier model
+(the same Tier~2 network with no Tier~1 forecast channels), for both targets, per
+zone, validation-selected on Test A.
+
+\begin{table}[t]
+\caption{Structural ablation: MAPE (\%), Test A, validation-selected. Lower is
+better; the better of each single/two-tier pair is bold.}
+\label{tab:structural}
+\begin{tabular}{lrrrr}
+\toprule
+ & \multicolumn{2}{c}{Production} & \multicolumn{2}{c}{Consumption} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Zone & single & two-tier & single & two-tier \\
+\midrule
+Singapore   & \textbf{0.68}  & 0.72  & \textbf{0.71}  & 0.90 \\
+US-MIDA-PJM & 6.31  & \textbf{6.04}  & \textbf{5.93}  & 8.30 \\
+US-NY-NYIS  & \textbf{6.37}  & 8.90  & \textbf{5.98}  & 7.03 \\
+Finland     & \textbf{15.35} & 37.24 & \textbf{12.05} & 21.89 \\
+Belgium     & 36.18 & \textbf{35.99} & \textbf{41.57} & 64.42 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The two-tier structure does not earn its complexity. For the consumption target
+the single-tier model wins in every zone, often by a wide margin. For the
+production target it wins or ties everywhere; the two-tier model is marginally
+ahead only in Belgium and PJM, both within the run-to-run noise band, while it is
+much worse in Finland. This is consistent with the Tier~1 diagnostic in
+Section~\ref{sec:findings}: the Tier~1 production forecasts are imperfect, and
+feeding them into Tier~2 adds noise rather than signal (Table~\ref{tab:tier1}). It
+does not contradict CarbonCast, whose two-tier advantage is robustness to missing
+and noisy source data, benchmarked against a deterministic equation baseline
+rather than a learned single-tier model.
+% TODO: feature ablation (flow on/off); per-horizon curve; forecast-vs-actual.
 
 \section{Discussion and Limitations}
 
