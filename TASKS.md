@@ -58,11 +58,14 @@ Collection-first because Test B window (Jun 8-21) is a live, non-recoverable clo
 
 ## DEADLINE Friday 2026-06-19 (advisor, see memory/advisor_directives.md)
 
-- [ ] Single-tier CI baseline = Tier 2 standalone (no Tier 1 channels), real split, val-selected, 5 zones. Run for BOTH targets (prod + cons)
-- [ ] Production two-tier (E2) real-split 5-zone, val-selected (E3 already done)
-- [ ] Comparison table: single-tier vs two-tier, prod + cons -> does the two-tier structure contribute?
-- [ ] Start the report (data + methodology sections from existing work)
-- Post-Friday: shorter FI training window; separate BE model + diagnose what BE misses
+- [x] Single-tier CI baseline (Tier 2 standalone), both targets, 5 zones, val-selected
+- [x] Production two-tier (E2) real-split 5-zone, val-selected; consumption two-tier done (FI on 2023 window)
+- [x] Comparison: two-tier does NOT earn complexity (single-tier wins/ties all). In report Results. outputs/structural_comparison.csv
+- [x] FI shorter window (2023): cons two-tier 24.04 -> 21.89
+- [x] Report started: Related Work, full EDA (figures), Methodology, Setup, Iterative Findings, structural ablation, Tier 1 diagnostic. Live on Overleaf via GitHub sync
+- [x] CarbonCast PJM benchmark: ours ~6.0 vs published 5.29 lifecycle (faithful repro)
+- [ ] Remaining report: feature ablation (flow on/off), per-horizon curve, forecast-vs-actual, abstract/conclusion numbers
+- [ ] Post-Friday: separate BE model + diagnose what BE misses; optional 24x4 prototype on PJM
 
 ## Week 3 (in progress from 2026-06-09): E3 extension
 
