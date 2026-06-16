@@ -12,6 +12,12 @@
 
 \newcommand{\figph}[1]{\par\noindent\textit{[Figure placeholder: #1]}\par}
 
+\usepackage{xcolor}
+% Year-over-year change tags: decrease (red), increase (blue), no change (gray).
+\newcommand{\yd}[1]{\,\textcolor{red}{(#1\%)}}
+\newcommand{\yu}[1]{\,\textcolor{blue}{(+#1\%)}}
+\newcommand{\yz}{\,\textcolor{gray}{(0\%)}}
+
 \title{Open, Reproducible Consumption-Based Carbon Intensity Forecasting with Explicit Cross-Border Flow Modeling}
 
 \author{Nicol\'as Higuera Wilches}
@@ -113,21 +119,22 @@ This section reports our initial evaluation of the extracted data across all fiv
 regions. Figures are flagged as placeholders here and added on the Overleaf port.
 
 \subsection{Carbon intensity evolution per region}
-\begin{table}[h]
-\caption{Annual mean consumption-based carbon intensity (gCO\textsubscript{2}eq/kWh).}
-\begin{tabular}{lrrrrr}
+\begin{table*}[t]
+\caption{Annual mean consumption-based carbon intensity (gCO\textsubscript{2}eq/kWh),
+with year-over-year change (red = decrease, blue = increase).}
+\begin{tabular}{lccccc}
 \toprule
 Year & Finland & Belgium & Singapore & PJM & NYIS \\
 \midrule
 2021 & 161 & 175 & 492 & 433 & 260 \\
-2022 & 127 & 195 & 492 & 429 & 284 \\
-2023 & 80  & 173 & 488 & 397 & 282 \\
-2024 & 77  & 151 & 485 & 397 & 297 \\
-2025 & 66  & 179 & 484 & 412 & 309 \\
-2026 & 84  & 188 & 481 & 401 & 308 \\
+2022 & 127\yd{-21} & 195\yu{11} & 492\yz & 429\yd{-1} & 284\yu{9} \\
+2023 & 80\yd{-37}  & 173\yd{-11} & 488\yd{-1} & 397\yd{-7} & 282\yd{-1} \\
+2024 & 77\yd{-4}   & 151\yd{-13} & 485\yd{-1} & 397\yz & 297\yu{5} \\
+2025 & 66\yd{-14}  & 179\yu{19} & 484\yz & 412\yu{4} & 309\yu{4} \\
+2026 & 84\yu{27}   & 188\yu{5} & 481\yd{-1} & 401\yd{-3} & 308\yz \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{eda_ci_evolution.pdf}
