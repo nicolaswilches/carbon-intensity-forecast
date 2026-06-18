@@ -177,7 +177,9 @@ small (0.7\% to 2.8\%). The mix barely moves, matching the flat intensity.
 recede, nuclear 25\% to 21\% and hydro 22\% to 18\%, with wind only 3\% to 5\%.
 This explains the rising intensity.
 \end{itemize}
-\begin{figure}[t]
+% [!t]: the figure scales to ~7.25in tall, above the default \topfraction limit
+% for a [t] float, so without "!" LaTeX defers it and leaves a blank gap.
+\begin{figure}[!t]
 \centering
 \includegraphics[width=\columnwidth]{eda_mix_sankey.pdf}
 \caption{Generation-mix transition from 2021 (left bar) to 2025 (right bar) per
