@@ -64,7 +64,7 @@ def horizon_curve() -> None:
     for r in (1, 2):
         for h in (24, 48, 72):
             fig.add_vline(x=h, line=dict(color="rgba(0,0,0,0.12)", width=1), row=r, col=1)
-    P.style_report_fig(fig, span="full", height=420, legend=True)
+    P.style_report_fig(fig, span="column", height=360, legend=True)
     fig.update_xaxes(title_text="forecast horizon (hours ahead)", row=2, col=1)
     out = os.path.join(FIGS, "results_horizon_curve.pdf")
     fig.write_image(out)
@@ -86,7 +86,7 @@ def forecast_vs_actual(h: int = 24) -> None:
                                  line=dict(color=P.REGIONAL_PALETTE[z], width=1.0),
                                  showlegend=(i == 1)), row=i, col=1)
         fig.update_yaxes(title_text="gCO₂eq/kWh", row=i, col=1)
-    P.style_report_fig(fig, span="full", height=1050, legend=True)
+    P.style_report_fig(fig, span="column", height=760, legend=True)
     out = os.path.join(FIGS, "results_forecast_vs_actual.pdf")
     fig.write_image(out)
     print("wrote", out)
