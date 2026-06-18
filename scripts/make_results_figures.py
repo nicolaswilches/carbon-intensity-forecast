@@ -73,7 +73,7 @@ def horizon_curve() -> None:
 
 def forecast_vs_actual(h: int = 24) -> None:
     fig = make_subplots(rows=len(ZONES), cols=1,
-                        subplot_titles=[LABEL[z] for z in ZONES], vertical_spacing=0.045)
+                        subplot_titles=[LABEL[z] for z in ZONES], vertical_spacing=0.09)
     for i, z in enumerate(ZONES, start=1):
         preds, y, origins = load(z)
         # ISO strings so kaleido's orjson serializer never sees a pandas Timestamp.
@@ -86,7 +86,7 @@ def forecast_vs_actual(h: int = 24) -> None:
                                  line=dict(color=P.REGIONAL_PALETTE[z], width=1.0),
                                  showlegend=(i == 1)), row=i, col=1)
         fig.update_yaxes(title_text="gCO₂eq/kWh", row=i, col=1)
-    P.style_report_fig(fig, span="column", height=760, legend=True)
+    P.style_report_fig(fig, span="column", height=840, legend=True)
     out = os.path.join(FIGS, "results_forecast_vs_actual.pdf")
     fig.write_image(out)
     print("wrote", out)
