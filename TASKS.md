@@ -64,7 +64,9 @@ Collection-first because Test B window (Jun 8-21) is a live, non-recoverable clo
 - [x] FI shorter window (2023): cons two-tier 24.04 -> 21.89
 - [x] Report started: Related Work, full EDA (figures), Methodology, Setup, Iterative Findings, structural ablation, Tier 1 diagnostic. Live on Overleaf via GitHub sync
 - [x] CarbonCast PJM benchmark: ours ~6.0 vs published 5.29 lifecycle (faithful repro)
-- [ ] Remaining report: feature ablation (flow on/off), per-horizon curve, forecast-vs-actual, abstract/conclusion numbers
+- [x] Report: abstract headline numbers, Finland-window effect (24.04->21.89), conclusion synthesized
+- [x] Report figures: per-horizon curve + forecast-vs-actual (scripts/make_results_figures.py from outputs/preds npz; wired into Results)
+- [ ] Remaining report: feature ablation (flow on/off) — needs a dedicated seed-averaged run
 - [ ] Post-Friday: separate BE model + diagnose what BE misses; optional 24x4 prototype on PJM
 
 ## Week 3 (in progress from 2026-06-09): E3 extension

@@ -49,8 +49,15 @@ extends it to a consumption-based target with interconnector flow and partner
 carbon intensity inputs, and compares both against a single-tier model that
 forecasts carbon intensity directly. We contribute a per-region accuracy atlas, a
 structural ablation of the two-tier design, a feature ablation of the cross-border
-inputs, and a characterization of where forecasts succeed and fail.
-% TODO: fold in final headline numbers once the model comparison completes.
+inputs, and a characterization of where forecasts succeed and fail. On a held-out
+May 2026 test month, consumption-based accuracy ranges from under 1\% MAPE in
+near-islanded Singapore to roughly 6\% in the large US markets, with Belgium the
+hard case at a distribution shift the model does not anticipate. Our central
+finding is that the two-tier structure does not earn its complexity: a single-tier
+network that forecasts carbon intensity directly matches or beats the two-tier
+model in every zone, because imperfect first-tier generation forecasts inject more
+noise than signal. On PJM the production-based two-tier model reproduces the
+published CarbonCast result (6.0 versus 5.3 MAPE), validating the reproduction.
 \end{abstract}
 
 \maketitle
@@ -363,8 +370,11 @@ artifact. We report this as a failure mode rather than correcting it away.
 
 \textbf{Finland regime shift and shortened training.} Inspecting carbon intensity
 over time revealed the Finnish nuclear-driven regime shift (Section~4.1). We
-shortened Finland's training window to begin in 2023 and re-ran the models.
-% TODO: report the measured effect of the shortened window on Finland.
+shortened Finland's training window to begin in 2023 and re-ran the models. The
+shortened window lowered Finland's consumption-based two-tier error on Test~A from
+24.04 to 21.89 MAPE, confirming that the pre-2023 high-carbon regime was actively
+hurting the forecast. We use the 2023-onward window for Finland throughout the
+results.
 
 \section{Results}
 % Provisional; consumption-based two-tier, Test A, validation-selected, full window.
@@ -396,6 +406,18 @@ denominator-inflated. Belgium is the genuine hard case.
 model, validation-selected. Provisional.}
 \label{fig:atlas}
 \end{figure}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{results_forecast_vs_actual.pdf}
+\caption{Day-ahead (24 hour) consumption-based carbon intensity forecast versus
+actual over Test A (May 2026), per zone (consumption-based two-tier,
+validation-selected). Singapore is near-exact; the US markets track the daily
+cycle; Finland's forecast flattens against a late-May rise; Belgium captures the
+shape but misses amplitude.}
+\label{fig:fva}
+\end{figure*}
+
 \subsection{Structural ablation: single-tier versus two-tier}
 Table~\ref{tab:structural} compares the two-tier model against a single-tier model
 (the same Tier~2 network with no Tier~1 forecast channels), for both targets, per
@@ -430,7 +452,28 @@ feeding them into Tier~2 adds noise rather than signal (Table~\ref{tab:tier1}). 
 does not contradict CarbonCast, whose two-tier advantage is robustness to missing
 and noisy source data, benchmarked against a deterministic equation baseline
 rather than a learned single-tier model.
-% TODO: feature ablation (flow on/off); per-horizon curve; forecast-vs-actual.
+% TODO: feature ablation (flow on/off) still pending a dedicated run.
+
+\subsection{Error by forecast horizon}
+Figure~\ref{fig:horizon} traces per-zone error across the full 1 to 96 hour
+horizon. Error does not simply grow with lead time. Singapore, the two US markets,
+and Finland stay low and only drift up slowly, so the day-ahead band is not
+markedly better than the four-day band. Belgium is the exception: its percentage
+error oscillates strongly on a 24 hour cycle, between roughly 45 and 85, because its
+consumption-based intensity dips low overnight and inflates the denominator at those
+hours. The oscillation is present in the absolute error too, so it is a real
+daily-pattern miss and not only a denominator artifact. The 1 to 24 hour band, where
+the Electricity Maps head-to-head will later sit, is among the lowest-error regions
+for every zone.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{results_horizon_curve.pdf}
+\caption{Per-zone forecast error by horizon (1 to 96 hours), consumption-based
+two-tier, Test A. Top: MAPE. Bottom: MAE. Vertical guides mark the 24, 48, and 72
+hour day boundaries.}
+\label{fig:horizon}
+\end{figure*}
 
 \section{Discussion and Limitations}
 
@@ -487,6 +530,31 @@ advertised 72, so the head-to-head comparison (Test~B) is restricted to the 1 to
 % TODO: Belgium failure-mode analysis; single vs separate model structures.
 
 \section{Conclusion}
-% TODO: synthesize once the structural and feature ablations are complete.
+We built an open, reproducible deep learning framework for short-horizon
+consumption-based carbon intensity forecasting and evaluated it across five
+structurally diverse grids. The framework reproduces the closed CarbonCast
+methodology as a production-based baseline, with the PJM two-tier model landing at
+6.0 MAPE against the published 5.3, and extends it to a consumption-based target
+with explicit cross-border flow and partner carbon intensity inputs.
+
+Two results stand out. First, the per-region atlas shows wide, structurally
+explained heterogeneity: a tight high-carbon island grid (Singapore) is trivial to
+forecast, the large US markets sit near 6\% MAPE, and the small import-heavy,
+rapidly decarbonizing European grids are hardest, with Belgium the clear failure
+case driven by a May 2026 distribution shift its training window does not cover.
+Second, the structural ablation overturns the assumption behind the two-tier
+design: a single-tier network that predicts carbon intensity directly matches or
+beats the two-tier model in every zone, decisively so for the consumption target.
+The cause is visible in the first tier, whose generation forecasts are imperfect
+enough that passing them downstream adds noise rather than signal. This does not
+contradict CarbonCast, whose two-tier benefit is robustness against missing source
+data measured against a deterministic baseline, not against a learned single-tier
+model.
+
+The work has clear next steps: a feature ablation isolating the contribution of the
+cross-border flow and partner inputs, the live Test~B head-to-head against the
+Electricity Maps operational forecast over the 1 to 24 hour band, and a
+Belgium-specific failure-mode analysis aimed at the distribution shift the shared
+model misses.
 
 \end{document}
