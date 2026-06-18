@@ -64,6 +64,10 @@ MARGIN_B: int = 80
 FIG_W_COLUMN: int = 470   # px; include at width=\columnwidth
 FIG_W_FULL: int = 980     # px; include at width=\textwidth (figure*)
 FIG_H_DEFAULT: int = 320  # px; default single-row height
+# One font size for every report figure (axis titles, ticks, legend, base). The
+# figures are scaled by ~0.68 on inclusion, so 13 px renders near the acmart 9 pt
+# body size, keeping figure text unified with the report text.
+REPORT_FONT: int = 13
 
 
 PLOT_AREA_LEFT_PAPER: float = MARGIN_L / PLOT_W
@@ -343,7 +347,7 @@ def style_report_fig(
     height = height or FIG_H_DEFAULT
     fig.update_layout(
         title=None,
-        font=dict(family=FONT_FAMILY, size=13, color=TEXT_COLOR),
+        font=dict(family=FONT_FAMILY, size=REPORT_FONT, color=TEXT_COLOR),
         paper_bgcolor="#FFFFFF",
         plot_bgcolor="#FFFFFF",
         width=width,
@@ -354,10 +358,10 @@ def style_report_fig(
     if legend:
         fig.update_layout(legend=dict(
             orientation="h", x=0, xanchor="left", y=1.02, yanchor="bottom",
-            font=dict(size=11),
+            font=dict(size=REPORT_FONT),
         ))
-    fig.update_xaxes(showgrid=False, tickfont=dict(size=11),
-                     title=dict(text=xlabel, font=dict(size=12)))
-    fig.update_yaxes(gridcolor=GRID_COLOR, tickfont=dict(size=11),
-                     title=dict(text=ylabel, font=dict(size=12)))
+    fig.update_xaxes(showgrid=False, tickfont=dict(size=REPORT_FONT),
+                     title=dict(text=xlabel, font=dict(size=REPORT_FONT)))
+    fig.update_yaxes(gridcolor=GRID_COLOR, tickfont=dict(size=REPORT_FONT),
+                     title=dict(text=ylabel, font=dict(size=REPORT_FONT)))
     return fig

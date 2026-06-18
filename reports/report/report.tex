@@ -10,15 +10,10 @@
 % candidates so it resolves whether the compile root is this dir or the repo root.
 \graphicspath{{../../outputs/figures/}{outputs/figures/}{figures/}}
 
-\newcommand{\figph}[1]{\par\noindent\textit{[Figure placeholder: #1]}\par}
-
-\usepackage{xcolor}
-% Year-over-year change tags: decrease (red), increase (blue), no change (gray).
-\definecolor{yoydown}{HTML}{AD2828}
-\definecolor{yoyup}{HTML}{2E6DB4}
-\newcommand{\yd}[1]{\,{\small\textcolor{yoydown}{(#1\%)}}}
-\newcommand{\yu}[1]{\,{\small\textcolor{yoyup}{(+#1\%)}}}
-\newcommand{\yz}{\,{\small\textcolor{gray}{(0\%)}}}
+% Year-over-year change tags, plain (no color): decrease, increase, no change.
+\newcommand{\yd}[1]{\,{\small(#1\%)}}
+\newcommand{\yu}[1]{\,{\small(+#1\%)}}
+\newcommand{\yz}{\,{\small(0\%)}}
 
 \title{Open, Reproducible Consumption-Based Carbon Intensity Forecasting with Explicit Cross-Border Flow Modeling}
 
@@ -129,9 +124,10 @@ This section reports our initial evaluation of the extracted data across all fiv
 regions.
 
 \subsection{Carbon intensity evolution per region}
-\begin{table*}[t]
+\begin{table}[t]
 \caption{Annual mean consumption-based carbon intensity (gCO\textsubscript{2}eq/kWh),
-with year-over-year change (red = decrease, blue = increase).}
+with year-over-year change in parentheses.}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{lccccc}
 \toprule
 Year & Finland & Belgium & Singapore & PJM & NYIS \\
@@ -143,8 +139,8 @@ Year & Finland & Belgium & Singapore & PJM & NYIS \\
 2025 & 66\yd{-14}  & 179\yu{19} & 484\yz & 412\yu{4} & 309\yu{4} \\
 2026 & 84\yu{27}   & 188\yu{5} & 481\yd{-1} & 401\yd{-3} & 308\yz \\
 \bottomrule
-\end{tabular}
-\end{table*}
+\end{tabular}}
+\end{table}
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{eda_ci_evolution.pdf}

@@ -144,7 +144,7 @@ def build() -> None:
                      ticktext=["2021", "2025"], row=len(ZONES), col=1)
     fig.update_layout(margin=dict(t=64, r=10, b=28, l=10),
                       legend=dict(orientation="h", x=0.5, xanchor="center",
-                                  y=1.045, yanchor="bottom", font=dict(size=10),
+                                  y=1.045, yanchor="bottom", font=dict(size=P.REPORT_FONT),
                                   itemwidth=30))
     out = os.path.join(FIGS, "eda_mix_sankey.pdf")
     fig.write_image(out)

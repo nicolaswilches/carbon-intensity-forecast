@@ -45,11 +45,12 @@ def build() -> None:
         for c, v in enumerate(row):
             fig.add_annotation(x=ZONES[c], y=FEATURES[r], text=f"{v:.2f}",
                                showarrow=False,
-                               font=dict(size=9, color="#1F1F1F" if abs(v) < 0.6 else "#FFFFFF"))
-    P.style_report_fig(fig, span="column", height=300, legend=False)
-    fig.update_xaxes(side="top", tickfont=dict(size=10))
-    # production CI (first feature) on top, temperature (last) at the bottom
-    fig.update_yaxes(tickfont=dict(size=10), autorange="reversed")
+                               font=dict(size=P.REPORT_FONT,
+                                         color="#1F1F1F" if abs(v) < 0.6 else "#FFFFFF"))
+    P.style_report_fig(fig, span="column", height=520, legend=False)
+    fig.update_xaxes(side="top")
+    # production CI (first feature) on top; scaleanchor makes the cells exact squares
+    fig.update_yaxes(autorange="reversed", scaleanchor="x", scaleratio=1)
     out = os.path.join(FIGS, "eda_correlation.pdf")
     fig.write_image(out)
     print("wrote", out)
