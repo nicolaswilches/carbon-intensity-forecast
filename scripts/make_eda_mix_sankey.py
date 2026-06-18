@@ -87,7 +87,7 @@ def ribbon(fig, row, lt, lb, rt, rb, c):
     fig.add_trace(go.Scatter(
         x=np.concatenate([x, x[::-1]]),
         y=np.concatenate([top, bot[::-1]]),
-        fill="toself", fillcolor=_alpha(c, 0.55), mode="lines",
+        fill="toself", fillcolor=_alpha(c, 0.70), mode="lines",
         line=dict(width=0), hoverinfo="skip", showlegend=False), row=row, col=1)
 
 
@@ -111,7 +111,7 @@ def build() -> None:
         fig.add_trace(go.Scatter(
             x=[None], y=[None], mode="markers",
             marker=dict(size=9, color=color(s), symbol="square"),
-            name=s.replace("_", " "), showlegend=True), row=1, col=1)
+            name=s.replace("_", " ").capitalize(), showlegend=True), row=1, col=1)
 
     for i, z in enumerate(ZONES, start=1):
         names, a, b = per_zone[z]
@@ -134,7 +134,7 @@ def build() -> None:
                                        row=i, col=1)
             cyl, cyr = lt_, rt_
 
-    P.style_report_fig(fig, span="column", height=900, legend=True)
+    P.style_report_fig(fig, span="column", height=1020, legend=True)
     fig.update_xaxes(showgrid=False, showticklabels=False, zeroline=False,
                      range=[-0.04, 1.04])
     fig.update_yaxes(showgrid=False, showticklabels=False, zeroline=False,
