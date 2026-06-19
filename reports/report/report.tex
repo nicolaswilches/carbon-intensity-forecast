@@ -257,12 +257,12 @@ Bars are colored by sign: red for net import (positive), blue for net export
 \end{figure}
 
 \subsection{Temporal patterns (local time)}
-A clear split by climate and structure. The European zones peak in winter
-(heating), with Finland strongly seasonal and almost no daily cycle, consistent
-with baseload nuclear plus hydro. The US zones peak in summer (cooling), with
-pronounced evening daily peaks. Singapore is flat on every axis, a tropical,
-islanded, gas-dominated grid, with only a slight midday dip as its small solar
-share grows. Weekday-over-weekend effects appear everywhere except Singapore.
+Figure~\ref{fig:temporal-hd} shows the daily and weekly cycle. Belgium, PJM, and
+New York are most carbon-intense at night and on weekdays, the hours and days when
+demand leans more on fossil generation, and their weekend rows are visibly lighter.
+Finland breaks the pattern, with its highest intensity around midday and on
+weekdays. Singapore concentrates its carbon intensity in the morning hours and
+holds that pattern across the whole week, showing no weekday-to-weekend difference.
 
 \begin{figure}[H]
 \centering
@@ -272,6 +272,16 @@ day of week (rows), per region. Color is each region's own carbon-intensity
 percentile.}
 \label{fig:temporal-hd}
 \end{figure}
+
+Figure~\ref{fig:temporal-my} adds the year-over-year view. Belgium shows no
+pronounced seasonal pattern and little change from 2021 to 2026, staying roughly
+where it began. Finland declines steadily year after year across every month, the
+clearest downward trend in the set. Singapore appears to fall sharply in the
+heatmap, but that is an artifact of the per-region percentile coloring: its
+absolute intensity barely moves, sitting in a narrow band near 490, so even a small
+decline spans the full color range. The two US grids show a strong, recurring band
+of high intensity in the summer months, present in every year, the cooling-demand
+signal from a different angle.
 
 \begin{figure}[H]
 \centering
