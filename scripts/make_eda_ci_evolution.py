@@ -28,6 +28,9 @@ LABEL = {"BE": "Belgium", "FI": "Finland", "SG": "Singapore",
          "US-MIDA-PJM": "US-MIDA-PJM", "US-NY-NYIS": "US-NY-NYIS"}
 # Pad the time axis so the start/end value labels sit in empty space, not on the axis.
 XPAD = ("2020-08-01", "2026-11-01")
+# The 2021 start values of FI (224), BE (235), and NYIS (237) cluster within ~13
+# units, so their labels overlap. Nudge them apart vertically (px).
+START_YSHIFT = {"FI": -10, "US-NY-NYIS": 13}
 
 
 def _alpha(hex_c: str, a: float) -> str:
@@ -54,7 +57,7 @@ def build() -> None:
                                  line=dict(color=_alpha(color, 0.5), width=1.3, dash="dot")))
         # Start (2021) and end (2026) carbon-intensity value labels.
         fig.add_annotation(x=x[0], y=y[0], text=f"{y[0]:.0f}", showarrow=False,
-                           xanchor="right", xshift=-3,
+                           xanchor="right", xshift=-3, yshift=START_YSHIFT.get(z, 0),
                            font=dict(size=P.REPORT_FONT - 2, color=color))
         fig.add_annotation(x=x[-1], y=y[-1], text=f"{y[-1]:.0f}", showarrow=False,
                            xanchor="left", xshift=3,
