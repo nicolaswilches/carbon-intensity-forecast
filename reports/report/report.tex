@@ -164,6 +164,47 @@ and last (2026) monthly values.}
 \label{fig:ci-evolution}
 \end{figure}
 
+\subsection{Carbon intensity distributions}
+The five regions occupy clearly different carbon-intensity bands
+(Figure~\ref{fig:distribution}). Singapore sits in a narrow band near 490, with a
+small spread and a strong left skew, so almost every hour is high-carbon. PJM and
+New York are mid-range and close to symmetric. Belgium and Finland are the lowest
+and the most right-skewed, with long tails toward occasional high-carbon hours.
+This spread explains the percentage-error pattern in the results: a tight, high
+grid like Singapore makes small relative error easy, while a low, right-skewed grid
+like Finland turns the same absolute miss into a large percentage. The
+consumption-minus-production gap is region-specific in sign and size, PJM $+54$,
+NYIS $+19$, Belgium $+3$, Singapore about $0$, and Finland $-10$, which is the core
+justification for a consumption-based target.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{eda_distribution.pdf}
+\caption{Consumption-based carbon intensity distribution per region (overlaid
+density histograms, 2021 to 2026).}
+\label{fig:distribution}
+\end{figure}
+
+The distributions also move over the study period
+(Figure~\ref{fig:distribution-shift}), comparing January through May of 2021
+against the same months of 2026. Finland shifts the most: its mean roughly halves
+(184 to 84) and the shape flips from near-symmetric to strongly right-skewed, as
+low-carbon hours become common. New York moves the other way, the whole
+distribution sliding upward (232 to 308). Belgium is the subtle case, its mean
+barely changes (190 to 188) while the spread widens (standard deviation 58 to 76),
+so the grid becomes more volatile rather than cleaner or dirtier. PJM eases down
+modestly (431 to 401), and Singapore barely moves, staying tight and high.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{eda_distribution_shift.pdf}
+\caption{Per-region carbon intensity distribution, 2021 versus 2026 (January to May
+of each year, matched for season). Gray bars and left-corner statistics are 2021;
+colored bars and right-corner statistics are 2026. Statistics are mean ($\mu$),
+median, standard deviation ($\sigma$), and skew.}
+\label{fig:distribution-shift}
+\end{figure}
+
 \subsection{Energy mix evolution per region}
 Per-source generation share, 2021 to 2025 (Figure~\ref{fig:mix-evolution}):
 \begin{itemize}
@@ -224,34 +265,6 @@ exporters; Singapore is islanded. Dominant interconnectors by mean absolute flow
 Belgium with France, the Netherlands, and Great Britain; Finland with Sweden and
 Estonia; PJM with MISO, NYIS, and TVA; NYIS with PJM and Hydro-Quebec/Ontario;
 Singapore only a small link to Peninsular Malaysia.
-
-\subsection{Carbon intensity distributions}
-\begin{table}[h]
-\caption{Consumption-based carbon intensity distribution per zone (gCO\textsubscript{2}eq/kWh).}
-\begin{tabular}{lrrrrr}
-\toprule
-Zone & mean & median & std & range & skew \\
-\midrule
-Singapore   & 488 & 494 & 13 & 420--502 & -1.88 \\
-PJM         & 412 & 407 & 46 & 266--568 & +0.37 \\
-NYIS        & 288 & 287 & 40 & 151--428 & +0.05 \\
-Belgium     & 175 & 163 & 64 & 48--383  & +0.60 \\
-Finland     & 101 & 86  & 54 & 29--288  & +0.93 \\
-\bottomrule
-\end{tabular}
-\end{table}
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{eda_distribution.pdf}
-\caption{Consumption-based carbon intensity distribution per region (overlaid histograms).}
-\label{fig:distribution}
-\end{figure*}
-This explains the percentage-error pattern in the results. Singapore is tight and
-high, so small relative error is easy, while Finland and Belgium are low and
-right-skewed, so the same absolute error becomes a large percentage. The
-consumption-minus-production gap is region-specific in sign and size: PJM $+54$,
-NYIS $+19$, Belgium $+3$, Singapore about $0$, Finland $-10$. This is the core
-justification for a consumption-based target.
 
 \subsection{Temporal patterns (local time)}
 \begin{table}[h]
