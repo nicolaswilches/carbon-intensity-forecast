@@ -2,9 +2,8 @@
 
 Two figures for the report's distribution subsection:
 
-- eda_distribution.pdf: overlaid density histograms of consumption-based carbon
-  intensity for all five regions (pooled over 2021-2026), the five-region
-  comparison.
+- eda_distribution.pdf: box plots of consumption-based carbon intensity for all
+  five regions (pooled over 2021-2026), the five-region comparison.
 - eda_distribution_shift.pdf: one panel per region, each overlaying the 2021 and
   2026 distributions with descriptive statistics in the top corners (2021 left,
   2026 right), so the per-region shift over the study period is visible. Both years
@@ -49,17 +48,22 @@ def _stats_text(s: pd.Series, year: int) -> str:
             f"<br>σ {s.std():.0f}<br>skew {s.skew():.2f}")
 
 
-def overlay() -> None:
+def comparison() -> None:
+    """Five-region comparison as vertical box plots.
+
+    Box plots avoid the density-axis dominance of overlaid histograms (Singapore's
+    tight spike crushed the other four), and the taller frame gives the carbon-
+    intensity axis room to separate the regions.
+    """
     fig = go.Figure()
     for z in ZONES:
         s = _series(z)
-        fig.add_trace(go.Histogram(
-            x=s.values, name=LABEL[z], histnorm="probability density", nbinsx=60,
-            marker_color=_alpha(P.REGIONAL_PALETTE[z], 0.55),
-            marker_line=dict(width=0)))
-    fig.update_layout(barmode="overlay")
-    P.style_report_fig(fig, span="column", height=300, legend=True,
-                       xlabel="gCO₂eq/kWh", ylabel="density")
+        color = P.REGIONAL_PALETTE[z]
+        fig.add_trace(go.Box(y=s.values, name=LABEL[z], boxmean=True, boxpoints=False,
+                             marker_color=color, fillcolor=_alpha(color, 0.4),
+                             line=dict(color=color, width=1.4)))
+    P.style_report_fig(fig, span="column", height=430, legend=False,
+                       ylabel="gCO₂eq/kWh")
     out = os.path.join(FIGS, "eda_distribution.pdf")
     fig.write_image(out)
     print("wrote", out)
@@ -109,5 +113,5 @@ def shift() -> None:
 
 if __name__ == "__main__":
     os.makedirs(FIGS, exist_ok=True)
-    overlay()
+    comparison()
     shift()
