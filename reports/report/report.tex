@@ -229,13 +229,12 @@ This explains the rising intensity.
 \end{itemize}
 % [!t]: the figure scales to ~7.25in tall, above the default \topfraction limit
 % for a [t] float, so without "!" LaTeX defers it and leaves a blank gap.
-\begin{figure}[!t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\columnwidth]{eda_mix_sankey.pdf}
-\caption{Generation-mix transition from 2021 (left bar) to 2025 (right bar) per
-zone. Each ribbon is one energy source and its width tracks that source's share of
-generation, so a narrowing ribbon is a declining source and a widening one a
-growing source. Each source connects only to itself, so no cross-flows are implied.}
+\includegraphics[width=\columnwidth]{eda_mix.pdf}
+\caption{Generation mix by source for each region, 2021 (top bar) versus 2025
+(bottom bar), as 100\% stacked bars (annual means). Each segment is labeled with
+that source's share of generation; sources below 1\% are grouped as ``other''.}
 \label{fig:mix-evolution}
 \end{figure}
 
