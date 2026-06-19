@@ -239,14 +239,6 @@ that source's share of generation; sources below 1\% are grouped as ``other''.}
 \end{figure}
 
 \subsection{Net energy flow (imports and exports)}
-\begin{figure}[H]
-\centering
-\includegraphics[width=\columnwidth]{eda_net_import.pdf}
-\caption{Monthly net import as a share of consumption, per region, 2021 to 2026.
-Bars are colored by sign: red for net import (positive), blue for net export
-(negative). Note the per-region vertical scales differ.}
-\label{fig:net-import}
-\end{figure}
 Belgium swings from net exporter ($-9\%$) to heavy net importer ($+30\%$),
 tracking its nuclear phase-out. Finland stays a net importer but leans on imports
 less as domestic nuclear grows (33\% to 17\%). PJM and NYIS are steady net
@@ -255,7 +247,23 @@ Belgium with France, the Netherlands, and Great Britain; Finland with Sweden and
 Estonia; PJM with MISO, NYIS, and TVA; NYIS with PJM and Hydro-Quebec/Ontario;
 Singapore only a small link to Peninsular Malaysia.
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{eda_net_import.pdf}
+\caption{Monthly net import as a share of consumption, per region, 2021 to 2026.
+Bars are colored by sign: red for net import (positive), blue for net export
+(negative). Note the per-region vertical scales differ.}
+\label{fig:net-import}
+\end{figure}
+
 \subsection{Temporal patterns (local time)}
+A clear split by climate and structure. The European zones peak in winter
+(heating), with Finland strongly seasonal and almost no daily cycle, consistent
+with baseload nuclear plus hydro. The US zones peak in summer (cooling), with
+pronounced evening daily peaks. Singapore is flat on every axis, a tropical,
+islanded, gas-dominated grid, with only a slight midday dip as its small solar
+share grows. Weekday-over-weekend effects appear everywhere except Singapore.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{eda_temporal_hour_dow.pdf}
@@ -273,12 +281,6 @@ region. Color is each region's own carbon-intensity percentile; white cells (Jun
 to December 2026) have no data yet.}
 \label{fig:temporal-my}
 \end{figure}
-A clear split by climate and structure. The European zones peak in winter
-(heating), with Finland strongly seasonal and almost no daily cycle, consistent
-with baseload nuclear plus hydro. The US zones peak in summer (cooling), with
-pronounced evening daily peaks. Singapore is flat on every axis, a tropical,
-islanded, gas-dominated grid, with only a slight midday dip as its small solar
-share grows. Weekday-over-weekend effects appear everywhere except Singapore.
 
 \subsection{Feature relationships and correlations}
 \begin{figure}[t]

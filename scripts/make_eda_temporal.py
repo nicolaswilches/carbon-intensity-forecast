@@ -98,7 +98,7 @@ def month_year() -> None:
             z=_pct(g.values), x=MONTHS, y=[str(y) for y in g.index],
             colorscale=CSCALE, zmin=0, zmax=100, xgap=0, ygap=0,
             showscale=(i == len(ZONES)), colorbar=_colorbar()), row=i, col=1)
-    _style(fig, height=560)
+    _style(fig, height=672)  # ~20% taller so the month/year cells are larger
     out = os.path.join(FIGS, "eda_temporal_month_year.pdf")
     fig.write_image(out)
     print("wrote", out)
