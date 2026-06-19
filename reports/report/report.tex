@@ -94,7 +94,10 @@ methodological reference. It is a two-tier hierarchical model: Tier~1 is a set o
 per-source feedforward artificial neural networks (ANNs) that forecast generation from history, calendar features, and weather; Tier~2 is a convolutional-recurrent network that consumes
 the Tier~1 forecasts together with historical carbon intensity and weather to
 forecast carbon intensity. It is production-based by design, explicitly ignoring
-imports and exports, and is evaluated on six regions, one being PJM, which is also covered in this report. CarbonCast was chosen as the two-tier \textit{production-based} baseline model from which our two-tier \textit{consumption-based} model extends.
+imports and exports, and is evaluated on six regions, one of them PJM, which this
+study also covers. Because it is open source, we adopt CarbonCast as the two-tier
+\emph{production-based} baseline that our two-tier \emph{consumption-based} model
+extends.
 
 \textbf{EnsembleCI} (Yan et al., 2025) is an adaptive ensemble that improves on
 CarbonCast for production-based carbon intensity across eleven grids including PJM,
@@ -102,21 +105,22 @@ but does not use interconnector flows. It is the strongest production-based prio
 art.
 
 \textbf{CarbonFlex} (Hanafy et al., 2025) and the \textbf{Phoenix field
-demonstration} (Colangelo et al., 2025) are not forecasting papers; they are
-downstream consumers of carbon intensity forecasts. We cite them to motivate the
-carbon-aware computing application, not as baselines.
+demonstration} (Colangelo et al., 2025) are not forecasting papers but
+downstream consumers of carbon intensity forecasts, cited to motivate the
+carbon-aware computing application rather than as baselines.
 
 \textbf{Electricity Maps operational forecast} (productionized January 2025)
 provides flow-traced, consumption-based carbon intensity forecasts across more
 than one hundred zones and is used by Google's carbon-intelligent computing
-platform. It is a closed model and is the operational benchmark our
-consumption-based work is positioned against.
+platform. It is a closed model, and the operational forecast our consumption-based
+work is benchmarked against.
 
-\textbf{The gap.} None of these does open consumption-based forecasting with
-explicit cross-border flow modeling for comparable regions. EnsembleCI is closest
-but production-based; the Electricity Maps forecast is consumption-based but
-closed. This work sits in the gap between open and production-based and closed and
-consumption-based.
+\textbf{The gap.} None of these offers open, consumption-based forecasting with
+explicit cross-border flow modeling for comparable regions. EnsembleCI is the
+strongest prior work but stays production-based, while the Electricity Maps forecast
+is consumption-based but closed. This work fills the empty corner: an open,
+reproducible model that targets consumption-based carbon intensity and models
+cross-border flows explicitly.
 % TODO: add formal citations / .bib entries. Decide whether to reproduce EnsembleCI on PJM or only cite.
 
 \section{Data}
