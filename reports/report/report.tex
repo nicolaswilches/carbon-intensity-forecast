@@ -10,6 +10,10 @@
 % candidates so it resolves whether the compile root is this dir or the repo root.
 \graphicspath{{../../outputs/figures/}{outputs/figures/}{figures/}}
 
+% Keep each section's floats within that section, so a table or figure cannot drift
+% above an earlier section heading (e.g. Table 1 / Figure 1 rising above Data).
+\usepackage[section]{placeins}
+
 % Year-over-year change tags, plain (no color): decrease, increase, no change.
 \newcommand{\yd}[1]{\,{\small(#1\%)}}
 \newcommand{\yu}[1]{\,{\small(+#1\%)}}
