@@ -90,13 +90,11 @@ fail across heterogeneous grids, and providing a reproducible benchmark.
 
 \section{Related Work}
 \textbf{CarbonCast} (Maji, Shenoy, Sitaraman, ACM BuildSys 2022) is the closest
-methodological anchor. It is a two-tier hierarchical model: Tier~1 is a set of
-per-source feedforward networks that forecast generation from history, calendar
-features, and weather; Tier~2 is a convolutional-recurrent network that consumes
+methodological reference. It is a two-tier hierarchical model: Tier~1 is a set of
+per-source feedforward artificial neural networks (ANNs) that forecast generation from history, calendar features, and weather; Tier~2 is a convolutional-recurrent network that consumes
 the Tier~1 forecasts together with historical carbon intensity and weather to
 forecast carbon intensity. It is production-based by design, explicitly ignoring
-imports and exports, and is evaluated on six regions (one, PJM, overlaps with our
-set). It is open source. We reproduce it as our production-based baseline.
+imports and exports, and is evaluated on six regions, one being PJM, which is also covered in this report. CarbonCast was chosen as the two-tier \textit{production-based} baseline model from which our two-tier \textit{consumption-based} model extends.
 
 \textbf{EnsembleCI} (Yan et al., 2025) is an adaptive ensemble that improves on
 CarbonCast for production-based carbon intensity across eleven grids including PJM,
@@ -129,7 +127,6 @@ zones. Carbon intensity is computed with CarbonCast Table~1 lifecycle emission
 factors. For each zone we also collect the carbon intensity history of its
 interconnector partners (twenty external zones), used as a consumption-based
 feature.
-
 The five zones were chosen for structural diversity: a large multi-state US market
 (PJM), a smaller US market with heavy hydro imports (NYIS), a Nordic grid
 undergoing a nuclear-driven decarbonization (Finland), a small import-heavy
