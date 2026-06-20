@@ -19,17 +19,22 @@ import os
 import sys
 import time
 
+import numpy as np
 import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
-from carbon_forecast.models.carboncast_extended import train_e3, evaluate_ci, E3Config  # noqa: E402
+from carbon_forecast.models.carboncast_extended import (  # noqa: E402
+    train_e3, evaluate_ci, predict_with_truth, E3Config,
+)
 from carbon_forecast.models.tier1_source import Tier1Config  # noqa: E402
 from carbon_forecast.models.tier1_flow import Tier1FlowConfig  # noqa: E402
 from carbon_forecast.models.tier2_cnnlstm import Tier2Config  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 DATA_ROOT = os.environ.get("DATA_ROOT", os.path.join(ROOT, "data", "processed"))
-OUT = os.path.join(ROOT, "outputs")
+# OUTDIR lets a throwaway directional run write elsewhere, away from the real ledger.
+OUT = os.environ.get("OUTDIR", os.path.join(ROOT, "outputs"))
+PREDS_DIR = os.path.join(OUT, "preds_feature_comparison")  # one npz per zone/mode/seed
 
 ALL_ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
 ZONES = os.environ.get("ZONES", ",".join(ALL_ZONES)).split(",")
@@ -53,41 +58,65 @@ def _drop_cross_border(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop(columns=cols)
 
 
-def run(zone: str, flow_on: bool, cfg: E3Config) -> dict:
+SEEDS_CSV = os.path.join(OUT, "feature_comparison_seeds.csv")
+
+
+def _load_done() -> tuple[list[dict], set]:
+    """Resume ledger: rows already computed in a previous (possibly killed) run."""
+    if not os.path.exists(SEEDS_CSV):
+        return [], set()
+    df = pd.read_csv(SEEDS_CSV)
+    return df.to_dict("records"), {(r.zone, r.flow, int(r.seed)) for r in df.itertuples()}
+
+
+def run(zone: str, flow_on: bool, cfg: E3Config, done: set, ledger: list[dict]) -> list[dict]:
+    """Train the not-yet-done seeds, save predictions + metrics, return all rows."""
+    mode = "on" if flow_on else "off"
     df = pd.read_parquet(os.path.join(DATA_ROOT, f"{zone}.parquet"))
     if not flow_on:
         df = _drop_cross_border(df)
     train, val, test = df.loc[TRAIN], df.loc[VAL], df.loc[TEST]
-    runs = []
+    rows = [r for r in ledger if r["zone"] == zone and r["flow"] == mode]
     for s in SEEDS:
+        if (zone, mode, s) in done:
+            print(f"  {zone} flow={mode} seed={s} (cached, skip)", flush=True)
+            continue
         art = train_e3(train, val, zone, cfg, verbose=0, seed=s)
         v, t = evaluate_ci(art, val), evaluate_ci(art, test)
-        runs.append((s, v["mape_pct"], t["mape_pct"], t["mae"], t["rmse"]))
-        print(f"  {zone} flow={'on' if flow_on else 'off'} seed={s} "
-              f"val={v['mape_pct']:.2f} test={t['mape_pct']:.2f}", flush=True)
-    best = min(runs, key=lambda r: r[1])  # lowest validation MAPE
-    return dict(zone=zone, flow="on" if flow_on else "off", best_seed=best[0],
-                val_mape=round(best[1], 2), test_mape=round(best[2], 2),
-                test_mae=round(best[3], 2), test_rmse=round(best[4], 2))
+        preds, y_true, origins = predict_with_truth(art, test)
+        np.savez_compressed(os.path.join(PREDS_DIR, f"{zone}_{mode}_seed{s}.npz"),
+                            preds=preds, y_true=y_true, origins=np.asarray(origins))
+        row = dict(zone=zone, flow=mode, seed=s,
+                   val_mape=round(v["mape_pct"], 2), test_mape=round(t["mape_pct"], 2),
+                   test_mae=round(t["mae"], 2), test_rmse=round(t["rmse"], 2))
+        rows.append(row)
+        ledger.append(row)
+        pd.DataFrame(ledger).to_csv(SEEDS_CSV, index=False)  # checkpoint per seed
+        print(f"  {zone} flow={mode} seed={s} val={v['mape_pct']:.2f} "
+              f"test={t['mape_pct']:.2f}", flush=True)
+    return rows
 
 
 def main():
     cfg = _cfg()
     modes = [m == "on" for m in os.environ.get("MODES", "off,on").split(",")]
-    rows = []
+    ledger, done = _load_done()
     for zone in ZONES:
         for flow_on in modes:
             t0 = time.time()
-            row = run(zone, flow_on, cfg)
-            row["minutes"] = round((time.time() - t0) / 60, 1)
-            rows.append(row)
-            print(f"{zone} flow={row['flow']}: test MAPE {row['test_mape']} "
-                  f"({row['minutes']} min)", flush=True)
-    out = os.path.join(OUT, "feature_comparison.csv")
-    pd.DataFrame(rows).to_csv(out, index=False)
-    print("wrote", out, flush=True)
+            rows = run(zone, flow_on, cfg, done, ledger)
+            best = min(rows, key=lambda r: r["val_mape"])  # best-by-validation
+            print(f"{zone} flow={'on' if flow_on else 'off'}: best-by-val test MAPE "
+                  f"{best['test_mape']} ({round((time.time() - t0) / 60, 1)} min)", flush=True)
+
+    # Summary: best-by-validation seed per (zone, mode).
+    seeds = pd.DataFrame(ledger)
+    summary = seeds.sort_values("val_mape").groupby(["zone", "flow"], as_index=False).first()
+    summary.to_csv(os.path.join(OUT, "feature_comparison.csv"), index=False)
+    print("wrote feature_comparison.csv (+ _seeds.csv, + preds_feature_comparison/)", flush=True)
 
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
+    os.makedirs(PREDS_DIR, exist_ok=True)
     main()
