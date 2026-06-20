@@ -133,10 +133,23 @@ cross-border flows explicitly.
 We use Electricity Maps (academic license) for hourly carbon intensity, power
 breakdown, and electricity flows, and Open-Meteo (ERA5 reanalysis for history,
 GFS for forecasts) for weather, over January 2021 through May 2026 across the five
-zones. Carbon intensity is computed with CarbonCast Table~1 lifecycle emission
-factors. For each zone we also collect the carbon intensity history of its
-interconnector partners (twenty external zones), used as a consumption-based
-feature.
+zones. We use two carbon-intensity signals. We compute the \emph{production-based}
+intensity, the quantity CarbonCast targets and the label for our production-based
+baseline, from the domestic generation mix exactly as CarbonCast does:
+\begin{equation}
+\mathrm{CI}^{\mathrm{prod}}_t = \frac{\sum_i E_{i,t}\,\mathrm{CEF}_i}{\sum_i E_{i,t}},
+\end{equation}
+where $E_{i,t}$ is the generation of source $i$ in hour $t$ and $\mathrm{CEF}_i$ its
+emission factor from CarbonCast Table~1. We take the lifecycle (scope~3) factors as
+the primary target and keep the direct (scope~2) factors as a variant. This signal
+ignores imports and exports by construction. The \emph{consumption-based} intensity,
+our main target, is not recomputed: we use the flow-traced value Electricity Maps
+reports, which already accounts for the carbon embedded in imported electricity. The
+cross-border information enters the forecasting model as input features, the
+per-partner carbon intensity and net interconnector flows introduced below, rather
+than as an additional term in a carbon-intensity formula. For each zone we also
+collect the carbon intensity history of its interconnector partners (twenty external
+zones), used as a consumption-based feature.
 The five zones were chosen for structural diversity: a large multi-state US market
 (PJM), a smaller US market with heavy hydro imports (NYIS), a Nordic grid
 undergoing a nuclear-driven decarbonization (Finland), a small import-heavy
