@@ -334,9 +334,17 @@ networks that forecast generation with a Tier~2 convolutional-recurrent network
 that consumes those forecasts together with historical carbon intensity, weather,
 and calendar features to emit a 96 hour carbon intensity vector. We extend Tier~1
 with per-interconnector flow networks that forecast signed net flow, and we add
-partner carbon intensity as a Tier~2 channel. To avoid in-sample leakage, the
-Tier~1 forecasts used for Tier~2 training are generated out of fold (leave one
-year out); final Tier~1 models drive inference.
+partner carbon intensity as a Tier~2 channel.
+
+Tier~2 always consumes Tier~1 \emph{forecasts}, never actual future generation, so
+no future information leaks into the carbon-intensity prediction. The forecasts used
+to train Tier~2 are generated out of fold, with leave-one-year-out Tier~1 models
+predicting each training year from the others. This matters because in-sample
+Tier~1 forecasts, produced by models that have already seen those hours, are
+unrealistically accurate, and training Tier~2 on them would teach it to over-trust
+the first tier and overstate its own accuracy. Out-of-fold forecasts instead carry
+the same error profile Tier~2 meets at inference, where the chain is always the
+final Tier~1 models followed by Tier~2.
 
 \subsection{Production and consumption targets}
 The production-based variant (the faithful baseline) targets the domestic
