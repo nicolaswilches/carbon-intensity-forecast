@@ -494,38 +494,40 @@ and Figures~\ref{fig:tier1-horizon} and~\ref{fig:tier1-pred} visualize it.
 \toprule
 Zone & h1 & h24 & h48 & h96 \\
 \midrule
-Singapore   & 3.1  & 4.3  & 4.6  & 5.2 \\
-US-MIDA-PJM & 5.6  & 8.6  & 10.1 & 13.3 \\
-US-NY-NYIS  & 8.3  & 12.3 & 14.3 & 15.8 \\
-Finland     & 11.5 & 16.3 & 18.7 & 17.5 \\
-Belgium     & 24.0 & 22.4 & 23.6 & 23.6 \\
+Singapore   & 2.6  & 3.5  & 4.5  & 4.4 \\
+US-MIDA-PJM & 4.8  & 7.2  & 8.4  & 10.6 \\
+US-NY-NYIS  & 8.3  & 11.3 & 13.2 & 14.3 \\
+Finland     & 10.1 & 14.7 & 17.3 & 14.1 \\
+Belgium     & 17.8 & 21.4 & 22.4 & 25.3 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Two patterns emerge. Belgium's Tier~1 error is high at every horizon (about 24\%,
-roughly flat), because its nuclear phase-out makes the generation mix volatile and
-hard to forecast; feeding production this noisy into Tier~2 is why Belgium's
-two-tier model is far worse than the single-tier one, and an iterated scheme would
-not help since the error is not horizon-driven. PJM, NYIS, and Finland instead
-degrade with horizon (PJM 5.6\% to 13.3\%), the regime where CarbonCast's iterated
-24-by-4 scheme could help, at the risk of compounding error across blocks. Because
-the single-tier model uses no Tier~1 input and already wins, improving Tier~1 is
-about rescuing the two-tier design rather than beating the single-tier baseline.
+Two patterns emerge. Belgium has the worst Tier~1 error at every horizon, already
+near 18\% one hour ahead and climbing past 25\% four days out, because its nuclear
+phase-out makes the generation mix volatile and hard to forecast. Feeding
+production this noisy into Tier~2 is why Belgium's two-tier model is far worse than
+its single-tier one, and the damage starts at the shortest horizon. Singapore is
+the easy case, holding near 3 to 5\% throughout. PJM, NYIS, and Finland sit in
+between and degrade steadily with horizon (PJM 4.8\% to 10.6\%), the regime where
+CarbonCast's iterated 24-by-4 scheme could help, at the risk of compounding error
+across blocks. Because the single-tier model uses no Tier~1 input and already wins,
+improving Tier~1 is about rescuing the two-tier design rather than beating the
+single-tier baseline.
 
-\begin{figure*}[t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{tier1_horizon_error.pdf}
+\includegraphics[width=\columnwidth]{tier1_horizon_error.pdf}
 \caption{Tier 1 total-generation forecast error (normalized RMSE) by horizon, per region, Test A.}
 \label{fig:tier1-horizon}
-\end{figure*}
+\end{figure}
 
-\begin{figure*}[t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{tier1_pred_vs_actual_pjm.pdf}
+\includegraphics[width=\columnwidth]{tier1_pred_vs_actual_pjm.pdf}
 \caption{Tier 1 day-ahead (24h) forecast versus actual gas production, US-MIDA-PJM, Test A.}
 \label{fig:tier1-pred}
-\end{figure*}
+\end{figure}
 
 \subsection{Other limitations}
 The Electricity Maps academic forecast horizon is 24 hours rather than the
