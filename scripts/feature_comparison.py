@@ -24,7 +24,7 @@ import pandas as pd
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 from carbon_forecast.models.carboncast_extended import (  # noqa: E402
-    train_e3, evaluate_ci, predict_with_truth, E3Config,
+    train_e3, evaluate_ci, predict_with_truth, save_e3, E3Config,
 )
 from carbon_forecast.models.tier1_source import Tier1Config  # noqa: E402
 from carbon_forecast.models.tier1_flow import Tier1FlowConfig  # noqa: E402
@@ -35,6 +35,8 @@ DATA_ROOT = os.environ.get("DATA_ROOT", os.path.join(ROOT, "data", "processed"))
 # OUTDIR lets a throwaway directional run write elsewhere, away from the real ledger.
 OUT = os.environ.get("OUTDIR", os.path.join(ROOT, "outputs"))
 PREDS_DIR = os.path.join(OUT, "preds_feature_comparison")  # one npz per zone/mode/seed
+MODELS_DIR = os.path.join(OUT, "models_feature_comparison")  # one save_e3 dir per cell
+SAVE_MODELS = os.environ.get("SAVE_MODELS", "1") != "0"     # set 0 to skip (disk)
 
 ALL_ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
 ZONES = os.environ.get("ZONES", ",".join(ALL_ZONES)).split(",")
@@ -86,6 +88,8 @@ def run(zone: str, flow_on: bool, cfg: E3Config, done: set, ledger: list[dict]) 
         preds, y_true, origins = predict_with_truth(art, test)
         np.savez_compressed(os.path.join(PREDS_DIR, f"{zone}_{mode}_seed{s}.npz"),
                             preds=preds, y_true=y_true, origins=np.asarray(origins))
+        if SAVE_MODELS:  # full trained E3, reloadable via load_e3 (e.g. for Test B)
+            save_e3(art, os.path.join(MODELS_DIR, f"{zone}_{mode}_seed{s}"))
         row = dict(zone=zone, flow=mode, seed=s,
                    val_mape=round(v["mape_pct"], 2), test_mape=round(t["mape_pct"], 2),
                    test_mae=round(t["mae"], 2), test_rmse=round(t["rmse"], 2))
@@ -119,4 +123,5 @@ def main():
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     os.makedirs(PREDS_DIR, exist_ok=True)
+    os.makedirs(MODELS_DIR, exist_ok=True)
     main()
