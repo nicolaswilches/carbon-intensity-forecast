@@ -352,7 +352,7 @@ def style_report_fig(
         plot_bgcolor="#FFFFFF",
         width=width,
         height=height,
-        margin=dict(t=(36 if legend else 14), r=18, b=46, l=60),
+        margin=dict(t=(36 if legend else 14), r=18, b=18, l=60),
         showlegend=legend,
     )
     if legend:
@@ -360,7 +360,9 @@ def style_report_fig(
             orientation="h", x=0, xanchor="left", y=1.02, yanchor="bottom",
             font=dict(size=REPORT_FONT),
         ))
-    fig.update_xaxes(showgrid=False, tickfont=dict(size=REPORT_FONT),
+    # automargin grows the bottom only as far as the x labels/title need, so the
+    # small base margin removes the dead space below the plot without clipping.
+    fig.update_xaxes(showgrid=False, automargin=True, tickfont=dict(size=REPORT_FONT),
                      title=dict(text=xlabel, font=dict(size=REPORT_FONT)))
     fig.update_yaxes(gridcolor=GRID_COLOR, tickfont=dict(size=REPORT_FONT),
                      title=dict(text=ylabel, font=dict(size=REPORT_FONT)))
