@@ -47,7 +47,7 @@ def build() -> None:
                                showarrow=False,
                                font=dict(size=P.REPORT_FONT,
                                          color="#1F1F1F" if abs(v) < 0.6 else "#FFFFFF"))
-    P.style_report_fig(fig, span="column", height=520, legend=False)
+    P.style_report_fig(fig, span="column", height=416, legend=False)
     fig.update_xaxes(side="top")
     # production CI (first feature) on top; scaleanchor makes the cells exact squares
     fig.update_yaxes(autorange="reversed", scaleanchor="x", scaleratio=1)

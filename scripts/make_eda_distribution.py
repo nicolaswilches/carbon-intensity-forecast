@@ -62,7 +62,7 @@ def comparison() -> None:
         fig.add_trace(go.Box(y=s.values, name=LABEL[z], boxmean=True, boxpoints=False,
                              marker_color=color, fillcolor=_alpha(color, 0.4),
                              line=dict(color=color, width=1.4)))
-    P.style_report_fig(fig, span="column", height=430, legend=False,
+    P.style_report_fig(fig, span="column", height=344, legend=False,
                        ylabel="gCO₂eq/kWh")
     out = os.path.join(FIGS, "eda_distribution.pdf")
     fig.write_image(out)
