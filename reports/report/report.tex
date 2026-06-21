@@ -53,8 +53,8 @@ extends it to a consumption-based target with interconnector flow and partner
 carbon intensity inputs, and compares both against a single-tier model that
 forecasts carbon intensity directly. We contribute a per-region accuracy atlas, a
 structural comparison of the two-tier design, and a characterization of where
-forecasts succeed and fail, with a feature comparison of the cross-border inputs
-underway. 
+forecasts succeed and fail; a feature comparison of the cross-border inputs and a
+head-to-head against the operational Electricity Maps forecast are under way. 
 
 \wip{On a held-out May 2026 test month, consumption-based accuracy ranges from under 1\% MAPE in near-islanded Singapore to roughly 6\% in the large US markets, with Belgium the hard case at a distribution shift the model does not anticipate. Our central finding is that the two-tier structure does not earn its complexity: a single-tier network that forecasts carbon intensity directly matches or beats the two-tier
 model in every zone, because imperfect first-tier generation forecasts inject more
@@ -404,32 +404,24 @@ the results.
 
 \section{Results}
 \begin{table}[h]
-\caption{Test A (May 2026) per-zone accuracy, consumption-based two-tier
-(validation-selected).}
+\caption{Test A (May 2026) per-zone accuracy of our best model, the consumption-based
+single-tier network (validation-selected).}
 \label{tab:atlas}
 \begin{tabular}{lrrr}
 \toprule
 Zone & MAPE (\%) & MAE & RMSE \\
 \midrule
-Singapore   & 0.90  & 4.17  & 6.54  \\
-US-NY-NYIS  & 7.03  & 19.22 & 25.45 \\
-US-MIDA-PJM & 8.30  & 31.69 & 40.25 \\
-Finland     & 24.04 & 11.43 & 14.41 \\
-Belgium     & 64.42 & 74.17 & 90.23 \\
+Singapore   & 0.71  & 3.31  & 5.45  \\
+US-NY-NYIS  & 5.98  & 16.46 & 20.46 \\
+US-MIDA-PJM & 5.93  & 21.54 & 26.52 \\
+Finland     & 12.05 & 6.17  & 8.19  \\
+Belgium     & 41.57 & 47.81 & 55.28 \\
 \bottomrule
 \end{tabular}
 \end{table}
-Four of five zones forecast well. Finland's percentage looks high but its absolute
-error is small (11.4 on a low-carbon grid), so the percentage is
-denominator-inflated. Belgium is the genuine hard case.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{results_atlas_cons_twotier.pdf}
-\caption{Per-region Test A accuracy (MAPE) for the consumption-based two-tier
-model, validation-selected.}
-\label{fig:atlas}
-\end{figure}
+Four of five zones forecast well: Singapore under 1\%, the two US markets near 6\%,
+and Finland at 12\% but with a small absolute error (6.2 on a low-carbon grid), so
+its percentage is denominator-inflated. Belgium is the genuine hard case.
 
 \begin{figure}[t]
 \centering
