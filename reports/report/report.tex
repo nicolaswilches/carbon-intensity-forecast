@@ -208,7 +208,7 @@ barely changes (190 to 188) while the spread widens (standard deviation 58 to 76
 so the grid becomes more volatile rather than cleaner or dirtier. PJM eases down
 modestly (431 to 401), and Singapore barely moves, staying tight and high.
 
-\begin{figure}[H]
+\begin{figure}[!tb]
 \centering
 \includegraphics[width=\columnwidth]{eda_distribution_shift.pdf}
 \caption{Per-region carbon intensity distribution, 2021 versus 2026 (January to May
@@ -241,7 +241,7 @@ This explains the rising intensity.
 \end{itemize}
 % [!t]: the figure scales to ~7.25in tall, above the default \topfraction limit
 % for a [t] float, so without "!" LaTeX defers it and leaves a blank gap.
-\begin{figure}[H]
+\begin{figure}[!tb]
 \centering
 \includegraphics[width=\columnwidth]{eda_mix.pdf}
 \caption{Generation mix by source for each region, 2021 (top bar) versus 2025
@@ -259,7 +259,7 @@ Belgium with France, the Netherlands, and Great Britain; Finland with Sweden and
 Estonia; PJM with MISO, NYIS, and TVA; NYIS with PJM and Hydro-Quebec/Ontario;
 Singapore only a small link to Peninsular Malaysia.
 
-\begin{figure}[H]
+\begin{figure}[!tb]
 \centering
 \includegraphics[width=\columnwidth]{eda_net_import.pdf}
 \caption{Monthly net import as a share of consumption, per region, 2021 to 2026.
@@ -276,7 +276,7 @@ Finland breaks the pattern, with its highest intensity around midday and on
 weekdays. Singapore concentrates its carbon intensity in the morning hours and
 holds that pattern across the whole week, showing no weekday-to-weekend difference.
 
-\begin{figure}[H]
+\begin{figure}[!tb]
 \centering
 \includegraphics[width=\columnwidth]{eda_temporal_hour_dow.pdf}
 \caption{Consumption-based carbon intensity by hour of day (columns, local time) and
@@ -295,7 +295,7 @@ decline spans the full color range. The two US grids show a strong, recurring ba
 of high intensity in the summer months, present in every year, the cooling-demand
 signal from a different angle.
 
-\begin{figure}[H]
+\begin{figure}[!tb]
 \centering
 \includegraphics[width=\columnwidth]{eda_temporal_month_year.pdf}
 \caption{Consumption-based carbon intensity by month (columns) and year (rows), per
@@ -430,7 +430,7 @@ Four of five zones forecast well: Singapore under 1\%, the two US markets near 6
 and Finland at 12\% but with a small absolute error (6.2 on a low-carbon grid), so
 its percentage is denominator-inflated. Belgium is the genuine hard case.
 
-\begin{figure}[t]
+\begin{figure}[!tb]
 \centering
 \includegraphics[width=\columnwidth]{results_forecast_vs_actual.pdf}
 \caption{Day-ahead (24 hour) consumption-based carbon intensity forecast versus
