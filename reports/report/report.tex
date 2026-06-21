@@ -435,15 +435,19 @@ Belgium     & 41.57 & 47.81 & 55.28 \\
 Four of five zones forecast well: Singapore under 1\%, the two US markets near 6\%,
 and Finland at 12\% but with a small absolute error (6.2 on a low-carbon grid), so
 its percentage is denominator-inflated. Belgium is the genuine hard case.
+Figure~\ref{fig:fva} shows how all four frameworks' day-ahead forecasts track the
+actual across zones; the two-tier models, Finland's production most of all, are
+visibly noisier.
 
 \begin{figure}[!tb]
 \centering
-\includegraphics[width=\columnwidth]{results_forecast_vs_actual.pdf}
-\caption{Day-ahead (24 hour) consumption-based carbon intensity forecast versus
-actual over Test A (May 2026), per zone (consumption-based single-tier,
-validation-selected). Singapore is near-exact; the US markets track the daily
-cycle; Finland's forecast flattens against a late-May rise; Belgium captures the
-shape but misses amplitude.}
+\includegraphics[width=\columnwidth]{results_fva_frameworks.pdf}
+\caption{Day-ahead (24 hour) forecast versus actual over Test A, all four
+frameworks. Rows are zones; the left column is the production-based target, the
+right the consumption-based target. In each cell the actual is gray, with the
+single-tier (blue) and two-tier (orange) forecasts overlaid. The two columns are
+different series and not cross-comparable. The two-tier forecasts are visibly more
+erratic, most extreme for Finland's production.}
 \label{fig:fva}
 \end{figure}
 
