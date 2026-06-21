@@ -15,6 +15,10 @@
 \usepackage[section]{placeins}
 % Enables [H] placement: drop a float exactly where it is written, no floating.
 \usepackage{float}
+% placeins only barriers at \section; add one at each \subsection too, so a figure
+% cannot drift out of its subsection (the EDA section packs 8 figures into 6).
+\let\cfOldsubsection\subsection
+\renewcommand\subsection{\FloatBarrier\cfOldsubsection}
 
 % Year-over-year change tags, plain (no color): decrease, increase, no change.
 \newcommand{\yd}[1]{\,{\small(#1\%)}}
