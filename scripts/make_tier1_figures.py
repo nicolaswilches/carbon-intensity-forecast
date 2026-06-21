@@ -36,8 +36,8 @@ FIGS = os.path.join(ROOT, "outputs", "figures")
 OUT = os.path.join(ROOT, "outputs")
 
 ZONES = ["SG", "US-MIDA-PJM", "US-NY-NYIS", "FI", "BE"]
-LABEL = {"BE": "Belgium", "FI": "Finland", "SG": "Singapore",
-         "US-MIDA-PJM": "US-MIDA-PJM", "US-NY-NYIS": "US-NY-NYIS"}
+LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
+         "US-MIDA-PJM": "PJM", "US-NY-NYIS": "NYIS"}
 CFG = Tier1Config(epochs=40, patience=6, stride=4)  # diagnostic budget, tractable on CPU
 TRAIN, VAL, PRED = slice("2021", "2025"), slice("2026-01", "2026-04"), slice("2026-04", "2026-05")
 

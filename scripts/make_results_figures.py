@@ -35,8 +35,8 @@ FIGS = os.path.join(ROOT, "outputs", "figures")
 ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
 NPZ = {z: f"{z}.npz" for z in ZONES}
 NPZ["FI"] = os.environ.get("FI_NPZ", "FI_2023.npz")
-LABEL = {"SG": "Singapore", "US-NY-NYIS": "US-NY-NYIS", "US-MIDA-PJM": "US-MIDA-PJM",
-         "FI": "Finland", "BE": "Belgium"}
+LABEL = {"SG": "SG", "US-NY-NYIS": "NYIS", "US-MIDA-PJM": "PJM",
+         "FI": "FI", "BE": "BE"}
 
 
 def load(zone: str):

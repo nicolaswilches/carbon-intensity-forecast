@@ -24,8 +24,8 @@ PROC = os.path.join(ROOT, "data", "processed")
 FIGS = os.path.join(ROOT, "outputs", "figures")
 
 ZONES = ["SG", "US-MIDA-PJM", "US-NY-NYIS", "BE", "FI"]  # legend order, high to low
-LABEL = {"BE": "Belgium", "FI": "Finland", "SG": "Singapore",
-         "US-MIDA-PJM": "US-MIDA-PJM", "US-NY-NYIS": "US-NY-NYIS"}
+LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
+         "US-MIDA-PJM": "PJM", "US-NY-NYIS": "NYIS"}
 # Pad the time axis so the start/end value labels sit in empty space, not on the axis.
 XPAD = ("2020-08-01", "2026-11-01")
 # The 2021 start values of FI (224), BE (235), and NYIS (237) cluster within ~13

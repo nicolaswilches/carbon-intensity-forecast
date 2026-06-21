@@ -24,8 +24,8 @@ PROC = os.path.join(ROOT, "data", "processed")
 FIGS = os.path.join(ROOT, "outputs", "figures")
 
 ZONES = ["BE", "FI", "SG", "US-MIDA-PJM", "US-NY-NYIS"]
-LABEL = {"BE": "Belgium", "FI": "Finland", "SG": "Singapore",
-         "US-MIDA-PJM": "US-MIDA-PJM", "US-NY-NYIS": "US-NY-NYIS"}
+LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
+         "US-MIDA-PJM": "PJM", "US-NY-NYIS": "NYIS"}
 
 
 def build() -> None:

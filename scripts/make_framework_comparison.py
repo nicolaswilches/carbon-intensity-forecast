@@ -24,8 +24,8 @@ OUT = os.path.join(ROOT, "outputs")
 FIGS = os.path.join(ROOT, "outputs", "figures")
 
 ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
-LABEL = {"BE": "Belgium", "FI": "Finland", "SG": "Singapore",
-         "US-MIDA-PJM": "US-MIDA-PJM", "US-NY-NYIS": "US-NY-NYIS"}
+LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
+         "US-MIDA-PJM": "PJM", "US-NY-NYIS": "NYIS"}
 SINGLE_C = "#E05312"   # single-tier
 TWOTIER_C = "#129FE0"  # two-tier
 # (single-tier csv, two-tier csv, output file)

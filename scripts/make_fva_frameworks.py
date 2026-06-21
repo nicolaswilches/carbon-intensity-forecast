@@ -25,8 +25,8 @@ PRED = os.path.join(ROOT, "outputs")
 FIGS = os.path.join(ROOT, "outputs", "figures")
 
 ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
-LABEL = {"BE": "Belgium", "FI": "Finland", "SG": "Singapore",
-         "US-MIDA-PJM": "US-MIDA-PJM", "US-NY-NYIS": "US-NY-NYIS"}
+LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
+         "US-MIDA-PJM": "PJM", "US-NY-NYIS": "NYIS"}
 H = 24  # day-ahead horizon (index H-1)
 ACTUAL_C, SINGLE_C, TWO_C = "#7F7F7F", "#E05312", "#129FE0"
 # (single-tier preds dir, two-tier preds dir, output file)

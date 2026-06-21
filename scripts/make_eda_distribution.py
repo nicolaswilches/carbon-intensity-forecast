@@ -28,8 +28,8 @@ PROC = os.path.join(ROOT, "data", "processed")
 FIGS = os.path.join(ROOT, "outputs", "figures")
 
 ZONES = ["SG", "US-MIDA-PJM", "US-NY-NYIS", "BE", "FI"]  # high to low CI
-LABEL = {"BE": "Belgium", "FI": "Finland", "SG": "Singapore",
-         "US-MIDA-PJM": "US-MIDA-PJM", "US-NY-NYIS": "US-NY-NYIS"}
+LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
+         "US-MIDA-PJM": "PJM", "US-NY-NYIS": "NYIS"}
 C2021 = "#9AA0A6"   # gray for the 2021 distribution
 MAXMONTH = 5        # Jan-May window, matched across years (2026 ends in May)
 
