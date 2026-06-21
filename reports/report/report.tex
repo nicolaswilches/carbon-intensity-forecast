@@ -14,7 +14,7 @@
 
 % Keep each section's floats within that section, so a table or figure cannot drift
 % above an earlier section heading (e.g. Table 1 / Figure 1 rising above Data).
-\usepackage[section]{placeins}
+%\usepackage[section]{placeins}
 \usepackage{float}
 % Float placement parameters: let LaTeX fill columns instead of forcing flushes.
 % A previous per-subsection \FloatBarrier plus [H]/[t]-only placement ejected floats
@@ -57,11 +57,11 @@
 
 \begin{document}
 
-\maketitle
 % acmart resets the page style inside \maketitle; reassert plain so every page has
 % just a centered folio and no running header.
 \thispagestyle{plain}
 \pagestyle{plain}
+
 
 \begin{abstract}
 We present an open, reproducible deep learning framework for short-horizon (96
@@ -85,6 +85,9 @@ published CarbonCast result (6.0 versus 5.3 MAPE), validating the reproduction.
 \end{abstract}
 
 
+\maketitle
+
+% 1. Introduction
 \section{Introduction and Problem}
 In recent years, global electricity demand has risen sharply, growing by more than
 4\% in 2024 and projected to keep climbing through the rest of the decade~\cite{iea2024electricity}.
@@ -113,17 +116,14 @@ The contribution is not introducing consumption-based forecasting as a target,
 since operational systems already exist, but opening a closed method, measuring
 the role of energy interconnector flows, characterizing where forecasts succeed and
 fail across diverse grids, and providing a reproducible benchmark.
+% / 1. Introduction
 
+
+% 2. Related Work
 \section{Related Work}
 \textbf{CarbonCast}~\cite{maji2022carboncast} is the closest
 reference. It is a two-tier model: Tier~1 is a set of
-per-source feedforward artificial neural networks (ANNs) that forecast generation from history, calendar features, and weather; Tier~2 is a convolutional-recurrent network that consumes
-the Tier~1 forecasts together with historical carbon intensity and weather to
-forecast carbon intensity. It is production-based by design, explicitly ignoring
-imports and exports, and is evaluated on six regions, one of them PJM, which this
-study also covers. Because it is open source~\cite{ucscospre2025}, we adopt CarbonCast as the two-tier
-\emph{production-based} baseline that our two-tier \emph{consumption-based} model
-extends.
+per-source feedforward artificial neural networks (ANNs) that forecast generation from history, calendar features, and weather; Tier~2 is a convolutional-recurrent network that consumes the Tier~1 forecasts together with historical carbon intensity and weather to forecast carbon intensity. It is production-based by design, explicitly ignoring imports and exports, and is evaluated on six regions, one of them PJM, which this study also covers. Because it is open source~\cite{ucscospre2025}, we adopt CarbonCast as the two-tier \emph{production-based} baseline that our two-tier \emph{consumption-based} model extends.
 
 \textbf{EnsembleCI}~\cite{yan2025ensembleci} is an adaptive ensemble that improves on
 CarbonCast for production-based carbon intensity across eleven grids including PJM,
@@ -148,16 +148,16 @@ is consumption-based but closed. This work fills the empty corner: an open,
 reproducible model that targets consumption-based carbon intensity and models
 cross-border flows explicitly.
 
+% 3. Data
 \section{Data}
-We use Electricity Maps~\cite{electricitymaps2025forecast} (academic license) for hourly carbon intensity, power
-breakdown, and electricity flows, and Open-Meteo~\cite{openmeteo} (ERA5 reanalysis~\cite{hersbach2020era5} for history,
-GFS~\cite{noaagfs} for forecasts) for weather, over January 2021 through May 2026 across the five
-zones. We use two carbon-intensity signals. We compute the \emph{production-based}
-intensity, the quantity CarbonCast targets and the label for our production-based
-baseline, from the domestic generation mix exactly as CarbonCast does~\cite{maji2022carboncast}:
+We use Electricity Maps~\cite{electricitymaps2025forecast} (academic license) for hourly carbon intensity, power breakdown, and electricity flows, and Open-Meteo~\cite{openmeteo} (ERA5 reanalysis~\cite{hersbach2020era5} for history,
+GFS~\cite{noaagfs} for forecasts) for weather, over January 2021 through May 2026 across the five zones. We use two carbon-intensity signals. We compute the \emph{production-based} intensity, the quantity CarbonCast targets and the label for our production-based baseline, from the domestic generation mix exactly as CarbonCast does~\cite{maji2022carboncast}:
+
 \begin{equation}
-\mathrm{CI}^{\mathrm{prod}}_t = \frac{\sum_i E_{i,t}\,\mathrm{CEF}_i}{\sum_i E_{i,t}},
+\mathrm{CI}^{\mathrm{prod}}_t = \frac{\sum_i E_{i,t}\,\mathrm{CEF}_i}{\sum_i E_{i,t}}
 \end{equation}
+
+
 where $E_{i,t}$ is the generation of source $i$ in hour $t$ and $\mathrm{CEF}_i$ its
 emission factor from CarbonCast Table~1. We take the lifecycle (scope~3) factors as
 the primary target and keep the direct (scope~2) factors as a variant. This signal
@@ -169,15 +169,18 @@ per-partner carbon intensity and net interconnector flows introduced below, rath
 than as an additional term in a carbon-intensity formula. For each zone we also
 collect the carbon intensity history of its interconnector partners (twenty external
 zones), used as a consumption-based feature.
+
 The five zones were chosen for structural diversity: a large multi-state US market
 (PJM), a smaller US market with heavy hydro imports (NYIS), a Nordic grid
 undergoing a nuclear-driven decarbonization (Finland), a small import-heavy
 European grid (Belgium), and a near-islanded gas-dominated grid (Singapore).
 
+% 4. EDA
 \section{Exploratory Data Analysis}
 This section reports our initial evaluation of the extracted data across all five
-regions.
+regions. First, we explore the temporal evolution of carbon intensity across the five target regions. After this, we evaluate the distribution of carbon intensity within each zone and the composition of their energy grids. These analysis allow us to visualize significant shifts in the carbon intensity generated by each region within a five years period and how this related to the composition of their energy grids. Subsequently, we analyze the energy trade of the five target regions with partner regions measured by total imports and exports of energy across all interconnection points. Finally, we evaluate the influence of temporal features on carbon intensity across regions and the correlation of major features.
 
+% 4.1. Carbon intensity evolution per region
 \subsection{Carbon intensity evolution per region}
 
 Three distinct trajectories stand out. Finland falls steeply, from 224 in early
@@ -196,7 +199,10 @@ and last monthly values.}
 \label{fig:ci-evolution}
 \end{figure}
 
+
+% 4.2 Carbon intensity distributions
 \subsection{Carbon intensity distributions}
+
 The five regions occupy clearly different carbon-intensity bands
 (Figure~\ref{fig:distribution}). Singapore sits in a narrow band near 490, with a
 small spread and a strong left skew, so almost every hour is high-carbon. PJM and
@@ -209,14 +215,6 @@ consumption-minus-production gap is region-specific in sign and size, PJM $+54$,
 NYIS $+19$, Belgium $+3$, Singapore about $0$, and Finland $-10$, which is the core
 justification for a consumption-based target.
 
-\begin{figure}[tbp]
-\centering
-\includegraphics[width=\columnwidth]{eda_distribution.pdf}
-\caption{Consumption-based carbon intensity distribution per region (2021 to 2026). Boxes span the IQR range, the solid line is the median and
-the dashed line the mean, and whiskers reach 1.5 times the IQR range.}
-\label{fig:distribution}
-\end{figure}
-
 The distributions also move over the study period
 (Figure~\ref{fig:distribution-shift}), comparing January through May of 2021
 against the same months of 2026. Finland shifts the most: its mean roughly halves
@@ -228,15 +226,15 @@ so the grid becomes more volatile rather than cleaner or dirtier. PJM eases down
 modestly (431 to 401), and Singapore barely moves, staying tight and high.
 
 \begin{figure}[tbp]
-\centering
-\includegraphics[width=\columnwidth]{eda_distribution_shift.pdf}
-\caption{Per-region carbon intensity distribution, 2021 versus 2026 (January to May
-of each year, matched for season). Gray bars and left-corner statistics are 2021;
-colored bars and right-corner statistics are 2026. Statistics are mean ($\mu$),
-median, standard deviation ($\sigma$), and skew.}
-\label{fig:distribution-shift}
+    \centering
+    \includegraphics[width=\columnwidth]{eda_distribution.pdf}
+    \Description{Distribution of consumption-based carbon intensity per region, showing median, mean, and IQR.}
+    \caption{Consumption-based carbon intensity distribution per region (2021 to 2026). The solid line is the median, the dashed line the mean, and whiskers reach x1.5 the IQR.}
+    \label{fig:distribution}
 \end{figure}
 
+
+%  4.3. Energy mix evolution per region
 \subsection{Energy mix evolution per region}
 Per-source generation share, 2021 to 2025 (Figure~\ref{fig:mix-evolution}):
 \begin{itemize}
@@ -258,17 +256,19 @@ small (0.7\% to 2.8\%). The mix barely moves, matching the flat intensity.
 recede, nuclear 25\% to 21\% and hydro 22\% to 18\%, with wind only 3\% to 5\%.
 This explains the rising intensity.
 \end{itemize}
-% [!t]: the figure scales to ~7.25in tall, above the default \topfraction limit
-% for a [t] float, so without "!" LaTeX defers it and leaves a blank gap.
+%
+
+
 \begin{figure}[tbp]
 \centering
-\includegraphics[width=\columnwidth]{eda_mix.pdf}
-\caption{Generation mix by source for each region, 2021 (top bar) versus 2025
-(bottom bar), as 100\% stacked bars (annual means). Each segment is labeled with
-that source's share of generation; sources below 1\% are grouped as ``other''.}
-\label{fig:mix-evolution}
+\includegraphics[width=\columnwidth]{eda_distribution_shift.pdf}
+\caption{Per-region carbon intensity distribution, 2021 vs. 2026 (January to May
+of each year, matched for season).}
+\label{fig:distribution-shift}
 \end{figure}
 
+
+% ---
 \subsection{Net energy flow (imports and exports)}
 Belgium swings from net exporter ($-9\%$) to heavy net importer ($+30\%$),
 tracking its nuclear phase-out. Finland stays a net importer but leans on imports
@@ -277,6 +277,16 @@ exporters; Singapore is islanded. Dominant interconnectors by mean absolute flow
 Belgium with France, the Netherlands, and Great Britain; Finland with Sweden and
 Estonia; PJM with MISO, NYIS, and TVA; NYIS with PJM and Hydro-Quebec/Ontario;
 Singapore only a small link to Peninsular Malaysia.
+
+\begin{figure}[tbp]
+    \centering
+    \includegraphics[width=\columnwidth]{eda_mix.pdf}
+    \Description{}{Generation mix by source for each region, 2021 (top bar) versus 2025
+    (bottom bar), as 100\% stacked bars (annual means). Each segment is labeled with
+    that source's share of generation; sources below 1\% are grouped as ``other''.}
+    \label{fig:mix-evolution}
+\end{figure}
+% ---
 
 \begin{figure}[tbp]
 \centering
