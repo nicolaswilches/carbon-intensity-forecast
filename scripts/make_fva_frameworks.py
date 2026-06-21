@@ -29,7 +29,7 @@ ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
 LABEL = {"BE": "Belgium", "FI": "Finland", "SG": "Singapore",
          "US-MIDA-PJM": "US-MIDA-PJM", "US-NY-NYIS": "US-NY-NYIS"}
 H = 24  # day-ahead horizon (index H-1)
-ACTUAL_C, SINGLE_C, TWO_C = "#7F7F7F", "#0072B2", "#E69F00"
+ACTUAL_C, SINGLE_C, TWO_C = "#7F7F7F", "#E05312", "#129FE0"
 # (column title, single-tier preds dir, two-tier preds dir)
 COLS = [("Production-based CI", "preds_single_prod", "preds_e2_prod"),
         ("Consumption-based CI", "preds_single_cons", "preds")]
@@ -61,7 +61,7 @@ def build() -> None:
             fig.add_trace(go.Scatter(x=t, y=two, mode="lines", name="two-tier",
                           line=dict(color=TWO_C, width=0.9), showlegend=first), row=r, col=c)
             first = False
-    P.style_report_fig(fig, span="column", height=900, legend=True)
+    P.style_report_fig(fig, span="full", height=760, legend=True)
     fig.update_xaxes(showticklabels=False)
     fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",
                                   y=1.03, yanchor="bottom"))
