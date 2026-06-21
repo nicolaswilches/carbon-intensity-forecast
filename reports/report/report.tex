@@ -15,12 +15,18 @@
 % Keep each section's floats within that section, so a table or figure cannot drift
 % above an earlier section heading (e.g. Table 1 / Figure 1 rising above Data).
 \usepackage[section]{placeins}
-% Enables [H] placement: drop a float exactly where it is written, no floating.
 \usepackage{float}
-% placeins only barriers at \section; add one at each \subsection too, so a figure
-% cannot drift out of its subsection (the EDA section packs 8 figures into 6).
-\let\cfOldsubsection\subsection
-\renewcommand\subsection{\FloatBarrier\cfOldsubsection}
+% Float placement parameters: let LaTeX fill columns instead of forcing flushes.
+% A previous per-subsection \FloatBarrier plus [H]/[t]-only placement ejected floats
+% at every subsection and left large blank gaps; section-level placeins keeps figures
+% in their section while these fractions let a page hold more float + text.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.7}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{3}
+\setcounter{totalnumber}{6}
 
 % Year-over-year change tags, plain (no color): decrease, increase, no change.
 \newcommand{\yd}[1]{\,{\small(#1\%)}}
@@ -181,7 +187,7 @@ only zone trending upward (237 to 270). PJM eases down (443 to 371) but holds ne
 400 on average. Belgium swings widely with no clear trend, and much of its 235 to
 161 endpoint gap is seasonal, a winter start against a spring end.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{eda_ci_evolution.pdf}
 \caption{Monthly-average consumption-based carbon intensity per region, 2021 to
@@ -203,7 +209,7 @@ consumption-minus-production gap is region-specific in sign and size, PJM $+54$,
 NYIS $+19$, Belgium $+3$, Singapore about $0$, and Finland $-10$, which is the core
 justification for a consumption-based target.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{eda_distribution.pdf}
 \caption{Consumption-based carbon intensity distribution per region (2021 to 2026). Boxes span the IQR range, the solid line is the median and
@@ -221,7 +227,7 @@ barely changes (190 to 188) while the spread widens (standard deviation 58 to 76
 so the grid becomes more volatile rather than cleaner or dirtier. PJM eases down
 modestly (431 to 401), and Singapore barely moves, staying tight and high.
 
-\begin{figure}[!tb]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{eda_distribution_shift.pdf}
 \caption{Per-region carbon intensity distribution, 2021 versus 2026 (January to May
@@ -254,7 +260,7 @@ This explains the rising intensity.
 \end{itemize}
 % [!t]: the figure scales to ~7.25in tall, above the default \topfraction limit
 % for a [t] float, so without "!" LaTeX defers it and leaves a blank gap.
-\begin{figure}[!tb]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{eda_mix.pdf}
 \caption{Generation mix by source for each region, 2021 (top bar) versus 2025
@@ -272,7 +278,7 @@ Belgium with France, the Netherlands, and Great Britain; Finland with Sweden and
 Estonia; PJM with MISO, NYIS, and TVA; NYIS with PJM and Hydro-Quebec/Ontario;
 Singapore only a small link to Peninsular Malaysia.
 
-\begin{figure}[!tb]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{eda_net_import.pdf}
 \caption{Monthly net import as a share of consumption, per region, 2021 to 2026.
@@ -289,7 +295,7 @@ Finland breaks the pattern, with its highest intensity around midday and on
 weekdays. Singapore concentrates its carbon intensity in the morning hours and
 holds that pattern across the whole week, showing no weekday-to-weekend difference.
 
-\begin{figure}[!tb]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{eda_temporal_hour_dow.pdf}
 \caption{Consumption-based carbon intensity by hour of day (columns, local time) and
@@ -308,7 +314,7 @@ decline spans the full color range. The two US grids show a strong, recurring ba
 of high intensity in the summer months, present in every year, the cooling-demand
 signal from a different angle.
 
-\begin{figure}[!tb]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{eda_temporal_month_year.pdf}
 \caption{Consumption-based carbon intensity by month (columns) and year (rows), per
@@ -318,7 +324,7 @@ to December 2026) have no data yet.}
 \end{figure}
 
 \subsection{Feature relationships and correlations}
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{eda_correlation.pdf}
 \caption{Pearson correlation of each feature with consumption-based carbon intensity, per region.}
@@ -423,7 +429,7 @@ reproduction. Table~\ref{tab:atlas} gives the accuracy of the best of the four, 
 consumption-based single-tier network, and the rest of this section compares all
 four and explains the result. All numbers are Test~A (May 2026), validation-selected.
 
-\begin{table}[h]
+\begin{table}[tbp]
 \caption{Test A (May 2026) per-zone accuracy of our best model, the consumption-based
 single-tier network (validation-selected).}
 \label{tab:atlas}
@@ -447,7 +453,7 @@ two-tier day-ahead forecasts track the actual across zones, on the production an
 consumption targets; the two-tier models, Finland's production most of all, are
 visibly noisier.
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{results_fva_prod.pdf}
 \caption{Day-ahead (24 hour) forecast versus actual over Test A, production-based
@@ -455,7 +461,7 @@ target.}
 \label{fig:fva-prod}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{results_fva_cons.pdf}
 \caption{Day-ahead (24 hour) forecast versus actual over Test A, consumption-based
@@ -471,7 +477,7 @@ Tier~2 network with no Tier~1 forecast channels. Production and consumption MAPE
 computed on different target series, so the two are compared only within each
 target, not across.
 
-\begin{table}[t]
+\begin{table}[tbp]
 \caption{Structural comparison: MAPE (\%), Test A, validation-selected. Lower is
 better; the better of each single/two-tier pair is bold.}
 \label{tab:structural}
@@ -490,7 +496,7 @@ Belgium     & 36.18 & \textbf{35.99} & \textbf{41.57} & 64.42 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{results_framework_prod.pdf}
 \caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
@@ -498,7 +504,7 @@ Belgium     & 36.18 & \textbf{35.99} & \textbf{41.57} & 64.42 \\
 \label{fig:framework-prod}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{results_framework_cons.pdf}
 \caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
@@ -529,7 +535,7 @@ framework built to use them: we train it with the interconnector net-flow and pa
 carbon-intensity channels switched on, and again with them switched off, average
 across seeds, and compare on Test~A. Table~\ref{tab:flow} reports the result.
 
-\begin{table}[t]
+\begin{table}[tbp]
 \caption{Cross-border inputs off versus on: consumption-based two-tier MAPE (\%) on
 Test~A, averaged across seeds. Lower is bold.}
 \label{tab:flow}
@@ -563,7 +569,7 @@ Belgium sits highest throughout, near 40\%, with the other four well below. Beca
 the curves are nearly flat, the 1 to 24 hour band of the Electricity Maps
 head-to-head (Section~\ref{sec:testb}) is no worse than the longer horizons.
 
-\begin{figure}[t]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{results_horizon_curve.pdf}
 \caption{Per-zone forecast error by horizon (1 to 96 hours), consumption-based
@@ -590,7 +596,7 @@ two-tier model is again unstable. New York is the one zone where the two-tier mo
 edges ahead, by a margin inside the run-to-run noise band. A different test month,
 the same conclusion.
 
-\begin{table}[t]
+\begin{table}[tbp]
 \caption{Test~B (June 2026) MAPE (\%) on the 1 to 24 hour band, every hourly
 origin in the settled window. The better of the two consumption models is bold.
 The two-tier production model is omitted; its role is the CarbonCast reproduction
@@ -623,7 +629,7 @@ captured weather forecasts would only widen the gap, so the conclusion is
 conservative as stated: an open, reproducible model lands within a few MAPE points
 of the operational baseline in most zones and ahead of it in one.
 
-\begin{table}[t]
+\begin{table}[tbp]
 \caption{Test~B head-to-head: 1 to 24 hour MAPE (\%) at the Electricity Maps
 snapshot origins. Lowest per zone is bold. Our models are replayed on actual future
 weather, an optimistic upper bound (see text).}
@@ -649,7 +655,7 @@ model. Inspecting Tier~1 directly explains why. Table~\ref{tab:tier1} reports th
 normalized RMSE (RMSE over the mean) of the total-generation forecast by horizon,
 and Figures~\ref{fig:tier1-horizon} and~\ref{fig:tier1-pred} visualize it.
 
-\begin{table}[h]
+\begin{table}[tbp]
 \caption{Tier 1 total-generation forecast error (normalized RMSE, \%) by horizon, Test A.}
 \label{tab:tier1}
 \begin{tabular}{lrrrr}
@@ -684,14 +690,14 @@ across blocks. Because the single-tier model uses no Tier~1 input and already wi
 improving Tier~1 is about rescuing the two-tier design rather than beating the
 single-tier baseline.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{tier1_horizon_error.pdf}
 \caption{Tier 1 total-generation forecast error (normalized RMSE) by horizon, per region, Test A.}
 \label{fig:tier1-horizon}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
 \includegraphics[width=\columnwidth]{tier1_pred_vs_actual_pjm.pdf}
 \caption{Tier 1 day-ahead (24h) forecast versus actual gas production, US-MIDA-PJM, Test A.}
