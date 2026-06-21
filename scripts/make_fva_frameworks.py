@@ -36,7 +36,10 @@ COLS = [("Production-based CI", "preds_single_prod", "preds_e2_prod"),
 
 
 def _load(subdir: str, zone: str):
-    d = np.load(os.path.join(PRED, subdir, f"{zone}.npz"), allow_pickle=True)
+    # Finland uses its 2023-window model for the consumption two-tier, matching the
+    # numbers reported elsewhere; production frames only have the full-window file.
+    fn = "FI_2023.npz" if (subdir == "preds" and zone == "FI") else f"{zone}.npz"
+    d = np.load(os.path.join(PRED, subdir, fn), allow_pickle=True)
     t = (pd.to_datetime(d["origins"]) + pd.Timedelta(hours=H)).strftime("%Y-%m-%dT%H:%M:%S").tolist()
     return t, d["preds"][:, H - 1], d["y_true"][:, H - 1]
 
