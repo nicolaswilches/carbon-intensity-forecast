@@ -2,6 +2,17 @@
 
 Phase 1 deadline: 2026-07-03. Full weekly timeline in `memory/project_thesis.md`.
 
+## NOW — pending for next session (as of 2026-06-21)
+
+- [ ] Run S06 feature-comparison on Colab GPU (full config, MODES=off,on) -> feature_comparison.csv + saved preds/models. Then write Results feature-comparison subsection (finding: flows DON'T help) + drop abstract "under way" caveat
+- [ ] Test B head-to-head vs EM (Contribution 4): backfill ~Jun 25, score on 1-24h band; uninstall launchd collector ~Jun 22; partner-CI forecast hook; reuse saved flow-on models (load_e3)
+- [ ] Finalize abstract (remove \wip red) once feature comparison lands
+- [ ] References: verify exact IEA report; cross-check ERA5/GFS/Radovanovic; decide EnsembleCI reproduce-on-PJM vs cite
+- [ ] Optional (advisor): BE separate model — diagnosed (distribution shift + nuclear outages), not built
+- [ ] Confirm Overleaf compiles after preamble edit (\maketitle moved before abstract)
+
+Done 2026-06-21: full section-by-section report review (4-framework Results: single-tier wins both targets); references wired (.bib + \cite + bibliography); CI formula in Data; OOF rationale in Methodology; BE nuclear-outage failure mode; all figures reproducible+restyled (fig 9/10 full-width, single #E05312 / two #129FE0, reduced margins, subsection float barriers); feature comparison directional run (flows don't help); save_e3 wired into runs. Lesson: 8GB local OOMs E3 -> Colab for 5-zone runs; always save preds+models.
+
 ## Done (grilling phase, 2026-05-10 to 2026-05-12)
 
 - [x] Lock thesis: open consumption-based CI forecasting with cross-border flows, 5 zones
