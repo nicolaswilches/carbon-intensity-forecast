@@ -97,8 +97,10 @@ def shift() -> None:
                            font=dict(size=P.REPORT_FONT - 3, color=color))
         fig.update_xaxes(title_text="gCO₂eq/kWh", row=i, col=1)
     fig.update_layout(barmode="overlay")
-    P.style_report_fig(fig, span="column", height=900, legend=False)
-    fig.update_layout(margin=dict(t=24, r=10, b=46, l=56))
+    P.style_report_fig(fig, span="column", height=860, legend=False)
+    # Small base bottom margin; x-axis automargin grows it to fit the FI tick labels,
+    # avoiding the extra blank band under the last panel.
+    fig.update_layout(margin=dict(t=24, r=10, b=18, l=56))
     out = os.path.join(FIGS, "eda_distribution_shift.pdf")
     fig.write_image(out)
     print("wrote", out)
