@@ -27,14 +27,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 from carbon_forecast.plotting import config as P  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-PREDS = os.path.join(ROOT, "outputs", "preds")
+PREDS = os.path.join(ROOT, "outputs", os.environ.get("PREDS_SUBDIR", "preds"))
 FIGS = os.path.join(ROOT, "outputs", "figures")
 
 # Display order (best to worst) and the npz file backing each zone. Finland uses
 # the shortened 2023-window model, consistent with the report's Finland choice.
 ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
 NPZ = {z: f"{z}.npz" for z in ZONES}
-NPZ["FI"] = "FI_2023.npz"
+NPZ["FI"] = os.environ.get("FI_NPZ", "FI_2023.npz")
 LABEL = {"SG": "Singapore", "US-NY-NYIS": "US-NY-NYIS", "US-MIDA-PJM": "US-MIDA-PJM",
          "FI": "Finland", "BE": "Belgium"}
 
