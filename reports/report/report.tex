@@ -150,13 +150,13 @@ cross-border flows explicitly.
 
 % 3. Data
 \section{Data}
+
 We use Electricity Maps~\cite{electricitymaps2025forecast} (academic license) for hourly carbon intensity, power breakdown, and electricity flows, and Open-Meteo~\cite{openmeteo} (ERA5 reanalysis~\cite{hersbach2020era5} for history,
 GFS~\cite{noaagfs} for forecasts) for weather, over January 2021 through May 2026 across the five zones. We use two carbon-intensity signals. We compute the \emph{production-based} intensity, the quantity CarbonCast targets and the label for our production-based baseline, from the domestic generation mix exactly as CarbonCast does~\cite{maji2022carboncast}:
 
 \begin{equation}
 \mathrm{CI}^{\mathrm{prod}}_t = \frac{\sum_i E_{i,t}\,\mathrm{CEF}_i}{\sum_i E_{i,t}}
 \end{equation}
-
 
 where $E_{i,t}$ is the generation of source $i$ in hour $t$ and $\mathrm{CEF}_i$ its
 emission factor from CarbonCast Table~1. We take the lifecycle (scope~3) factors as
@@ -231,7 +231,7 @@ barely changes (190 to 188) while the spread widens (standard deviation 58 to 76
 so the grid becomes more volatile rather than cleaner or dirtier. PJM eases down
 modestly (431 to 401), and Singapore barely moves, staying tight and high.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{eda_distribution.pdf}
     \Description{Distribution of consumption-based carbon intensity per region, showing median, mean, and IQR.}
