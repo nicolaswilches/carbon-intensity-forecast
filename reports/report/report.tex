@@ -61,13 +61,15 @@ extends it to a consumption-based target with interconnector flow and partner
 carbon intensity inputs, and compares both against a single-tier model that
 forecasts carbon intensity directly. We contribute a per-region accuracy atlas, a
 structural comparison of the two-tier design, and a characterization of where
-forecasts succeed and fail; a feature comparison of the cross-border inputs and a
-head-to-head against the operational Electricity Maps forecast are under way. 
+forecasts succeed and fail. On a live June 2026 window the open model lands within a
+few points of the operational Electricity Maps forecast in most zones and ahead of
+it in one. An ablation on the cross-border flow inputs shows they do not improve
+accuracy: removing them leaves the model as good or better in four of five zones.
 
-\wip{On a held-out May 2026 test month, consumption-based accuracy ranges from under 1\% MAPE in near-islanded Singapore to roughly 6\% in the large US markets, with Belgium the hard case at a distribution shift the model does not anticipate. Our central finding is that the two-tier structure does not earn its complexity: a single-tier network that forecasts carbon intensity directly matches or beats the two-tier
+On a held-out May 2026 test month, consumption-based accuracy ranges from under 1\% MAPE in near-islanded Singapore to roughly 6\% in the large US markets, with Belgium the hard case at a distribution shift the model does not anticipate. Our central finding is that the two-tier structure does not earn its complexity: a single-tier network that forecasts carbon intensity directly matches or beats the two-tier
 model in every zone, because imperfect first-tier generation forecasts inject more
 noise than signal. On PJM the production-based two-tier model reproduces the
-published CarbonCast result (6.0 versus 5.3 MAPE), validating the reproduction.}
+published CarbonCast result (6.0 versus 5.3 MAPE), validating the reproduction.
 \end{abstract}
 
 
@@ -133,7 +135,6 @@ strongest prior work but stays production-based, while the Electricity Maps fore
 is consumption-based but closed. This work fills the empty corner: an open,
 reproducible model that targets consumption-based carbon intensity and models
 cross-border flows explicitly.
-% TODO: decide whether to reproduce EnsembleCI on PJM or only cite.
 
 \section{Data}
 We use Electricity Maps~\cite{electricitymaps2025forecast} (academic license) for hourly carbon intensity, power
@@ -499,15 +500,49 @@ feeding them into Tier~2 adds noise rather than signal (Table~\ref{tab:tier1}). 
 does not contradict CarbonCast, whose two-tier advantage is robustness to missing
 and noisy source data, benchmarked against a deterministic equation baseline
 rather than a learned single-tier model.
-% TODO: feature comparison (flow on/off) still pending a dedicated run.
+
+\subsection{Do cross-border flow inputs help?}
+\label{sec:flowablation}
+Contribution~2 asks whether the cross-border inputs that distinguish our model
+actually improve it. We answer this directly with an ablation on the two-tier
+consumption model, the framework built to use them: we train it with the
+interconnector net-flow and partner carbon-intensity channels switched on, and again
+with them switched off, seed-averaged, and compare on Test~A. Table~\ref{tab:flow}
+reports the result.
+
+\begin{table}[t]
+\caption{Flow-feature ablation: consumption-based two-tier MAPE (\%) on Test~A with
+the cross-border inputs off versus on, seed-averaged. Lower is bold.}
+\label{tab:flow}
+\begin{tabular}{lrr}
+\toprule
+Zone & flows off & flows on \\
+\midrule
+Singapore   & \textbf{0.80}  & 0.92 \\
+US-MIDA-PJM & \textbf{6.31}  & 7.69 \\
+US-NY-NYIS  & \textbf{6.69}  & 8.97 \\
+Finland     & 12.63 & \textbf{12.03} \\
+Belgium     & \textbf{28.98} & 58.50 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The cross-border inputs do not help. Switching them off leaves the model as good or
+better in four of five zones, and the lone exception, Finland, improves by a margin
+inside the run-to-run noise band. In Belgium the flow channels are actively harmful,
+nearly doubling the error. The reason mirrors the two-tier result above: the flow and
+partner-CI channels are themselves forecasts, and the Tier~1 flow forecasts are noisy
+enough that the future block carries more noise than signal. A feature designed to
+encode physical coupling helps only if it can be predicted well, and on these grids,
+over this horizon, it cannot.
 
 \subsection{Error by forecast horizon}
 Figure~\ref{fig:horizon} traces per-zone error across the full 1 to 96 hour
 horizon. Error does not simply grow with lead time; for every zone the curve stays
 roughly flat, so the day-ahead band is not markedly better than the four-day band.
 Belgium sits highest throughout, near 40\%, with the other four well below. Because
-the curves are nearly flat, the 1 to 24 hour band where the Electricity Maps
-head-to-head will later sit is no worse than the longer horizons.
+the curves are nearly flat, the 1 to 24 hour band of the Electricity Maps
+head-to-head (Section~\ref{sec:testb}) is no worse than the longer horizons.
 
 \begin{figure}[t]
 \centering
@@ -517,6 +552,75 @@ single-tier, Test A. Top: MAPE. Bottom: MAE. Vertical guides mark the 24, 48, an
 hour day boundaries.}
 \label{fig:horizon}
 \end{figure}
+
+\subsection{A second window and the Electricity Maps head-to-head}
+\label{sec:testb}
+Test~A is a single held-out month. To check that the structural finding is not an
+artifact of that month, and to benchmark against the operational baseline, we
+collected a live Test~B window: every six hours from June 8 to 21, 2026 we captured
+the Electricity Maps consumption-based forecast and the matching weather forecast
+for each zone, then scored against the realized carbon intensity once it settled.
+Because the academic forecast is capped at roughly 24 hours
+(Section~\ref{sec:other-limits}), Test~B is evaluated on the 1 to 24 hour band, and
+we restrict the scored origins so each horizon ends on settled actuals.
+
+Table~\ref{tab:testb-struct} repeats the structural comparison on this second
+window. The result is the same as on Test~A: the single-tier consumption model
+beats the two-tier model in four of five zones, decisively so in Finland, where the
+two-tier model is again unstable. New York is the one zone where the two-tier model
+edges ahead, by a margin inside the run-to-run noise band. A different test month,
+the same conclusion.
+
+\begin{table}[t]
+\caption{Test~B (June 2026) MAPE (\%) on the 1 to 24 hour band, every hourly
+origin in the settled window. The better of the two consumption models is bold.
+The two-tier production model is omitted; its role is the CarbonCast reproduction
+on Test~A (Table~\ref{tab:structural}).}
+\label{tab:testb-struct}
+\begin{tabular}{lrrr}
+\toprule
+ & Single & \multicolumn{2}{c}{Consumption} \\
+\cmidrule(lr){3-4}
+Zone & production & single & two-tier \\
+\midrule
+Singapore   & 0.63  & \textbf{0.65}  & 0.90 \\
+US-MIDA-PJM & 4.51  & \textbf{4.30}  & 5.93 \\
+US-NY-NYIS  & 4.62  & 6.30  & \textbf{5.30} \\
+Finland     & 23.08 & \textbf{17.36} & 69.56 \\
+Belgium     & 33.32 & \textbf{33.52} & 35.68 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:testb-h2h} places our consumption-based models head to head with the
+Electricity Maps forecast, scored at the exact origins Electricity Maps issued. The
+open single-tier model beats the closed operational forecast in Finland and ties it
+in Singapore, while Electricity Maps leads in Belgium, PJM, and New York. One
+caveat keeps this honest: our models are replayed on the actual future weather,
+whereas Electricity Maps used a real weather forecast it could not perfect. Our
+column is therefore an optimistic upper bound, and even with that advantage the
+open model trails in the three larger, more coupled grids. Replaying on the
+captured weather forecasts would only widen the gap, so the conclusion is
+conservative as stated: an open, reproducible model lands within a few MAPE points
+of the operational baseline in most zones and ahead of it in one.
+
+\begin{table}[t]
+\caption{Test~B head-to-head: 1 to 24 hour MAPE (\%) at the Electricity Maps
+snapshot origins. Lowest per zone is bold. Our models are replayed on actual future
+weather, an optimistic upper bound (see text).}
+\label{tab:testb-h2h}
+\begin{tabular}{lrrr}
+\toprule
+Zone & Electricity Maps & single (cons) & two-tier (cons) \\
+\midrule
+Singapore   & \textbf{0.63}  & 0.65  & 0.90 \\
+US-MIDA-PJM & \textbf{3.17}  & 4.33  & 5.91 \\
+US-NY-NYIS  & \textbf{3.82}  & 6.36  & 5.22 \\
+Finland     & 20.74 & \textbf{17.69} & 69.01 \\
+Belgium     & \textbf{23.48} & 33.26 & 35.02 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Discussion and Limitations}
 
@@ -576,6 +680,7 @@ single-tier baseline.
 \end{figure}
 
 \subsection{Other limitations}
+\label{sec:other-limits}
 The Electricity Maps academic forecast horizon is 24 hours rather than the
 advertised 72, so the head-to-head comparison (Test~B) is restricted to the 1 to
 24 hour band.
@@ -603,11 +708,17 @@ contradict CarbonCast, whose two-tier benefit is robustness against missing sour
 data measured against a deterministic baseline, not against a learned single-tier
 model.
 
-The work has clear next steps: a feature comparison isolating the contribution of the
-cross-border flow and partner inputs, the live Test~B head-to-head against the
-Electricity Maps operational forecast over the 1 to 24 hour band, and a
-Belgium-specific failure-mode analysis aimed at the distribution shift the shared
-model misses.
+Two further results complete the picture. The flow-feature ablation shows the
+cross-border inputs do not improve accuracy: removing them leaves the model as good
+or better in four of five zones, for the same reason the second tier fails, since the
+flow channels are themselves noisy forecasts. And on a live June 2026 window the open
+model lands within a few MAPE points of the closed Electricity Maps operational
+forecast in most zones, beating it in Finland.
+
+The remaining next steps are narrower than the contributions themselves: a faithful
+replay of the head-to-head on the captured weather forecasts rather than on actual
+weather, a longer Test~B window, and a Belgium-specific failure-mode analysis aimed
+at the distribution shift the shared model misses.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}

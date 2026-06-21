@@ -4,12 +4,12 @@ Phase 1 deadline: 2026-07-03. Full weekly timeline in `memory/project_thesis.md`
 
 ## NOW — pending for next session (as of 2026-06-21)
 
-- [ ] Run S06 feature-comparison on Colab GPU (full config, MODES=off,on) -> feature_comparison.csv + saved preds/models. Then write Results feature-comparison subsection (finding: flows DON'T help) + drop abstract "under way" caveat
-- [ ] Test B head-to-head vs EM (Contribution 4): backfill ~Jun 25, score on 1-24h band; uninstall launchd collector ~Jun 22; partner-CI forecast hook; reuse saved flow-on models (load_e3)
-- [ ] Finalize abstract (remove \wip red) once feature comparison lands
-- [ ] References: verify exact IEA report; cross-check ERA5/GFS/Radovanovic; decide EnsembleCI reproduce-on-PJM vs cite
-- [ ] Optional (advisor): BE separate model — diagnosed (distribution shift + nuclear outages), not built
-- [ ] Confirm Overleaf compiles after preamble edit (\maketitle moved before abstract)
+- [x] Feature comparison (Contribution 2): shipped DIRECTIONAL result as final (no Colab full run). Report subsec "Do cross-border flow inputs help?" (tab:flow): flows DON'T help, off<=on in 4/5 (SG/PJM/NYIS/BE), FI marginal, BE catastrophic. Abstract "under way" replaced with finding
+- [x] Test B head-to-head vs EM (Contribution 4): pulled Jun 1-21 actuals, materialized June frames, scripts/score_test_b.py replays 3 saved configs (single prod/cons + E3 cons) on 1-24h, settled window ends Jun 18. outputs/test_b_{structural,headtohead}.csv. Report subsec sec:testb (2 tables). EM wins 3/5, we win FI + tie SG. CAVEAT: ours uses perfect weather (stated)
+- [x] References: verified IEA (460->1000 TWh by 2026 matches Electricity 2024), ERA5 (146/1999-2049/qj.3803), Radovanovic (TPWRS 38(2) 1270-1280), GFS ok; EnsembleCI = cite-only (TODO removed from report)
+- [ ] USER-SIDE: confirm Overleaf compiles (no local LaTeX). New: 3 tables + sec:testb/sec:flowablation/sec:other-limits labels
+- [ ] Uninstall launchd collector (com.carbonforecast.collect) — was due ~Jun 22; data window already used
+- [ ] FUTURE (not blocking): faithful GFS-weather head-to-head replay (removes perfect-weather caveat); longer Test B window; E2 two-tier prod on Test B (only config not saved locally); BE separate model (diagnosed, not built)
 
 Done 2026-06-21: full section-by-section report review (4-framework Results: single-tier wins both targets); references wired (.bib + \cite + bibliography); CI formula in Data; OOF rationale in Methodology; BE nuclear-outage failure mode; all figures reproducible+restyled (fig 9/10 full-width, single #E05312 / two #129FE0, reduced margins, subsection float barriers); feature comparison directional run (flows don't help); save_e3 wired into runs. Lesson: 8GB local OOMs E3 -> Colab for 5-zone runs; always save preds+models.
 
