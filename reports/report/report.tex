@@ -66,16 +66,15 @@ published CarbonCast result (6.0 versus 5.3 MAPE), validating the reproduction.}
 
 \section{Introduction and Problem}
 In recent years, global electricity demand has risen sharply, growing by more than
-4\% in 2024 and projected to keep climbing through the rest of the decade (IEA).
+4\% in 2024 and projected to keep climbing through the rest of the decade~\cite{iea2024electricity}.
 Data centers are among the fastest-growing sources of this load: their electricity
 use is projected to more than double, from roughly 460 TWh in 2022 to over
-1{,}000 TWh by 2026 (IEA). Meeting that demand is a challenge, but it also creates
+1{,}000 TWh by 2026~\cite{iea2024electricity}. Meeting that demand is a challenge, but it also creates
 an opening. Because a computing workload can run in different places and at
 different times, and the emissions it causes depend on when and where it runs,
 operators can move data center work toward cleaner grids and cleaner hours and cut
 its carbon footprint. Acting on this requires an accurate, location-specific
 measure of how carbon-intense a region's electricity is.
-% TODO: verify exact IEA figures and add bib entries (2024 electricity demand growth; data-centre TWh projection).
 
 Most prior work predicts a region's carbon intensity from its own energy
 production. That production-based view is incomplete, because a region's real
@@ -95,29 +94,29 @@ the role of energy interconnector flows, characterizing where forecasts succeed 
 fail across heterogeneous grids, and providing a reproducible benchmark.
 
 \section{Related Work}
-\textbf{CarbonCast} (Maji, Shenoy, Sitaraman, ACM BuildSys 2022) is the closest
+\textbf{CarbonCast}~\cite{maji2022carboncast} is the closest
 methodological reference. It is a two-tier hierarchical model: Tier~1 is a set of
 per-source feedforward artificial neural networks (ANNs) that forecast generation from history, calendar features, and weather; Tier~2 is a convolutional-recurrent network that consumes
 the Tier~1 forecasts together with historical carbon intensity and weather to
 forecast carbon intensity. It is production-based by design, explicitly ignoring
 imports and exports, and is evaluated on six regions, one of them PJM, which this
-study also covers. Because it is open source, we adopt CarbonCast as the two-tier
+study also covers. Because it is open source~\cite{ucscospre2025}, we adopt CarbonCast as the two-tier
 \emph{production-based} baseline that our two-tier \emph{consumption-based} model
 extends.
 
-\textbf{EnsembleCI} (Yan et al., 2025) is an adaptive ensemble that improves on
+\textbf{EnsembleCI}~\cite{yan2025ensembleci} is an adaptive ensemble that improves on
 CarbonCast for production-based carbon intensity across eleven grids including PJM,
 but does not use interconnector flows. It is the strongest production-based prior
 art.
 
-\textbf{Electricity Maps operational forecast} (productionized January 2025)
+\textbf{Electricity Maps operational forecast}~\cite{electricitymaps2025forecast} (productionized January 2025)
 provides flow-traced, consumption-based carbon intensity forecasts across more
 than one hundred zones and is used by Google's carbon-intelligent computing
-platform. It is a closed model, and the operational forecast our consumption-based
+platform~\cite{radovanovic2023carbon}. It is a closed model, and the operational forecast our consumption-based
 work is benchmarked against.
 
-\textbf{CarbonFlex} (Hanafy et al., 2025) and the \textbf{Phoenix field
-demonstration} (Colangelo et al., 2025) are not forecasting papers but
+\textbf{CarbonFlex}~\cite{hanafy2025carbonflex} and the \textbf{Phoenix field
+demonstration}~\cite{colangelo2025phoenix} are not forecasting papers but
 downstream consumers of carbon intensity forecasts, cited to motivate the
 carbon-aware computing application rather than as baselines.
 
@@ -127,15 +126,15 @@ strongest prior work but stays production-based, while the Electricity Maps fore
 is consumption-based but closed. This work fills the empty corner: an open,
 reproducible model that targets consumption-based carbon intensity and models
 cross-border flows explicitly.
-% TODO: add formal citations / .bib entries. Decide whether to reproduce EnsembleCI on PJM or only cite.
+% TODO: decide whether to reproduce EnsembleCI on PJM or only cite.
 
 \section{Data}
-We use Electricity Maps (academic license) for hourly carbon intensity, power
-breakdown, and electricity flows, and Open-Meteo (ERA5 reanalysis for history,
-GFS for forecasts) for weather, over January 2021 through May 2026 across the five
+We use Electricity Maps~\cite{electricitymaps2025forecast} (academic license) for hourly carbon intensity, power
+breakdown, and electricity flows, and Open-Meteo~\cite{openmeteo} (ERA5 reanalysis~\cite{hersbach2020era5} for history,
+GFS~\cite{noaagfs} for forecasts) for weather, over January 2021 through May 2026 across the five
 zones. We use two carbon-intensity signals. We compute the \emph{production-based}
 intensity, the quantity CarbonCast targets and the label for our production-based
-baseline, from the domestic generation mix exactly as CarbonCast does:
+baseline, from the domestic generation mix exactly as CarbonCast does~\cite{maji2022carboncast}:
 \begin{equation}
 \mathrm{CI}^{\mathrm{prod}}_t = \frac{\sum_i E_{i,t}\,\mathrm{CEF}_i}{\sum_i E_{i,t}},
 \end{equation}
@@ -591,5 +590,8 @@ cross-border flow and partner inputs, the live Test~B head-to-head against the
 Electricity Maps operational forecast over the 1 to 24 hour band, and a
 Belgium-specific failure-mode analysis aimed at the distribution shift the shared
 model misses.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
 
 \end{document}
