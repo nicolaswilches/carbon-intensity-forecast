@@ -477,14 +477,15 @@ Belgium     & 36.18 & \textbf{35.99} & \textbf{41.57} & 64.42 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure*}[!tb]
 \centering
-\includegraphics[width=\columnwidth]{results_framework_comparison.pdf}
-\caption{Per-zone Test A accuracy (MAPE) of the single-tier and two-tier models on
-each target. Top: production-based CI. Bottom: consumption-based CI. The two targets
-are different series, so bars are comparable within a panel, not across panels.}
+\includegraphics[width=\textwidth]{results_framework_comparison.pdf}
+\caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
+(blue) models on each target. Top: production-based CI. Bottom: consumption-based
+CI. The two targets are different series, so bars are comparable within a panel, not
+across panels.}
 \label{fig:framework}
-\end{figure}
+\end{figure*}
 
 The two-tier structure does not earn its complexity. For the consumption target
 the single-tier model wins in every zone, often by a wide margin. For the

@@ -27,8 +27,8 @@ FIGS = os.path.join(ROOT, "outputs", "figures")
 ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
 LABEL = {"BE": "Belgium", "FI": "Finland", "SG": "Singapore",
          "US-MIDA-PJM": "US-MIDA-PJM", "US-NY-NYIS": "US-NY-NYIS"}
-SINGLE_C = "#0072B2"   # single-tier
-TWOTIER_C = "#E69F00"  # two-tier
+SINGLE_C = "#E05312"   # single-tier
+TWOTIER_C = "#129FE0"  # two-tier
 # (panel title, single-tier csv, two-tier csv)
 PANELS = [("Production-based CI", "single_tier_prod", "e2_realsplit_testA_valsel"),
           ("Consumption-based CI", "single_tier_cons", "e3_realsplit_testA_valsel")]
@@ -57,7 +57,7 @@ def build() -> None:
                       row=i, col=1)
         fig.update_yaxes(title_text="MAPE (%)", row=i, col=1)
     fig.update_layout(barmode="group", bargap=0.3, bargroupgap=0.08)
-    P.style_report_fig(fig, span="column", height=520, legend=True)
+    P.style_report_fig(fig, span="full", height=420, legend=True)
     fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",
                                   y=1.06, yanchor="bottom"))
     out = os.path.join(FIGS, "results_framework_comparison.pdf")
