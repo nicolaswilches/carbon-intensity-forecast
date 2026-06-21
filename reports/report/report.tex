@@ -56,15 +56,15 @@ We present an open, reproducible deep learning framework for short-horizon (96
 hour) consumption-based carbon intensity forecasting that explicitly models
 cross-border electricity flows, evaluated across five structurally diverse energy grid
 zones: US-MIDA-PJM (US Mid-Atlantic grid), US-NY-NYIS (New York grid), Finland, Belgium, and Singapore. The framework
-reproduces the closed CarbonCast methodology as a production-based baseline,
+reproduces the closed CarbonCast method as a production-based baseline,
 extends it to a consumption-based target with interconnector flow and partner
 carbon intensity inputs, and compares both against a single-tier model that
 forecasts carbon intensity directly. We contribute a per-region accuracy atlas, a
 structural comparison of the two-tier design, and a characterization of where
 forecasts succeed and fail. On a live June 2026 window the open model lands within a
 few points of the operational Electricity Maps forecast in most zones and ahead of
-it in one. An ablation on the cross-border flow inputs shows they do not improve
-accuracy: removing them leaves the model as good or better in four of five zones.
+it in one. Turning the cross-border flow inputs off shows they do not improve
+accuracy: the model is as good or better without them in four of five zones.
 
 On a held-out May 2026 test month, consumption-based accuracy ranges from under 1\% MAPE in near-islanded Singapore to roughly 6\% in the large US markets, with Belgium the hard case at a distribution shift the model does not anticipate. Our central finding is that the two-tier structure does not earn its complexity: a single-tier network that forecasts carbon intensity directly matches or beats the two-tier
 model in every zone, because imperfect first-tier generation forecasts inject more
@@ -98,13 +98,13 @@ consumption-based target by modeling the net energy exchange between five zones 
 their interconnector partners, producing a short-horizon (96 hour) forecast that
 can inform systems scheduling data center workloads by a region's carbon intensity.
 The contribution is not introducing consumption-based forecasting as a target,
-since operational systems already exist, but opening a closed methodology, measuring
+since operational systems already exist, but opening a closed method, measuring
 the role of energy interconnector flows, characterizing where forecasts succeed and
-fail across heterogeneous grids, and providing a reproducible benchmark.
+fail across diverse grids, and providing a reproducible benchmark.
 
 \section{Related Work}
 \textbf{CarbonCast}~\cite{maji2022carboncast} is the closest
-methodological reference. It is a two-tier hierarchical model: Tier~1 is a set of
+reference. It is a two-tier model: Tier~1 is a set of
 per-source feedforward artificial neural networks (ANNs) that forecast generation from history, calendar features, and weather; Tier~2 is a convolutional-recurrent network that consumes
 the Tier~1 forecasts together with historical carbon intensity and weather to
 forecast carbon intensity. It is production-based by design, explicitly ignoring
@@ -377,7 +377,7 @@ three random seeds and the model with the best validation score is kept
 
 \section{Iterative Findings and Modeling Decisions}
 \label{sec:findings}
-Our methodology was shaped by a sequence of empirical findings, recorded here
+Our approach was shaped by a sequence of findings from experiments, recorded here
 because they justify the final design.
 
 \textbf{Initialization sensitivity.} Early five-zone runs showed large
@@ -497,22 +497,21 @@ reproducing the published CarbonCast lifecycle result (5.29) and validating our
 reproduction. This is consistent with the Tier~1 diagnostic in
 Section~\ref{sec:findings}: the Tier~1 production forecasts are imperfect, and
 feeding them into Tier~2 adds noise rather than signal (Table~\ref{tab:tier1}). It
-does not contradict CarbonCast, whose two-tier advantage is robustness to missing
-and noisy source data, benchmarked against a deterministic equation baseline
+does not contradict CarbonCast, whose two-tier advantage is staying accurate when
+source data is missing or noisy, benchmarked against a fixed equation baseline
 rather than a learned single-tier model.
 
 \subsection{Do cross-border flow inputs help?}
-\label{sec:flowablation}
+\label{sec:flowcompare}
 Contribution~2 asks whether the cross-border inputs that distinguish our model
-actually improve it. We answer this directly with an ablation on the two-tier
-consumption model, the framework built to use them: we train it with the
-interconnector net-flow and partner carbon-intensity channels switched on, and again
-with them switched off, seed-averaged, and compare on Test~A. Table~\ref{tab:flow}
-reports the result.
+actually improve it. We answer this directly in the two-tier consumption model, the
+framework built to use them: we train it with the interconnector net-flow and partner
+carbon-intensity channels switched on, and again with them switched off, average
+across seeds, and compare on Test~A. Table~\ref{tab:flow} reports the result.
 
 \begin{table}[t]
-\caption{Flow-feature ablation: consumption-based two-tier MAPE (\%) on Test~A with
-the cross-border inputs off versus on, seed-averaged. Lower is bold.}
+\caption{Cross-border inputs off versus on: consumption-based two-tier MAPE (\%) on
+Test~A, averaged across seeds. Lower is bold.}
 \label{tab:flow}
 \begin{tabular}{lrr}
 \toprule
@@ -690,12 +689,12 @@ advertised 72, so the head-to-head comparison (Test~B) is restricted to the 1 to
 We built an open, reproducible deep learning framework for short-horizon
 consumption-based carbon intensity forecasting and evaluated it across five
 structurally diverse grids. The framework reproduces the closed CarbonCast
-methodology as a production-based baseline, with the PJM two-tier model landing at
+method as a production-based baseline, with the PJM two-tier model landing at
 6.0 MAPE against the published 5.3, and extends it to a consumption-based target
 with explicit cross-border flow and partner carbon intensity inputs.
 
 Two results stand out. First, the per-region atlas shows wide, structurally
-explained heterogeneity: a tight high-carbon island grid (Singapore) is trivial to
+explained variation across regions: a tight high-carbon island grid (Singapore) is trivial to
 forecast, the large US markets sit near 6\% MAPE, and the small import-heavy,
 rapidly decarbonizing European grids are hardest, with Belgium the clear failure
 case driven by a May 2026 distribution shift its training window does not cover.
@@ -704,13 +703,13 @@ design: a single-tier network that predicts carbon intensity directly matches or
 beats the two-tier model in every zone, decisively so for the consumption target.
 The cause is visible in the first tier, whose generation forecasts are imperfect
 enough that passing them downstream adds noise rather than signal. This does not
-contradict CarbonCast, whose two-tier benefit is robustness against missing source
-data measured against a deterministic baseline, not against a learned single-tier
-model.
+contradict CarbonCast, whose two-tier benefit is staying accurate when source
+data is missing, measured against a fixed equation baseline, not against a learned
+single-tier model.
 
-Two further results complete the picture. The flow-feature ablation shows the
-cross-border inputs do not improve accuracy: removing them leaves the model as good
-or better in four of five zones, for the same reason the second tier fails, since the
+Two further results complete the picture. The flow on/off comparison shows the
+cross-border inputs do not improve accuracy: the model is as good or better without
+them in four of five zones, for the same reason the second tier fails, since the
 flow channels are themselves noisy forecasts. And on a live June 2026 window the open
 model lands within a few MAPE points of the closed Electricity Maps operational
 forecast in most zones, beating it in Finland.
