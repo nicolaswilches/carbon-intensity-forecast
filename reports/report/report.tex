@@ -1,8 +1,10 @@
 \documentclass[sigconf,nonacm]{acmart}
 
-\settopmatter{printacmref=false}
+\settopmatter{printacmref=false,printfolios=true}
 \renewcommand\footnotetextcopyrightpermission[1]{}
+% Drop the running header (title/author note) and show a centered page number.
 \pagestyle{plain}
+\renewcommand{\shortauthors}{}
 
 \usepackage{booktabs}
 \usepackage{graphicx}
@@ -50,6 +52,10 @@
 \begin{document}
 
 \maketitle
+% acmart resets the page style inside \maketitle; reassert plain so every page has
+% just a centered folio and no running header.
+\thispagestyle{plain}
+\pagestyle{plain}
 
 \begin{abstract}
 We present an open, reproducible deep learning framework for short-horizon (96
@@ -436,25 +442,34 @@ Belgium     & 41.57 & 47.81 & 55.28 \\
 Four of five zones forecast well: Singapore under 1\%, the two US markets near 6\%,
 and Finland at 12\% but with a small absolute error (6.2 on a low-carbon grid), so
 its percentage is denominator-inflated. Belgium is the genuine hard case.
-Figure~\ref{fig:fva} shows how all four frameworks' day-ahead forecasts track the
-actual across zones; the two-tier models, Finland's production most of all, are
+Figures~\ref{fig:fva-prod} and~\ref{fig:fva-cons} show how the single-tier and
+two-tier day-ahead forecasts track the actual across zones, on the production and
+consumption targets; the two-tier models, Finland's production most of all, are
 visibly noisier.
 
-\begin{figure*}[!tb]
+\begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{results_fva_frameworks.pdf}
-\caption{Day-ahead (24 hour) forecast versus actual over Test A, all four
-frameworks. Rows are zones; the left column is the production-based target, the
-right the consumption-based target. In each cell the actual is gray, with the
-single-tier (orange) and two-tier (blue) forecasts overlaid. The two columns are
-different series and not cross-comparable. The two-tier forecasts are visibly more
-erratic, most extreme for Finland's production.}
-\label{fig:fva}
-\end{figure*}
+\includegraphics[width=\columnwidth]{results_fva_prod.pdf}
+\caption{Day-ahead (24 hour) forecast versus actual over Test A, production-based
+target. Rows are zones; the actual is gray, with the single-tier (orange) and
+two-tier (blue) forecasts overlaid. The two-tier forecasts are visibly more erratic,
+most extreme for Finland.}
+\label{fig:fva-prod}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{results_fva_cons.pdf}
+\caption{Day-ahead (24 hour) forecast versus actual over Test A, consumption-based
+target. Rows are zones; the actual is gray, with the single-tier (orange) and
+two-tier (blue) forecasts overlaid.}
+\label{fig:fva-cons}
+\end{figure}
 
 \subsection{Comparing the four frameworks}
-Figure~\ref{fig:framework} and Table~\ref{tab:structural} compare the single-tier
-and two-tier models on both targets, per zone. The single-tier model is the same
+Figures~\ref{fig:framework-prod} and~\ref{fig:framework-cons}, with
+Table~\ref{tab:structural}, compare the single-tier and two-tier models on both
+targets, per zone. The single-tier model is the same
 Tier~2 network with no Tier~1 forecast channels. Production and consumption MAPE are
 computed on different target series, so the two are compared only within each
 target, not across.
@@ -478,15 +493,23 @@ Belgium     & 36.18 & \textbf{35.99} & \textbf{41.57} & 64.42 \\
 \end{tabular}
 \end{table}
 
-\begin{figure*}[!tb]
+\begin{figure}[t]
 \centering
-\includegraphics[width=\textwidth]{results_framework_comparison.pdf}
+\includegraphics[width=\columnwidth]{results_framework_prod.pdf}
 \caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
-(blue) models on each target. Top: production-based CI. Bottom: consumption-based
-CI. The two targets are different series, so bars are comparable within a panel, not
-across panels.}
-\label{fig:framework}
-\end{figure*}
+(blue) models on the production-based target. Lower is better.}
+\label{fig:framework-prod}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{results_framework_cons.pdf}
+\caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
+(blue) models on the consumption-based target. The two targets are different series,
+so this figure is comparable to Figure~\ref{fig:framework-prod} only in shape, not
+level.}
+\label{fig:framework-cons}
+\end{figure}
 
 The two-tier structure does not earn its complexity. For the consumption target
 the single-tier model wins in every zone, often by a wide margin. For the
