@@ -29,11 +29,9 @@ LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
          "US-MIDA-PJM": "PJM", "US-NY-NYIS": "NYIS"}
 H = 24  # day-ahead horizon (index H-1)
 ACTUAL_C, SINGLE_C, TWO_C = "#7F7F7F", "#E05312", "#129FE0"
-# (single-tier preds dir, two-tier preds dir, output file)
-TARGETS = [
-    ("preds_single_prod", "preds_e2_prod", "results_fva_prod.pdf"),
-    ("preds_single_cons", "preds", "results_fva_cons.pdf"),
-]
+# Columns of the combined full-width grid: (title, single-tier dir, two-tier dir).
+COLS = [("Production-based CI", "preds_single_prod", "preds_e2_prod"),
+        ("Consumption-based CI", "preds_single_cons", "preds")]
 
 
 def _load(subdir: str, zone: str):
@@ -45,33 +43,31 @@ def _load(subdir: str, zone: str):
     return t, d["preds"][:, H - 1], d["y_true"][:, H - 1]
 
 
-def build_one(single_dir: str, two_dir: str, out_name: str) -> None:
-    fig = make_subplots(rows=len(ZONES), cols=1,
-                        subplot_titles=[LABEL[z] for z in ZONES],
-                        vertical_spacing=0.05)
+def build() -> None:
+    """One full-width figure: rows = zones, left column production, right consumption."""
+    titles = [f"{LABEL[z]} ({'prod' if c == 0 else 'cons'})"
+              for z in ZONES for c in range(2)]
+    fig = make_subplots(rows=len(ZONES), cols=2, subplot_titles=titles,
+                        vertical_spacing=0.045, horizontal_spacing=0.08)
     first = True
     for r, z in enumerate(ZONES, start=1):
-        t, single, actual = _load(single_dir, z)
-        _, two, _ = _load(two_dir, z)
-        fig.add_trace(go.Scatter(x=t, y=actual, mode="lines", name="actual",
-                      line=dict(color=ACTUAL_C, width=0.9), showlegend=first), row=r, col=1)
-        fig.add_trace(go.Scatter(x=t, y=single, mode="lines", name="single-tier",
-                      line=dict(color=SINGLE_C, width=0.9), showlegend=first), row=r, col=1)
-        fig.add_trace(go.Scatter(x=t, y=two, mode="lines", name="two-tier",
-                      line=dict(color=TWO_C, width=0.9), showlegend=first), row=r, col=1)
-        first = False
-    P.style_report_fig(fig, span="column", height=660, legend=True)
+        for c, (_, single_dir, two_dir) in enumerate(COLS, start=1):
+            t, single, actual = _load(single_dir, z)
+            _, two, _ = _load(two_dir, z)
+            fig.add_trace(go.Scatter(x=t, y=actual, mode="lines", name="actual",
+                          line=dict(color=ACTUAL_C, width=0.9), showlegend=first), row=r, col=c)
+            fig.add_trace(go.Scatter(x=t, y=single, mode="lines", name="single-tier",
+                          line=dict(color=SINGLE_C, width=0.9), showlegend=first), row=r, col=c)
+            fig.add_trace(go.Scatter(x=t, y=two, mode="lines", name="two-tier",
+                          line=dict(color=TWO_C, width=0.9), showlegend=first), row=r, col=c)
+            first = False
+    P.style_report_fig(fig, span="full", height=760, legend=True)
     fig.update_xaxes(showticklabels=False)
     fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",
-                                  y=1.02, yanchor="bottom"))
-    out = os.path.join(FIGS, out_name)
+                                  y=1.03, yanchor="bottom"))
+    out = os.path.join(FIGS, "results_fva_frameworks.pdf")
     fig.write_image(out)
     print("wrote", out)
-
-
-def build() -> None:
-    for single_dir, two_dir, out_name in TARGETS:
-        build_one(single_dir, two_dir, out_name)
 
 
 if __name__ == "__main__":
