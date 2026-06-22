@@ -97,7 +97,7 @@ def shift() -> None:
                            font=dict(size=P.REPORT_FONT - 3, color=color))
         fig.update_xaxes(title_text="gCO₂eq/kWh", row=i, col=1)
     fig.update_layout(barmode="overlay")
-    P.style_report_fig(fig, span="column", height=774, legend=False)
+    P.style_report_fig(fig, span="column", height=890, legend=False)
     # Small base bottom margin; x-axis automargin grows it to fit the FI tick labels,
     # avoiding the extra blank band under the last panel.
     fig.update_layout(margin=dict(t=24, r=10, b=18, l=56))
