@@ -62,7 +62,9 @@ def _colorbar():
 
 def _style(fig, height):
     P.style_report_fig(fig, span="column", height=height, legend=False)
-    fig.update_layout(margin=dict(t=24, r=64, b=40, l=44))
+    # Small base bottom margin; x-axis automargin grows it just enough for the
+    # bottom-row tick labels, so no blank band is left under the last panel.
+    fig.update_layout(margin=dict(t=24, r=64, b=14, l=44))
     fig.update_yaxes(autorange="reversed", tickfont=dict(size=P.REPORT_FONT - 2))
     fig.update_xaxes(tickfont=dict(size=P.REPORT_FONT - 2))
 
@@ -79,7 +81,7 @@ def hour_dow() -> None:
             showscale=(i == len(ZONES)), colorbar=_colorbar()), row=i, col=1)
     fig.update_xaxes(tickmode="array", tickvals=[0, 6, 12, 18, 23],
                      ticktext=["00", "06", "12", "18", "23"], row=len(ZONES), col=1)
-    _style(fig, height=600)
+    _style(fig, height=540)
     out = os.path.join(FIGS, "eda_temporal_hour_dow.pdf")
     fig.write_image(out)
     print("wrote", out)
@@ -98,7 +100,7 @@ def month_year() -> None:
             z=_pct(g.values), x=MONTHS, y=[str(y) for y in g.index],
             colorscale=CSCALE, zmin=0, zmax=100, xgap=0, ygap=0,
             showscale=(i == len(ZONES)), colorbar=_colorbar()), row=i, col=1)
-    _style(fig, height=672)  # ~20% taller so the month/year cells are larger
+    _style(fig, height=600)  # paired with hour_dow to fit both in one column
     out = os.path.join(FIGS, "eda_temporal_month_year.pdf")
     fig.write_image(out)
     print("wrote", out)
