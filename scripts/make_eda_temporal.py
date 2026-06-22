@@ -81,7 +81,7 @@ def hour_dow() -> None:
             showscale=(i == len(ZONES)), colorbar=_colorbar()), row=i, col=1)
     fig.update_xaxes(tickmode="array", tickvals=[0, 6, 12, 18, 23],
                      ticktext=["00", "06", "12", "18", "23"], row=len(ZONES), col=1)
-    _style(fig, height=513)
+    _style(fig, height=564)
     out = os.path.join(FIGS, "eda_temporal_hour_dow.pdf")
     fig.write_image(out)
     print("wrote", out)
@@ -100,7 +100,7 @@ def month_year() -> None:
             z=_pct(g.values), x=MONTHS, y=[str(y) for y in g.index],
             colorscale=CSCALE, zmin=0, zmax=100, xgap=0, ygap=0,
             showscale=(i == len(ZONES)), colorbar=_colorbar()), row=i, col=1)
-    _style(fig, height=513)  # same height as hour_dow so both fit one column
+    _style(fig, height=564)  # same height as hour_dow so both fit one column
     out = os.path.join(FIGS, "eda_temporal_month_year.pdf")
     fig.write_image(out)
     print("wrote", out)
