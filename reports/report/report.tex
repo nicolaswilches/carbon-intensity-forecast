@@ -417,7 +417,7 @@ nothing for the stable zones.
 
 \textbf{Why two test sets.} The two windows answer different questions, and neither
 alone is enough. Test~A is a complete held-out month drawn from the historical
-archive, scored at the full 1 to 96 hour horizon against the realized carbon
+data, scored at the full 1 to 96 hour horizon against the realized carbon
 intensity. Because every framework runs through the same offline pipeline on it,
 Test~A carries the internal comparisons: the per-region accuracy atlas, the
 single-tier versus two-tier structural result, and the CarbonCast reproduction. What
@@ -484,21 +484,22 @@ consumption-based single-tier network, and the rest of this section compares all
 four and explains the result. All numbers are Test~A (May 2026), validation-selected.
 
 \begin{table}[H]
-\caption{Test A (May 2026) per-zone accuracy of our best model, the consumption-based
-single-tier network (validation-selected).}
-\label{tab:atlas}
-\begin{tabular}{lrrr}
-\toprule
-Zone & MAPE (\%) & MAE & RMSE \\
-\midrule
-Singapore   & 0.71  & 3.31  & 5.45  \\
-US-NY-NYIS  & 5.98  & 16.46 & 20.46 \\
-US-MIDA-PJM & 5.93  & 21.54 & 26.52 \\
-Finland     & 12.05 & 6.17  & 8.19  \\
-Belgium     & 41.57 & 47.81 & 55.28 \\
-\bottomrule
-\end{tabular}
+    \caption{Test A (May 2026) per-zone accuracy of our best model, the consumption-based
+    single-tier network (validation-selected).}
+    \label{tab:atlas}
+    \begin{tabular}{lrrr}
+    \toprule
+    Zone & MAPE (\%) & MAE & RMSE \\
+    \midrule
+    Singapore   & 0.71  & 3.31  & 5.45  \\
+    US-NY-NYIS  & 5.98  & 16.46 & 20.46 \\
+    US-MIDA-PJM & 5.93  & 21.54 & 26.52 \\
+    Finland     & 12.05 & 6.17  & 8.19  \\
+    Belgium     & 41.57 & 47.81 & 55.28 \\
+    \bottomrule
+    \end{tabular}
 \end{table}
+
 Four of five zones forecast well: Singapore under 1\%, the two US markets near 6\%,
 and Finland at 12\% but with a small absolute error (6.2 on a low-carbon grid), so
 its percentage is denominator-inflated. Belgium is the genuine hard case.
@@ -510,21 +511,17 @@ models, Finland's production most of all, are visibly noisier.
     \centering
     \includegraphics[width=\textwidth]{results_fva_frameworks.pdf}
     \caption{Day-ahead (24 hour) forecast versus actual over Test A. Rows are zones; the
-    left column is the production-based target, the right the consumption-based target. In
-    each cell the actual is gray, with the single-tier (orange) and two-tier (blue)
-    forecasts overlaid. The two columns are different series and not cross-comparable. The
-    two-tier forecasts are visibly more erratic, most extreme for Finland.}
+    left column is the production-based target, the right the consumption-based target. In each cell the actual is gray, with the single-tier (orange) and two-tier (blue)
+    forecasts overlaid. The two columns are different series and not cross-comparable. The two-tier forecasts are visibly more erratic, most extreme for Finland.}
     \label{fig:fva}
 \end{figure*}
 
+
+% 8.1. Comparing the four frameworks
 \subsection{Comparing the four frameworks}
 
 Figures~\ref{fig:framework-prod} and~\ref{fig:framework-cons}, with
-Table~\ref{tab:structural}, compare the single-tier and two-tier models on both
-targets, per zone. The single-tier model is the same
-Tier~2 network with no Tier~1 forecast channels. Production and consumption MAPE are
-computed on different target series, so the two are compared only within each
-target, not across.
+Table~\ref{tab:structural}, compare the single-tier and two-tier models on both targets, per zone. The single-tier model is the same Tier~2 network with no Tier~1 forecast channels. Production and consumption MAPE are computed on different target series, so the two are compared only within each target, not across.
 
 \begin{table}[H]
     \caption{Structural comparison: MAPE (\%), Test A, validation-selected. Lower is
@@ -577,6 +574,8 @@ does not contradict CarbonCast, whose two-tier advantage is staying accurate whe
 source data is missing or noisy, benchmarked against a fixed equation baseline
 rather than a learned single-tier model.
 
+
+% 8.2. Do cross-border flow inputs help?
 \subsection{Do cross-border flow inputs help?}
 \label{sec:flowcompare}
 Contribution~2 asks whether the cross-border inputs that distinguish our model
@@ -585,21 +584,21 @@ framework built to use them: we train it with the interconnector net-flow and pa
 carbon-intensity channels switched on, and again with them switched off, average
 across seeds, and compare on Test~A. Table~\ref{tab:flow} reports the result.
 
-\begin{table}[tbp]
-\caption{Cross-border inputs off versus on: consumption-based two-tier MAPE (\%) on
-Test~A, averaged across seeds. Lower is bold.}
-\label{tab:flow}
-\begin{tabular}{lrr}
-\toprule
-Zone & flows off & flows on \\
-\midrule
-Singapore   & \textbf{0.80}  & 0.92 \\
-US-MIDA-PJM & \textbf{6.31}  & 7.69 \\
-US-NY-NYIS  & \textbf{6.69}  & 8.97 \\
-Finland     & 12.63 & \textbf{12.03} \\
-Belgium     & \textbf{28.98} & 58.50 \\
-\bottomrule
-\end{tabular}
+\begin{table}[H]
+    \caption{Cross-border inputs off versus on: consumption-based two-tier MAPE (\%) on
+    Test~A, averaged across seeds. Lower is bold.}
+    \label{tab:flow}
+    \begin{tabular}{lrr}
+    \toprule
+    Zone & flows off & flows on \\
+    \midrule
+    Singapore   & \textbf{0.80}  & 0.92 \\
+    US-MIDA-PJM & \textbf{6.31}  & 7.69 \\
+    US-NY-NYIS  & \textbf{6.69}  & 8.97 \\
+    Finland     & 12.63 & \textbf{12.03} \\
+    Belgium     & \textbf{28.98} & 58.50 \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
 The cross-border inputs do not help. Switching them off leaves the model as good or
@@ -611,6 +610,8 @@ enough that the future block carries more noise than signal. A feature designed 
 encode physical coupling helps only if it can be predicted well, and on these grids,
 over this horizon, it cannot.
 
+
+% 8.3. Error by forecast horizon
 \subsection{Error by forecast horizon}
 Figure~\ref{fig:horizon} traces per-zone error across the full 1 to 96 hour
 horizon. Error does not simply grow with lead time; for every zone the curve stays
@@ -619,7 +620,7 @@ Belgium sits highest throughout, near 40\%, with the other four well below. Beca
 the curves are nearly flat, the 1 to 24 hour band of the Electricity Maps
 head-to-head (Section~\ref{sec:testb}) is no worse than the longer horizons.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{results_horizon_curve.pdf}
 \caption{Per-zone forecast error by horizon (1 to 96 hours), consumption-based
