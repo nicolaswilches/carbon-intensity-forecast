@@ -314,13 +314,11 @@ Belgium with France, the Netherlands, and Great Britain; Finland with Sweden and
 Estonia; PJM with MISO, NYIS, and TVA; NYIS with PJM and Hydro-Quebec/Ontario;
 Singapore only a small link to Peninsular Malaysia.
 
-
 \begin{figure}[tbp]
     \centering
     \includegraphics[width=\columnwidth]{eda_net_import.pdf}
-    \caption{Monthly net import as a share of consumption, per region, 2021 to 2026.
-    Red for net import (positive), blue for net export
-    (negative). Per-region vertical scales differ.}
+    \caption{Monthly net import as a share of consumption, 2021 to 2026.
+    Red for net import, blue for net export. Per-region vertical scales differ.}
     \label{fig:net-import}
 \end{figure}
 
@@ -330,17 +328,14 @@ New York are most carbon-intense at night and on weekdays, the hours and days wh
 demand leans more on fossil generation, and their weekend rows are visibly lighter.
 Finland breaks the pattern, with its highest intensity around midday and on
 weekdays. Singapore concentrates its carbon intensity in the morning hours and
-holds that pattern across the whole week, showing no weekday-to-weekend difference.
-
-
-Figure~\ref{fig:temporal-my} adds the year-over-year view. Belgium shows no
-pronounced seasonal pattern and little change from 2021 to 2026, staying roughly
+holds that pattern across the whole week, showing no weekday-to-weekend difference. Figure~\ref{fig:temporal-my} adds the year-over-year view. Belgium shows no
+pronounced seasonal pattern and little change, staying roughly
 where it began. Finland declines steadily year after year across every month, the
-clearest downward trend in the set. Singapore appears to fall sharply in the
-heatmap, but that is the product of the per-region color scale: its
-absolute intensity barely moves, so even a small decline spans the full color range. The two US grids show a strong, recurring band of high intensity in the summer months, present in every year, the cooling-demand signal from a different angle.
+clearest downward trend in the set. Singapore appears to fall in the
+heatmap, but that's the product of per-region color scaling: its
+absolute intensity barely moves. The two US grids show a strong, recurring band of high intensity in the summer months, present in every year, the cooling-demand signal from a different angle.
 
-\begin{figure}[t]
+\begin{figure}[tbh]
     \centering
     \includegraphics[width=\columnwidth]{eda_temporal_hour_dow.pdf}
     \caption{Consumption-based carbon intensity by hour of day and
@@ -348,7 +343,7 @@ absolute intensity barely moves, so even a small decline spans the full color ra
     \label{fig:temporal-hd}
 \end{figure}
 
-\begin{figure}[tbh]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{eda_temporal_month_year.pdf}
     \caption{Consumption-based carbon intensity by month and year. Color scale is independent per region.}
