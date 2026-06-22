@@ -414,6 +414,25 @@ Electricity Maps operational forecast. Finland uses a shortened training start o
 zones use the full window. Each zone has its own model, so a per-zone window costs
 nothing for the stable zones.
 
+\textbf{Why two test sets.} The two windows answer different questions, and neither
+alone is enough. Test~A is a complete held-out month drawn from the historical
+archive, scored at the full 1 to 96 hour horizon against the realized carbon
+intensity. Because every framework runs through the same offline pipeline on it,
+Test~A carries the internal comparisons: the per-region accuracy atlas, the
+single-tier versus two-tier structural result, and the CarbonCast reproduction. What
+it cannot do is benchmark against the operational baseline, because the Electricity
+Maps forecast is published live and not archived, so it cannot be reconstructed for
+an arbitrary past month. Test~B fills that gap. Over June 8 to 21, 2026 we captured
+the Electricity Maps forecast as it was issued, every six hours, alongside the weather
+forecast the model would have seen at that moment. This is a non-recoverable clock:
+the operational forecast for a given hour exists only until it is overwritten, so it
+had to be collected in real time rather than pulled afterward. Test~B therefore makes
+two things possible that Test~A cannot: a head-to-head against the closed operational
+forecast on identical inputs, and a second, fully out-of-sample window that checks
+whether the May structural finding still holds in June. Its horizon is capped at 1 to
+24 hours by the academic license (Section~\ref{sec:other-limits}), so the two windows
+are reported separately rather than pooled.
+
 \textbf{Training.} RMSE loss, Adam with gradient clipping. Each model is trained on
 three random seeds and the model with the best validation score is kept
 (Section~\ref{sec:findings}).
