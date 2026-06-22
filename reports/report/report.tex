@@ -710,7 +710,12 @@ Belgium     & \textbf{23.48} & 33.26 & 35.02 \\
 A single-tier model that ignores Tier~1 entirely matches or beats the two-tier
 model. Inspecting Tier~1 directly explains why. Table~\ref{tab:tier1} reports the
 normalized RMSE (RMSE over the mean) of the total-generation forecast by horizon,
-and Figures~\ref{fig:tier1-horizon} and~\ref{fig:tier1-pred} visualize it.
+and Figures~\ref{fig:tier1-horizon} and~\ref{fig:tier1-pred} visualize it. The
+takeaway is the same in every view: the Tier~1 generation forecasts are not accurate
+enough to help. Their error propagates into Tier~2 as noise and caps what the
+two-tier model can achieve, which is precisely why it never beats the single-tier
+baseline. The two figures are the evidence for this limitation, one in aggregate and
+one up close.
 
 \begin{table}[tbp]
 \caption{Tier 1 total-generation forecast error (normalized RMSE, \%) by horizon, Test A.}
@@ -750,14 +755,18 @@ single-tier baseline.
 \begin{figure}[tbp]
     \centering
     \includegraphics[width=\columnwidth]{tier1_horizon_error.pdf}
-    \caption{Tier 1 total-generation forecast error (normalized RMSE) by horizon, per region, Test A.}
+    \caption{Tier 1 total-generation forecast error (normalized RMSE) by horizon, per
+    region, Test A. This error is large and grows with horizon; it is the noise that
+    propagates into Tier 2 and limits the two-tier framework.}
     \label{fig:tier1-horizon}
 \end{figure}
 
 \begin{figure}[tbp]
     \centering
     \includegraphics[width=\columnwidth]{tier1_pred_vs_actual_pjm.pdf}
-    \caption{Tier 1 day-ahead (24h) forecast versus actual gas production, US MIDA-PJM, Test A.}
+    \caption{Tier 1 day-ahead (24h) forecast versus actual gas production,
+    US-MIDA-PJM, Test A. A concrete instance of the Tier 1 miss that, once fed into
+    Tier 2, degrades the two-tier forecast.}
     \label{fig:tier1-pred}
 \end{figure}
 
