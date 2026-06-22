@@ -246,25 +246,23 @@ Figure~\ref{fig:mix-evolution} shows per-source generation share from 2021 to 20
 The five grids are not moving in the same direction or at the same speed, and in each
 case the shift in the data lines up with a concrete policy or asset change we can name
 and source.
+
 \begin{itemize}
 \item \textbf{Belgium:} nuclear falls sharply, 52\% to 33\%, while solar nearly
 triples (5\% to 15\%) and wind grows (12\% to 18\%); gas holds near 20\%. This tracks
 the country's legislated nuclear phase-out, the 2003 federal law that capped reactor
 lifetimes and barred new build; the IEA warned that retiring this firm, low-carbon
-capacity would raise the carbon intensity of Belgian
-electricity~\cite{iea2022belgium}, which is exactly what the data show. (The law was
-repealed only in 2025, after our study window.) Firm nuclear is giving way to
-weather-driven renewables that gas must back up, so Belgium's intensity both rises and
-swings with wind and sunlight. It is the largest structural change in the set and the
-root of Belgium's forecasting difficulty later in the paper.
+capacity would raise the carbon intensity of Belgian electricity~\cite{iea2022belgium}, which is exactly what the data show. Firm nuclear is giving way to weather-driven renewables that gas must back up, so Belgium's intensity both rises and swings with wind and sunlight. It is the largest structural change in the set and the root of Belgium's forecasting difficulty later in the paper.
+
 \item \textbf{Finland:} wind more than doubles (12\% to 27\%) and nuclear edges up
 (36\% to 39\%), while coal collapses (11\% to 2\%) and gas all but disappears (7\%
 to 1\%); hydro eases from 23\% to 15\%. The nuclear step coincides with Olkiluoto~3, a
 1{,}600~MW reactor that began regular production in April 2023 and now supplies close
-to a third of Finnish electricity~\cite{tvo2023ol3}. Finland is therefore
-decarbonizing on two fronts at once, adding a large block of new nuclear and a wave of
-wind while retiring fossil capacity, and the combination halves its carbon intensity
-over the window, the steepest decline in the set.
+to a third of Finnish electricity~\cite{tvo2023ol3}. Finland is
+decarbonizing on two fronts at once, adding a block of new nuclear and a wave of
+wind while retiring fossils, and the combination halves its carbon intensity
+over, the steepest decline in the set.
+
 \item \textbf{Singapore:} gas dominates throughout (97\% to 95\%) with no nuclear,
 and only solar moves, from a thin 0.7\% to 2.8\%. This matches the national fuel mix
 the Energy Market Authority reports, where natural gas supplies roughly 94\% of
@@ -272,6 +270,7 @@ generation and renewables are held back by limited land and the grid's near-isla
 position~\cite{emases}. With almost no interconnection and a single dominant fuel, the
 mix has little room to change, so intensity stays flat and high, which is also why
 Singapore is by far the easiest zone to forecast.
+
 \item \textbf{US-MIDA-PJM:} a slow coal-to-gas shift on a stable base: gas rises
 38\% to 42\% and coal falls 22\% to 17\%, with nuclear steady near 32\% and solar
 still small (0.7\% to 2.8\%). This is the long-running PJM transition the EIA
@@ -281,21 +280,20 @@ base~\cite{eia2018pjmgas}. Because the change is gradual and that nuclear block 
 the mix, intensity barely moves across the window; the size and diversity of the
 market give it strong inertia, the kind of well-behaved signal that is comparatively
 easy to model.
+
 \item \textbf{US-NY-NYIS:} gas grows (48\% to 53\%) while both low-carbon sources
 recede, nuclear 25\% to 21\% and hydro 22\% to 18\%, with wind only 3\% to 5\%. The
 nuclear drop lines up with the 2021 retirement of Indian Point, whose roughly 2~GW of
-low-carbon output was replaced almost entirely by new gas
-plants~\cite{eia2021indianpoint}. Here the trend runs the wrong way: as nuclear
+low-carbon output was replaced almost entirely by new gas plants~\cite{eia2021indianpoint}. Here the trend runs the wrong way: as nuclear
 capacity leaves and hydro's share slips, gas fills the gap and intensity climbs, with
 renewables not yet scaling fast enough to offset the lost low-carbon generation.
 \end{itemize}
+
 Taken together the five grids span most of the range a forecaster can face: one
 decarbonizing fast (Finland), two essentially static (Singapore and PJM), one drifting
 upward (NYIS), and one in volatile transition (Belgium). This is the heterogeneity the
 per-region accuracy atlas later quantifies, and it is why a single architecture lands
 at very different error levels from one zone to the next.
-%
-
 
 
 % 4.4. Net energy flow (imports and exports)
