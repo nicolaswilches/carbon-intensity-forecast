@@ -27,14 +27,17 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 from carbon_forecast.plotting import config as P  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-PREDS = os.path.join(ROOT, "outputs", os.environ.get("PREDS_SUBDIR", "preds"))
+# Default to the single-tier consumption model: it is the report's best model, and
+# the horizon figures are captioned single-tier. (The two-tier preds live in
+# outputs/preds; override with PREDS_SUBDIR if needed.)
+PREDS = os.path.join(ROOT, "outputs", os.environ.get("PREDS_SUBDIR", "preds_single_cons"))
 FIGS = os.path.join(ROOT, "outputs", "figures")
 
-# Display order (best to worst) and the npz file backing each zone. Finland uses
-# the shortened 2023-window model, consistent with the report's Finland choice.
+# Display order (best to worst) and the npz file backing each zone. The single-tier
+# model uses Finland's full-window file (the 2023-window variant is a two-tier choice).
 ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
 NPZ = {z: f"{z}.npz" for z in ZONES}
-NPZ["FI"] = os.environ.get("FI_NPZ", "FI_2023.npz")
+NPZ["FI"] = os.environ.get("FI_NPZ", "FI.npz")
 LABEL = {"SG": "SG", "US-NY-NYIS": "NYIS", "US-MIDA-PJM": "PJM",
          "FI": "FI", "BE": "BE"}
 
