@@ -613,20 +613,28 @@ over this horizon, it cannot.
 
 % 8.3. Error by forecast horizon
 \subsection{Error by forecast horizon}
-Figure~\ref{fig:horizon} traces per-zone error across the full 1 to 96 hour
+Figures~\ref{fig:horizon-mape} and~\ref{fig:horizon-mae} trace per-zone error, as
+MAPE and MAE, across the full 1 to 96 hour
 horizon. Error does not simply grow with lead time; for every zone the curve stays
 roughly flat, so the day-ahead band is not markedly better than the four-day band.
 Belgium sits highest throughout, near 40\%, with the other four well below. Because
 the curves are nearly flat, the 1 to 24 hour band of the Electricity Maps
 head-to-head (Section~\ref{sec:testb}) is no worse than the longer horizons.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
 \centering
-\includegraphics[width=\columnwidth]{results_horizon_curve.pdf}
-\caption{Per-zone forecast error by horizon (1 to 96 hours), consumption-based
-single-tier, Test A. Top: MAPE. Bottom: MAE. Vertical guides mark the 24, 48, and 72
-hour day boundaries.}
-\label{fig:horizon}
+\includegraphics[width=\columnwidth]{results_horizon_mape.pdf}
+\caption{Per-zone forecast MAPE by horizon (1 to 96 hours), consumption-based
+single-tier, Test A. Vertical guides mark the 24, 48, and 72 hour day boundaries.}
+\label{fig:horizon-mape}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=\columnwidth]{results_horizon_mae.pdf}
+\caption{Per-zone forecast MAE by horizon (1 to 96 hours), consumption-based
+single-tier, Test A. Vertical guides mark the 24, 48, and 72 hour day boundaries.}
+\label{fig:horizon-mae}
 \end{figure}
 
 \subsection{A second window and the Electricity Maps head-to-head}

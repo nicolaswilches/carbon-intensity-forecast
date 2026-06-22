@@ -44,31 +44,37 @@ def load(zone: str):
     return d["preds"], d["y_true"], pd.to_datetime(d["origins"])
 
 
-def horizon_curve() -> None:
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.10,
-                        subplot_titles=("MAPE (%)", "MAE (gCO₂eq/kWh)"))
+def _horizon_one(metric: str, ylabel: str, out_name: str) -> None:
+    """One single-panel horizon curve (MAPE or MAE), legend above the plot area."""
+    fig = go.Figure()
     for z in ZONES:
         preds, y, _ = load(z)
         ae = np.abs(preds - y)
-        mape_h = np.nanmean(ae / np.clip(np.abs(y), 1e-6, None), axis=0) * 100
-        mae_h = np.nanmean(ae, axis=0)
+        if metric == "mape":
+            yv = np.nanmean(ae / np.clip(np.abs(y), 1e-6, None), axis=0) * 100
+        else:
+            yv = np.nanmean(ae, axis=0)
         hours = np.arange(1, preds.shape[1] + 1)
-        color = P.REGIONAL_PALETTE[z]
-        fig.add_trace(go.Scatter(x=hours, y=mape_h, mode="lines", name=LABEL[z],
-                                 legendgroup=z, line=dict(color=color, width=P.LINE_WIDTH)),
-                      row=1, col=1)
-        fig.add_trace(go.Scatter(x=hours, y=mae_h, mode="lines", name=LABEL[z],
-                                 legendgroup=z, showlegend=False,
-                                 line=dict(color=color, width=P.LINE_WIDTH)),
-                      row=2, col=1)
-    for r in (1, 2):
-        for h in (24, 48, 72):
-            fig.add_vline(x=h, line=dict(color="rgba(0,0,0,0.12)", width=1), row=r, col=1)
-    P.style_report_fig(fig, span="column", height=360, legend=True)
-    fig.update_xaxes(title_text="forecast horizon (hours ahead)", row=2, col=1)
-    out = os.path.join(FIGS, "results_horizon_curve.pdf")
+        fig.add_trace(go.Scatter(x=hours, y=yv, mode="lines", name=LABEL[z],
+                                 line=dict(color=P.REGIONAL_PALETTE[z], width=P.LINE_WIDTH)))
+    for h in (24, 48, 72):
+        fig.add_vline(x=h, line=dict(color="rgba(0,0,0,0.12)", width=1))
+    P.style_report_fig(fig, span="column", height=420, legend=True)
+    fig.update_xaxes(title_text="forecast horizon (hours ahead)")
+    fig.update_yaxes(title_text=ylabel)
+    # Horizontal legend above the axes (paper y > 1) so it never overlaps the lines;
+    # extra top margin reserves room for it.
+    fig.update_layout(margin=dict(t=46, r=14, b=46, l=58),
+                      legend=dict(orientation="h", x=0.5, xanchor="center",
+                                  y=1.04, yanchor="bottom"))
+    out = os.path.join(FIGS, out_name)
     fig.write_image(out)
     print("wrote", out)
+
+
+def horizon_curve() -> None:
+    _horizon_one("mape", "MAPE (%)", "results_horizon_mape.pdf")
+    _horizon_one("mae", "MAE (gCO₂eq/kWh)", "results_horizon_mae.pdf")
 
 
 def forecast_vs_actual(h: int = 24) -> None:
