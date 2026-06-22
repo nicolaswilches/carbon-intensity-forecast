@@ -337,13 +337,10 @@ Figure~\ref{fig:temporal-my} adds the year-over-year view. Belgium shows no
 pronounced seasonal pattern and little change from 2021 to 2026, staying roughly
 where it began. Finland declines steadily year after year across every month, the
 clearest downward trend in the set. Singapore appears to fall sharply in the
-heatmap, but that is an artifact of the per-region percentile coloring: its
-absolute intensity barely moves, sitting in a narrow band near 490, so even a small
-decline spans the full color range. The two US grids show a strong, recurring band
-of high intensity in the summer months, present in every year, the cooling-demand
-signal from a different angle.
+heatmap, but that is the product of the per-region color scale: its
+absolute intensity barely moves, so even a small decline spans the full color range. The two US grids show a strong, recurring band of high intensity in the summer months, present in every year, the cooling-demand signal from a different angle.
 
-\begin{figure}[tbp]
+\begin{figure}[t]
     \centering
     \includegraphics[width=\columnwidth]{eda_temporal_hour_dow.pdf}
     \caption{Consumption-based carbon intensity by hour of day (columns, local time) and
@@ -351,7 +348,7 @@ signal from a different angle.
     \label{fig:temporal-hd}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{eda_temporal_month_year.pdf}
     \caption{Consumption-based carbon intensity by month (columns) and year (rows), per
