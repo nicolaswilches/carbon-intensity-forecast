@@ -547,7 +547,7 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
     \centering
     \includegraphics[width=\columnwidth]{results_framework_prod.pdf}
     \caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
-    (blue) models on the production-based target. Lower is better.}
+    (blue) models on the production-based target.}
     \label{fig:framework-prod}
 \end{figure}
 
@@ -556,8 +556,7 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
     \centering
     \includegraphics[width=\columnwidth]{results_framework_cons.pdf}
     \caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
-    (blue) models on the consumption-based target. The two targets are different series. This figure is comparable to Figure~\ref{fig:framework-prod} only in shape, not
-    level.}
+    (blue) models on the consumption-based target.}
     \label{fig:framework-cons}
 \end{figure}
 
@@ -621,20 +620,20 @@ Belgium sits highest throughout, near 40\%, with the other four well below. Beca
 the curves are nearly flat, the 1 to 24 hour band of the Electricity Maps
 head-to-head (Section~\ref{sec:testb}) is no worse than the longer horizons.
 
-\begin{figure}[tbp]
-\centering
-\includegraphics[width=\columnwidth]{results_horizon_mape.pdf}
-\caption{Per-zone forecast MAPE by horizon (1 to 96 hours), consumption-based
-single-tier, Test A. Vertical guides mark the 24, 48, and 72 hour day boundaries.}
-\label{fig:horizon-mape}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{results_horizon_mape.pdf}
+    \caption{Per-zone forecast MAPE by horizon (1 to 96 hours), consumption-based
+    single-tier, Test A. Vertical guides mark the 24, 48, and 72 hour day boundaries.}
+    \label{fig:horizon-mape}
 \end{figure}
 
-\begin{figure}[tbp]
-\centering
-\includegraphics[width=\columnwidth]{results_horizon_mae.pdf}
-\caption{Per-zone forecast MAE by horizon (1 to 96 hours), consumption-based
-single-tier, Test A. Vertical guides mark the 24, 48, and 72 hour day boundaries.}
-\label{fig:horizon-mae}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{results_horizon_mae.pdf}
+    \caption{Per-zone forecast MAE by horizon (1 to 96 hours), consumption-based
+    single-tier, Test A. Vertical guides mark the 24, 48, and 72 hour day boundaries.}
+    \label{fig:horizon-mae}
 \end{figure}
 
 \subsection{A second window and the Electricity Maps head-to-head}
@@ -656,24 +655,23 @@ edges ahead, by a margin inside the run-to-run noise band. A different test mont
 the same conclusion.
 
 \begin{table}[tbp]
-\caption{Test~B (June 2026) MAPE (\%) on the 1 to 24 hour band, every hourly
-origin in the settled window. The better of the two consumption models is bold.
-The two-tier production model is omitted; its role is the CarbonCast reproduction
-on Test~A (Table~\ref{tab:structural}).}
-\label{tab:testb-struct}
-\begin{tabular}{lrrr}
-\toprule
- & Single & \multicolumn{2}{c}{Consumption} \\
-\cmidrule(lr){3-4}
-Zone & production & single & two-tier \\
-\midrule
-Singapore   & 0.63  & \textbf{0.65}  & 0.90 \\
-US-MIDA-PJM & 4.51  & \textbf{4.30}  & 5.93 \\
-US-NY-NYIS  & 4.62  & 6.30  & \textbf{5.30} \\
-Finland     & 23.08 & \textbf{17.36} & 69.56 \\
-Belgium     & 33.32 & \textbf{33.52} & 35.68 \\
-\bottomrule
-\end{tabular}
+    \caption{Test~B (June 2026) MAPE (\%) on the 1 to 24 hour band, every hourly
+    origin in the settled window. The two-tier production model is omitted; its role is the CarbonCast reproduction
+    on Test~A (Table~\ref{tab:structural}).}
+    \label{tab:testb-struct}
+    \begin{tabular}{lrrr}
+    \toprule
+     & Single & \multicolumn{2}{c}{Consumption} \\
+    \cmidrule(lr){3-4}
+    Zone & production & single & two-tier \\
+    \midrule
+    Singapore   & 0.63  & \textbf{0.65}  & 0.90 \\
+    US-MIDA-PJM & 4.51  & \textbf{4.30}  & 5.93 \\
+    US-NY-NYIS  & 4.62  & 6.30  & \textbf{5.30} \\
+    Finland     & 23.08 & \textbf{17.36} & 69.56 \\
+    Belgium     & 33.32 & \textbf{33.52} & 35.68 \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
 Table~\ref{tab:testb-h2h} places our consumption-based models head to head with the
