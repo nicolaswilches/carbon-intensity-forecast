@@ -359,23 +359,20 @@ Consistent and interpretable signal. Production intensity is the dominant
 predictor everywhere (0.86 to 1.00). Partner carbon intensity is strong (0.71 to
 0.81) in every connected grid and weak only in islanded Singapore (0.38),
 confirming it as a genuine consumption-based feature; for Belgium specifically the
-import-weighted partner intensity correlates 0.83 with the
-consumption-minus-production gap over about 42{,}800 importing hours. Higher
-renewable share lowers intensity everywhere, most extremely in Singapore ($-0.99$,
-solar displacing gas, reinforced by shortwave radiation at $-0.75$). In the large
-US markets total generation is positively correlated (0.68 to 0.73): high demand
-brings fossil peakers online. In the cold European grids low temperature raises
-intensity (Finland $-0.58$). The autocorrelation of carbon intensity shows daily
-peaks persisting past seven days, supporting the 168 hour lookback.
+import-weighted partner intensity correlates 0.83 with the consumption-minus-production gap over about 42{,}800 importing hours. Higher renewable share lowers intensity everywhere, most extremely in Singapore ($-0.99$, solar displacing gas, reinforced by shortwave radiation at $-0.75$). In the large US markets total generation is positively correlated (0.68 to 0.73): high demand brings fossil peakers online. In the cold European grids low temperature raises intensity (Finland $-0.58$). The autocorrelation of carbon intensity shows daily peaks persisting past seven days, supporting the 168 hour lookback.
 
 \begin{figure}[H]
-\centering
-\includegraphics[width=\columnwidth]{eda_correlation.pdf}
-\caption{Pearson correlation of each feature with consumption-based carbon intensity, per region.}
-\label{fig:correlation}
+    \centering
+    \includegraphics[width=\columnwidth]{eda_correlation.pdf}
+    \caption{Pearson correlation of each feature with consumption-based carbon intensity, per region.}
+    \label{fig:correlation}
 \end{figure}
 
+
+% 5. Methodology
 \section{Methodology}
+
+% 5.1. Two-tier architecture 
 \subsection{Two-tier architecture}
 Following CarbonCast, the two-tier model couples per-source Tier~1 feedforward
 networks that forecast generation with a Tier~2 CNN-LSTM
@@ -394,11 +391,13 @@ the first tier and overstate its own accuracy. Out-of-fold forecasts instead car
 the same error profile Tier~2 meets at inference, where the chain is always the
 final Tier~1 models followed by Tier~2.
 
+% 5.2. Production and consumption targets
 \subsection{Production and consumption targets}
 The production-based variant (the faithful baseline) targets the domestic
 generation-mix intensity. The consumption-based variant targets the
 Electricity Maps reported consumption intensity and adds the cross-border channels.
 
+% 5.3. Single-tier baseline
 \subsection{Single-tier baseline}
 To test whether the two-tier structure earns its complexity, we compare against a
 single-tier model: the same Tier~2 network run standalone, with no Tier~1 forecast
@@ -406,6 +405,8 @@ channels, predicting carbon intensity directly from its own history plus weather
 and calendar. Because the network is identical, the comparison isolates the
 contribution of the two-tier design.
 
+
+% 6. Experimental Setup
 \section{Experimental Setup}
 \textbf{Splits.} Training 2021 through 2025, validation January through April 2026,
 Test~A May 2026, and a live Test~B (June 8 to 21, 2026) head-to-head against the
@@ -418,6 +419,8 @@ nothing for the stable zones.
 three random seeds and the model with the best validation score is kept
 (Section~\ref{sec:findings}).
 
+
+% 7. Iterative Findings and Modeling Decisions
 \section{Iterative Findings and Modeling Decisions}
 \label{sec:findings}
 Our approach was shaped by a sequence of findings from experiments, recorded here
@@ -452,6 +455,7 @@ shortened window lowered Finland's consumption-based two-tier error on Test~A
 actively hurting the forecast. We use the 2023-onward window for Finland throughout
 the results.
 
+% 7. Results
 \section{Results}
 We evaluate four frameworks: a single-tier network and the two-tier
 (CarbonCast-style) pipeline, each trained on the production-based and the
@@ -460,7 +464,7 @@ reproduction. Table~\ref{tab:atlas} gives the accuracy of the best of the four, 
 consumption-based single-tier network, and the rest of this section compares all
 four and explains the result. All numbers are Test~A (May 2026), validation-selected.
 
-\begin{table}[tbp]
+\begin{table}[H]
 \caption{Test A (May 2026) per-zone accuracy of our best model, the consumption-based
 single-tier network (validation-selected).}
 \label{tab:atlas}
@@ -484,17 +488,18 @@ the actual across zones, on the production and consumption targets; the two-tier
 models, Finland's production most of all, are visibly noisier.
 
 \begin{figure*}[tbp]
-\centering
-\includegraphics[width=\textwidth]{results_fva_frameworks.pdf}
-\caption{Day-ahead (24 hour) forecast versus actual over Test A. Rows are zones; the
-left column is the production-based target, the right the consumption-based target. In
-each cell the actual is gray, with the single-tier (orange) and two-tier (blue)
-forecasts overlaid. The two columns are different series and not cross-comparable. The
-two-tier forecasts are visibly more erratic, most extreme for Finland.}
-\label{fig:fva}
+    \centering
+    \includegraphics[width=\textwidth]{results_fva_frameworks.pdf}
+    \caption{Day-ahead (24 hour) forecast versus actual over Test A. Rows are zones; the
+    left column is the production-based target, the right the consumption-based target. In
+    each cell the actual is gray, with the single-tier (orange) and two-tier (blue)
+    forecasts overlaid. The two columns are different series and not cross-comparable. The
+    two-tier forecasts are visibly more erratic, most extreme for Finland.}
+    \label{fig:fva}
 \end{figure*}
 
 \subsection{Comparing the four frameworks}
+
 Figures~\ref{fig:framework-prod} and~\ref{fig:framework-cons}, with
 Table~\ref{tab:structural}, compare the single-tier and two-tier models on both
 targets, per zone. The single-tier model is the same
@@ -502,41 +507,42 @@ Tier~2 network with no Tier~1 forecast channels. Production and consumption MAPE
 computed on different target series, so the two are compared only within each
 target, not across.
 
-\begin{table}[tbp]
-\caption{Structural comparison: MAPE (\%), Test A, validation-selected. Lower is
-better; the better of each single/two-tier pair is bold.}
-\label{tab:structural}
-\begin{tabular}{lrrrr}
-\toprule
- & \multicolumn{2}{c}{Production} & \multicolumn{2}{c}{Consumption} \\
-\cmidrule(lr){2-3}\cmidrule(lr){4-5}
-Zone & single & two-tier & single & two-tier \\
-\midrule
-Singapore   & \textbf{0.68}  & 0.72  & \textbf{0.71}  & 0.90 \\
-US-MIDA-PJM & 6.31  & \textbf{6.04}  & \textbf{5.93}  & 8.30 \\
-US-NY-NYIS  & \textbf{6.37}  & 8.90  & \textbf{5.98}  & 7.03 \\
-Finland     & \textbf{15.35} & 37.24 & \textbf{12.05} & 21.89 \\
-Belgium     & 36.18 & \textbf{35.99} & \textbf{41.57} & 64.42 \\
-\bottomrule
-\end{tabular}
+\begin{table}[H]
+    \caption{Structural comparison: MAPE (\%), Test A, validation-selected. Lower is
+    better; the better of each single/two-tier pair is bold.}
+    \label{tab:structural}
+    \begin{tabular}{lrrrr}
+    \toprule
+     & \multicolumn{2}{c}{Production} & \multicolumn{2}{c}{Consumption} \\
+    \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+    Zone & single & two-tier & single & two-tier \\
+    \midrule
+    Singapore   & \textbf{0.68}  & 0.72  & \textbf{0.71}  & 0.90 \\
+    US-MIDA-PJM & 6.31  & \textbf{6.04}  & \textbf{5.93}  & 8.30 \\
+    US-NY-NYIS  & \textbf{6.37}  & 8.90  & \textbf{5.98}  & 7.03 \\
+    Finland     & \textbf{15.35} & 37.24 & \textbf{12.05} & 21.89 \\
+    Belgium     & 36.18 & \textbf{35.99} & \textbf{41.57} & 64.42 \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
+% Figure 10
 \begin{figure}[tbp]
-\centering
-\includegraphics[width=\columnwidth]{results_framework_prod.pdf}
-\caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
-(blue) models on the production-based target. Lower is better.}
-\label{fig:framework-prod}
+    \centering
+    \includegraphics[width=\columnwidth]{results_framework_prod.pdf}
+    \caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
+    (blue) models on the production-based target. Lower is better.}
+    \label{fig:framework-prod}
 \end{figure}
 
+% Figure 11
 \begin{figure}[tbp]
-\centering
-\includegraphics[width=\columnwidth]{results_framework_cons.pdf}
-\caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
-(blue) models on the consumption-based target. The two targets are different series,
-so this figure is comparable to Figure~\ref{fig:framework-prod} only in shape, not
-level.}
-\label{fig:framework-cons}
+    \centering
+    \includegraphics[width=\columnwidth]{results_framework_cons.pdf}
+    \caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
+    (blue) models on the consumption-based target. The two targets are different series. This figure is comparable to Figure~\ref{fig:framework-prod} only in shape, not
+    level.}
+    \label{fig:framework-cons}
 \end{figure}
 
 The two-tier structure does not earn its complexity. For the consumption target
@@ -716,17 +722,17 @@ improving Tier~1 is about rescuing the two-tier design rather than beating the
 single-tier baseline.
 
 \begin{figure}[tbp]
-\centering
-\includegraphics[width=\columnwidth]{tier1_horizon_error.pdf}
-\caption{Tier 1 total-generation forecast error (normalized RMSE) by horizon, per region, Test A.}
-\label{fig:tier1-horizon}
+    \centering
+    \includegraphics[width=\columnwidth]{tier1_horizon_error.pdf}
+    \caption{Tier 1 total-generation forecast error (normalized RMSE) by horizon, per region, Test A.}
+    \label{fig:tier1-horizon}
 \end{figure}
 
 \begin{figure}[tbp]
-\centering
-\includegraphics[width=\columnwidth]{tier1_pred_vs_actual_pjm.pdf}
-\caption{Tier 1 day-ahead (24h) forecast versus actual gas production, US-MIDA-PJM, Test A.}
-\label{fig:tier1-pred}
+    \centering
+    \includegraphics[width=\columnwidth]{tier1_pred_vs_actual_pjm.pdf}
+    \caption{Tier 1 day-ahead (24h) forecast versus actual gas production, US MIDA-PJM, Test A.}
+    \label{fig:tier1-pred}
 \end{figure}
 
 \subsection{Other limitations}
