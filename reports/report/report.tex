@@ -350,13 +350,10 @@ absolute intensity barely moves. The two US grids show a strong, recurring band 
     \label{fig:temporal-my}
 \end{figure}
 
+
+% 4.6. Feature relationships and correlations
 \subsection{Feature relationships and correlations}
-\begin{figure}[tbp]
-\centering
-\includegraphics[width=\columnwidth]{eda_correlation.pdf}
-\caption{Pearson correlation of each feature with consumption-based carbon intensity, per region.}
-\label{fig:correlation}
-\end{figure}
+
 To understand how predictors relate to our target variable, we visualized the 
 Consistent and interpretable signal. Production intensity is the dominant
 predictor everywhere (0.86 to 1.00). Partner carbon intensity is strong (0.71 to
@@ -370,6 +367,13 @@ US markets total generation is positively correlated (0.68 to 0.73): high demand
 brings fossil peakers online. In the cold European grids low temperature raises
 intensity (Finland $-0.58$). The autocorrelation of carbon intensity shows daily
 peaks persisting past seven days, supporting the 168 hour lookback.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\columnwidth]{eda_correlation.pdf}
+\caption{Pearson correlation of each feature with consumption-based carbon intensity, per region.}
+\label{fig:correlation}
+\end{figure}
 
 \section{Methodology}
 \subsection{Two-tier architecture}
