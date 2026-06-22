@@ -233,16 +233,13 @@ like Finland turns the same absolute miss into a large percentage.
     \label{fig:distribution-shift}
 \end{figure}
 
-The distributions also move over the study period (Figure~\ref{fig:distribution-shift}), comparing January through May of 2021 against the same months of 2026. Finland shifts the most: its mean roughly halves (184 to 84) and the shape flips from near-symmetric to strongly right-skewed, as low-carbon hours become common. New York moves the other way, the whole distribution sliding upward (232 to 308). Belgium is the subtle case, its mean
-barely changes (190 to 188) while the spread widens (standard deviation 58 to 76),
-so the grid becomes more volatile rather than cleaner or dirtier. PJM eases down
-modestly (431 to 401), and Singapore barely moves, staying tight and high.
-
+The distributions also move over the study period (Figure~\ref{fig:distribution-shift}), comparing January through May of 2021 against the same months of 2026. Finland shifts the most: its mean roughly halves (184 to 84) and the shape flips from near-symmetric to strongly right-skewed, as low-carbon hours become common. New York moves the other way, the whole distribution sliding upward (232 to 308). Belgium is the subtle case, its mean barely changes (190 to 188) while the spread widens (standard deviation 58 to 76), so the grid becomes more volatile rather than cleaner or dirtier. PJM eases down modestly (431 to 401), and Singapore barely moves, staying tight and high.
 
 
 %  4.3. Energy mix evolution per region
 \subsection{Energy mix evolution per region}
 Per-source generation share, 2021 to 2025 (Figure~\ref{fig:mix-evolution}):
+
 \begin{itemize}
 \item \textbf{Belgium:} nuclear falls sharply, 52\% to 33\%, as the phase-out
 proceeds, while solar nearly triples (5\% to 15\%) and wind grows (12\% to 18\%);
@@ -251,34 +248,36 @@ low-carbon nuclear is giving way to weather-driven renewables that gas has to ba
 up. The result is an intensity that both rises and swings with wind and sunlight,
 and a mix whose behavior is the hardest to anticipate, the root of Belgium's
 forecasting difficulty later in the paper.
+
 \item \textbf{Finland:} wind more than doubles (12\% to 27\%) and nuclear edges up
 (36\% to 39\%), while coal collapses (11\% to 2\%) and gas all but disappears (7\%
 to 1\%); hydro eases from 23\% to 15\%. Finland decarbonizes on two fronts at once,
 adding a large block of new nuclear and a wave of wind while retiring its fossil
 capacity. Together these halve its carbon intensity over the window, the steepest
 decline in the set.
+
 \item \textbf{Singapore:} gas dominates throughout (97\% to 95\%) with no nuclear,
 and only solar moves, from a thin 0.7\% to 2.8\%. With almost no interconnection and
 a single dominant fuel, the mix has little room to change, so intensity stays flat
 and high. That structural simplicity is also why Singapore is by far the easiest
 zone to forecast.
+
 \item \textbf{US-MIDA-PJM:} a slow coal-to-gas shift on a stable base: gas rises
 38\% to 42\% and coal falls 22\% to 17\%, with nuclear steady near 32\% and solar
 still small (0.7\% to 2.8\%). Because the change is gradual and a large nuclear block
 anchors the mix, intensity barely moves across the window. The size and diversity of
 this market give it strong inertia, the kind of well-behaved signal that is
 comparatively easy to model.
+
 \item \textbf{US-NY-NYIS:} gas grows (48\% to 53\%) while both low-carbon sources
 recede, nuclear 25\% to 21\% and hydro 22\% to 18\%, with wind only 3\% to 5\%. Here
 the trend runs the wrong way: as nuclear capacity retires and hydro's share slips,
 gas fills the gap and intensity climbs. Renewables are not yet scaling fast enough to
 offset the lost low-carbon generation.
 \end{itemize}
-%
 
 
-
-% ---
+% 4.4. Net energy flow (imports and exports)
 \subsection{Net energy flow (imports and exports)}
 Belgium swings from net exporter ($-9\%$) to heavy net importer ($+30\%$),
 tracking its nuclear phase-out. Finland stays a net importer but leans on imports
@@ -291,7 +290,7 @@ Singapore only a small link to Peninsular Malaysia.
 \begin{figure}[tbp]
     \centering
     \includegraphics[width=\columnwidth]{eda_mix.pdf}
-    \Description{}{Generation mix by source for each region, 2021 (top bar) versus 2025
+    \caption{Generation mix by source for each region, 2021 (top bar) versus 2025
     (bottom bar), as 100\% stacked bars (annual means). Each segment is labeled with
     that source's share of generation; sources below 1\% are grouped as ``other''.}
     \label{fig:mix-evolution}
