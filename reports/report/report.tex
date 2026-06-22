@@ -123,7 +123,7 @@ fail across diverse grids, and providing a reproducible benchmark.
 \section{Related Work}
 \textbf{CarbonCast}~\cite{maji2022carboncast} is the closest
 reference. It is a two-tier model: Tier~1 is a set of
-per-source feedforward artificial neural networks (ANNs) that forecast generation from history, calendar features, and weather; Tier~2 is a convolutional-recurrent network that consumes the Tier~1 forecasts together with historical carbon intensity and weather to forecast carbon intensity. It is production-based by design, explicitly ignoring imports and exports, and is evaluated on six regions, one of them PJM, which this study also covers. Because it is open source~\cite{ucscospre2025}, we adopt CarbonCast as the two-tier \emph{production-based} baseline that our two-tier \emph{consumption-based} model extends.
+per-source feedforward artificial neural networks (ANNs) that forecast generation from history, calendar features, and weather; Tier~2 is a convolutional neural network feeding a long short-term memory layer (CNN-LSTM) that consumes the Tier~1 forecasts together with historical carbon intensity and weather to forecast carbon intensity. It is production-based by design, explicitly ignoring imports and exports, and is evaluated on six regions, one of them PJM, which this study also covers. Because it is open source~\cite{ucscospre2025}, we adopt CarbonCast as the two-tier \emph{production-based} baseline that our two-tier \emph{consumption-based} model extends.
 
 \textbf{EnsembleCI}~\cite{yan2025ensembleci} is an adaptive ensemble that improves on
 CarbonCast for production-based carbon intensity across eleven grids including PJM,
@@ -374,7 +374,7 @@ peaks persisting past seven days, supporting the 168 hour lookback.
 \section{Methodology}
 \subsection{Two-tier architecture}
 Following CarbonCast, the two-tier model couples per-source Tier~1 feedforward
-networks that forecast generation with a Tier~2 convolutional-recurrent network
+networks that forecast generation with a Tier~2 CNN-LSTM
 that consumes those forecasts together with historical carbon intensity, weather,
 and calendar features to emit a 96 hour carbon intensity vector. We extend Tier~1
 with per-interconnector flow networks that forecast signed net flow, and we add
