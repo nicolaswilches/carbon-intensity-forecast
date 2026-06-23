@@ -582,7 +582,7 @@ across seeds, and compare on Test~A. Table~\ref{tab:flow} reports the result.
 
 \begin{table}[H]
     \caption{Cross-border inputs off versus on: consumption-based two-tier MAPE (\%) on
-    Test~A, averaged across seeds. Lower is bold.}
+    Test~A, averaged across seeds.}
     \label{tab:flow}
     \begin{tabular}{lrr}
     \toprule
@@ -651,7 +651,7 @@ two-tier model is again unstable. New York is the one zone where the two-tier mo
 edges ahead, by a margin inside the run-to-run noise band. A different test month,
 the same conclusion.
 
-\begin{table}[tbp]
+\begin{table}[H]
     \caption{Test~B (June 2026) MAPE (\%) on the 1 to 24 hour band, every hourly
     origin in the settled window. The two-tier production model is omitted; its role is the CarbonCast reproduction
     on Test~A (Table~\ref{tab:structural}).}
@@ -670,6 +670,8 @@ the same conclusion.
     \bottomrule
     \end{tabular}
 \end{table}
+\vspace{1em}
+
 
 Table~\ref{tab:testb-h2h} places our consumption-based models head to head with the
 Electricity Maps forecast, scored at the exact origins Electricity Maps issued. The
@@ -683,22 +685,22 @@ captured weather forecasts would only widen the gap, so the conclusion is
 conservative as stated: an open, reproducible model lands within a few MAPE points
 of the operational baseline in most zones and ahead of it in one.
 
-\begin{table}[tbp]
-\caption{Test~B head-to-head: 1 to 24 hour MAPE (\%) at the Electricity Maps
-snapshot origins. Lowest per zone is bold. Our models are replayed on actual future
-weather, an optimistic upper bound (see text).}
-\label{tab:testb-h2h}
-\begin{tabular}{lrrr}
-\toprule
-Zone & Electricity Maps & single (cons) & two-tier (cons) \\
-\midrule
-Singapore   & \textbf{0.63}  & 0.65  & 0.90 \\
-US-MIDA-PJM & \textbf{3.17}  & 4.33  & 5.91 \\
-US-NY-NYIS  & \textbf{3.82}  & 6.36  & 5.22 \\
-Finland     & 20.74 & \textbf{17.69} & 69.01 \\
-Belgium     & \textbf{23.48} & 33.26 & 35.02 \\
-\bottomrule
-\end{tabular}
+\begin{table}[H]
+    \caption{Test~B head-to-head: 1 to 24 hour MAPE (\%) at the Electricity Maps
+    snapshot origins. Lowest per zone is bold. Our models are replayed on actual future
+    weather, an optimistic upper bound (see text).}
+    \label{tab:testb-h2h}
+    \begin{tabular}{lrrr}
+    \toprule
+    Zone & Electricity Maps & single (cons) & two-tier (cons) \\
+    \midrule
+    Singapore   & \textbf{0.63}  & 0.65  & 0.90 \\
+    US-MIDA-PJM & \textbf{3.17}  & 4.33  & 5.91 \\
+    US-NY-NYIS  & \textbf{3.82}  & 6.36  & 5.22 \\
+    Finland     & 20.74 & \textbf{17.69} & 69.01 \\
+    Belgium     & \textbf{23.48} & 33.26 & 35.02 \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
 \section{Discussion and Limitations}
@@ -714,20 +716,20 @@ two-tier model can achieve, which is precisely why it never beats the single-tie
 baseline. The two figures are the evidence for this limitation, one in aggregate and
 one up close.
 
-\begin{table}[tbp]
-\caption{Tier 1 total-generation forecast error (normalized RMSE, \%) by horizon, Test A.}
-\label{tab:tier1}
-\begin{tabular}{lrrrr}
-\toprule
-Zone & h1 & h24 & h48 & h96 \\
-\midrule
-Singapore   & 2.6  & 3.5  & 4.5  & 4.4 \\
-US-MIDA-PJM & 4.8  & 7.2  & 8.4  & 10.6 \\
-US-NY-NYIS  & 8.3  & 11.3 & 13.2 & 14.3 \\
-Finland     & 10.1 & 14.7 & 17.3 & 14.1 \\
-Belgium     & 17.8 & 21.4 & 22.4 & 25.3 \\
-\bottomrule
-\end{tabular}
+\begin{table}[H]
+    \caption{Tier 1 total-generation forecast error (normalized RMSE, \%) by horizon, Test A.}
+    \label{tab:tier1}
+    \begin{tabular}{lrrrr}
+    \toprule
+    Zone & h1 & h24 & h48 & h96 \\
+    \midrule
+    Singapore   & 2.6  & 3.5  & 4.5  & 4.4 \\
+    US-MIDA-PJM & 4.8  & 7.2  & 8.4  & 10.6 \\
+    US-NY-NYIS  & 8.3  & 11.3 & 13.2 & 14.3 \\
+    Finland     & 10.1 & 14.7 & 17.3 & 14.1 \\
+    Belgium     & 17.8 & 21.4 & 22.4 & 25.3 \\
+    \bottomrule
+    \end{tabular}
 \end{table}
 
 Two patterns emerge. Belgium has the worst Tier~1 error at every horizon, already
@@ -749,7 +751,7 @@ across blocks. Because the single-tier model uses no Tier~1 input and already wi
 improving Tier~1 is about rescuing the two-tier design rather than beating the
 single-tier baseline.
 
-\begin{figure}[tbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{tier1_horizon_error.pdf}
     \caption{Tier 1 total-generation forecast error (normalized RMSE) by horizon, per
@@ -758,7 +760,7 @@ single-tier baseline.
     \label{fig:tier1-horizon}
 \end{figure}
 
-\begin{figure}[tbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{tier1_pred_vs_actual_pjm.pdf}
     \caption{Tier 1 day-ahead (24h) forecast versus actual gas production,
