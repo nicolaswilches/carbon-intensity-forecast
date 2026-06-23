@@ -21,11 +21,10 @@ uv run nbstripout --install --attributes .gitattributes
 ```
 src/carbon_forecast/   installable package (data, models, evaluation, plotting, utils)
 scripts/               extraction and collection entry points
-notebooks/             S01..S07 session-numbered exploration
+notebooks/             S01..S06 session-numbered exploration
 data/raw/              immutable EM and weather pulls (gitignored)
 data/processed/        modelling-ready joins (gitignored)
-models/                trained artefacts (gitignored, published to HF Hub at end)
-outputs/               figures and tables
+outputs/               figures and metrics (tracked); models/preds gitignored, published to HF Hub at end (see outputs/README.md)
 reports/               proposal + final report (Overleaf-synced via drag-drop)
 docs/                  literature notes and design docs
 tests/                 lean pytest suite
