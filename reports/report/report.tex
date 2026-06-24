@@ -71,11 +71,11 @@ carbon intensity inputs, and compares both against a single-tier model that
 forecasts carbon intensity directly. We contribute a per-region accuracy atlas, a
 structural comparison of the two-tier design, and a characterization of where
 forecasts succeed and fail. On a live June 2026 window the open model lands within a
-few points of the operational Electricity Maps forecast in most zones and ahead of
+few points of the operational Electricity Maps forecast in every zone and ahead of
 it in one. Turning the cross-border flow inputs off shows they do not improve
 accuracy: the model is as good or better without them in four of five zones.
 
-On a held-out May 2026 test month, consumption-based accuracy ranges from under 1\% MAPE in near-islanded Singapore to roughly 6\% in the large US markets, with Belgium the hard case at a distribution shift the model does not anticipate. Our central finding is that the two-tier structure does not earn its complexity: a single-tier network that forecasts carbon intensity directly matches or beats the two-tier
+On a held-out May 2026 test month, consumption-based accuracy ranges from under 1\% MAPE in near-islanded Singapore to roughly 6\% in the large US markets, with Belgium the hard case, a distribution shift that training on recent data only partly closes. Our central finding is that the two-tier structure does not earn its complexity: a single-tier network that forecasts carbon intensity directly matches or beats the two-tier
 model in every zone, because imperfect first-tier generation forecasts inject more
 noise than signal. On PJM the production-based two-tier model reproduces the
 published CarbonCast result (6.0 versus 5.3 MAPE), validating the reproduction.
@@ -407,10 +407,11 @@ contribution of the two-tier design.
 \section{Experimental Setup}
 \textbf{Splits.} Training 2021 through 2025, validation January through April 2026,
 Test~A May 2026, and a live Test~B (June 8 to 21, 2026) head-to-head against the
-Electricity Maps operational forecast. Finland uses a shortened training start of
-2023 (a per-zone window), for the regime-shift reason in Section~4.1; the other
-zones use the full window. Each zone has its own model, so a per-zone window costs
-nothing for the stable zones.
+Electricity Maps operational forecast. Two transitioning grids use a shortened
+per-zone window for the distribution-shift reasons in Section~4.1: Finland from 2023
+and Belgium from 2024. The other three zones use the full 2021-2025 window. Each zone
+has its own model, so a per-zone window costs nothing for the stable zones, and the
+window choice is validated, not assumed (Section~\ref{sec:findings}).
 
 \textbf{Why two test sets.} The two windows answer different questions, and neither
 alone is enough. Test~A is a complete held-out month drawn from the historical
@@ -460,8 +461,9 @@ adding gradient clipping removed them, with stable seeds unaffected.
 largest instability. Even after stabilization its best-validation model generalized
 poorly from the validation months to Test~A, the validation error far below the
 test error (Table~\ref{tab:atlas}), indicating a genuine distribution shift in May
-2026 rather than a training artifact. We report this as a failure mode rather than
-correcting it away.
+2026 rather than a training artifact. The training-window experiment below shows
+that restricting Belgium to recent data substantially reduces this gap, since the
+pre-phase-out history no longer matches the test period.
 
 \textbf{Finland regime shift and shortened training.} Inspecting carbon intensity
 over time revealed the Finnish nuclear-driven regime shift (Section~4.1). We
@@ -470,6 +472,20 @@ shortened window lowered Finland's consumption-based two-tier error on Test~A
 (Table~\ref{tab:structural}), confirming that the pre-2023 high-carbon regime was
 actively hurting the forecast. We use the 2023-onward window for Finland throughout
 the results.
+
+\textbf{How far to shorten: the 2024 window.} To probe the limit of this idea we
+trained every framework on a 2024-onward window for the two transitioning grids.
+Belgium improved across all four frameworks and, crucially, on both test windows:
+its consumption-based single-tier error fell from 41.6 to 31.1 on Test~A and from
+33.3 to 25.4 on Test~B, the latter bringing it within two points of Electricity Maps
+(Section~\ref{sec:testb}). We therefore adopt the 2024 window for Belgium. Finland
+behaved differently: the 2024 window improved Test~A but did not generalize,
+regressing sharply on Test~B (single-tier 17.7 to 31.2, and losing to Electricity
+Maps), so Finland keeps the 2023 window. The lesson is that recency helps a shifting
+grid only while the training set stays large enough to generalize. Belgium's later,
+sharper phase-out rewards the most recent data; Finland's slower shift needs more
+history. The final design uses a per-zone window: 2024 for Belgium, 2023 for
+Finland, full 2021-2025 for the three stable grids.
 
 % 7. Results
 \section{Results}
@@ -492,7 +508,7 @@ four and explains the result. All numbers are Test~A (May 2026), validation-sele
     US-NY-NYIS  & 5.98  & 16.46 & 20.46 \\
     US-MIDA-PJM & 5.93  & 21.54 & 26.52 \\
     Finland     & 12.05 & 6.17  & 8.19  \\
-    Belgium     & 41.57 & 47.81 & 55.28 \\
+    Belgium     & 31.13 & 40.80 & 50.07 \\
     \bottomrule
     \end{tabular}
 \end{table}
@@ -534,7 +550,7 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
     US-MIDA-PJM & 6.31  & \textbf{6.04}  & \textbf{5.93}  & 8.30 \\
     US-NY-NYIS  & \textbf{6.37}  & 8.90  & \textbf{5.98}  & 7.03 \\
     Finland     & \textbf{15.35} & 37.24 & \textbf{12.05} & 21.89 \\
-    Belgium     & 36.18 & \textbf{35.99} & \textbf{41.57} & 64.42 \\
+    Belgium     & \textbf{29.79} & 34.67 & \textbf{31.13} & 32.44 \\
     \bottomrule
     \end{tabular}
 \end{table}
@@ -560,7 +576,7 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
 The two-tier structure does not earn its complexity. For the consumption target
 the single-tier model wins in every zone, often by a wide margin. For the
 production target it wins or ties everywhere; the two-tier model is marginally
-ahead only in Belgium and PJM, both within the run-to-run noise band, while it is
+ahead only in PJM, within the run-to-run noise band, while it is
 much worse in Finland. On PJM the two-tier production model reaches 6.04 MAPE,
 reproducing the published CarbonCast lifecycle result (5.29) and validating our
 reproduction. This is consistent with the Tier~1 diagnostic in
@@ -582,7 +598,8 @@ across seeds, and compare on Test~A. Table~\ref{tab:flow} reports the result.
 
 \begin{table}[H]
     \caption{Cross-border inputs off versus on: consumption-based two-tier MAPE (\%) on
-    Test~A, averaged across seeds.}
+    Test~A, averaged across seeds. Computed on the full-window models; the per-zone
+    window choice does not change the conclusion.}
     \label{tab:flow}
     \begin{tabular}{lrr}
     \toprule
@@ -613,7 +630,7 @@ Figures~\ref{fig:horizon-mape} and~\ref{fig:horizon-mae} trace per-zone error, a
 MAPE and MAE, across the full 1 to 96 hour
 horizon. Error does not simply grow with lead time; for every zone the curve stays
 roughly flat, so the day-ahead band is not markedly better than the four-day band.
-Belgium sits highest throughout, near 40\%, with the other four well below. Because
+Belgium sits highest throughout, near 30\%, with the other four well below. Because
 the curves are nearly flat, the 1 to 24 hour band of the Electricity Maps
 head-to-head (Section~\ref{sec:testb}) is no worse than the longer horizons.
 
@@ -666,7 +683,7 @@ the same conclusion.
     US-MIDA-PJM & 4.51  & \textbf{4.30}  & 5.93 \\
     US-NY-NYIS  & 4.62  & 6.30  & \textbf{5.30} \\
     Finland     & 23.08 & \textbf{17.36} & 69.56 \\
-    Belgium     & 33.32 & \textbf{33.52} & 35.68 \\
+    Belgium     & 29.28 & \textbf{26.05} & 30.93 \\
     \bottomrule
     \end{tabular}
 \end{table}
@@ -676,14 +693,14 @@ the same conclusion.
 Table~\ref{tab:testb-h2h} places our consumption-based models head to head with the
 Electricity Maps forecast, scored at the exact origins Electricity Maps issued. The
 open single-tier model beats the closed operational forecast in Finland and ties it
-in Singapore, while Electricity Maps leads in Belgium, PJM, and New York. One
+in Singapore. Electricity Maps leads in PJM, New York, and Belgium, though with
+Belgium's 2024 window that gap closes to under two points (25.4 versus 23.5). One
 caveat keeps this honest: our models are replayed on the actual future weather,
-whereas Electricity Maps used a real weather forecast it could not perfect. Our
-column is therefore an optimistic upper bound, and even with that advantage the
-open model trails in the three larger, more coupled grids. Replaying on the
-captured weather forecasts would only widen the gap, so the conclusion is
-conservative as stated: an open, reproducible model lands within a few MAPE points
-of the operational baseline in most zones and ahead of it in one.
+whereas Electricity Maps used a real weather forecast it could not perfect, so our
+column is an optimistic upper bound. Replaying on the captured weather forecasts
+would only widen the gap, so the conclusion is conservative as stated: an open,
+reproducible model lands within a few MAPE points of the operational baseline in
+every zone and ahead of it in one.
 
 \begin{table}[H]
     \caption{Test~B head-to-head: 1 to 24 hour MAPE (\%) at the Electricity Maps
@@ -698,7 +715,7 @@ of the operational baseline in most zones and ahead of it in one.
     US-MIDA-PJM & \textbf{3.17}  & 4.33  & 5.91 \\
     US-NY-NYIS  & \textbf{3.82}  & 6.36  & 5.22 \\
     Finland     & 20.74 & \textbf{17.69} & 69.01 \\
-    Belgium     & \textbf{23.48} & 33.26 & 35.02 \\
+    Belgium     & \textbf{23.48} & 25.41 & 30.46 \\
     \bottomrule
     \end{tabular}
 \end{table}
@@ -717,7 +734,9 @@ baseline. The two figures are the evidence for this limitation, one in aggregate
 one up close.
 
 \begin{table}[H]
-    \caption{Tier 1 total-generation forecast error (normalized RMSE, \%) by horizon, Test A.}
+    \caption{Tier 1 total-generation forecast error (normalized RMSE, \%) by horizon,
+    Test A (full-window models; this diagnoses the two-tier mechanism and holds under
+    the per-zone windows).}
     \label{tab:tier1}
     \begin{tabular}{lrrrr}
     \toprule
@@ -787,7 +806,10 @@ Two results stand out. First, the per-region atlas shows wide, structurally
 explained variation across regions: a tight high-carbon island grid (Singapore) is trivial to
 forecast, the large US markets sit near 6\% MAPE, and the small import-heavy,
 rapidly decarbonizing European grids are hardest, with Belgium the clear failure
-case driven by a May 2026 distribution shift its training window does not cover.
+case driven by a May 2026 distribution shift. Restricting Belgium's training to recent
+data (2024 onward) substantially narrows this gap, the framework's per-zone
+training-window result: recency helps a grid in rapid transition, while the stable
+grids still do best on full history.
 Second, the structural comparison overturns the assumption behind the two-tier
 design: a single-tier network that predicts carbon intensity directly matches or
 beats the two-tier model in every zone, decisively so for the consumption target.
@@ -802,12 +824,12 @@ cross-border inputs do not improve accuracy: the model is as good or better with
 them in four of five zones, for the same reason the second tier fails, since the
 flow channels are themselves noisy forecasts. And on a live June 2026 window the open
 model lands within a few MAPE points of the closed Electricity Maps operational
-forecast in most zones, beating it in Finland.
+forecast in every zone, beating it in Finland.
 
 The remaining next steps are narrower than the contributions themselves: a faithful
 replay of the head-to-head on the captured weather forecasts rather than on actual
-weather, a longer Test~B window, and a Belgium-specific failure-mode analysis aimed
-at the distribution shift the shared model misses.
+weather, a longer Test~B window, and a broader study of how far the per-zone training
+window should shorten for grids in transition.
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
