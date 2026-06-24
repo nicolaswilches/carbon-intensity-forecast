@@ -30,15 +30,13 @@ LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
 H = 24  # day-ahead horizon (index H-1)
 ACTUAL_C, SINGLE_C, TWO_C = "#7F7F7F", "#E05312", "#129FE0"
 # Columns of the combined full-width grid: (title, single-tier dir, two-tier dir).
-COLS = [("Production-based CI", "preds_single_prod", "preds_e2_prod"),
-        ("Consumption-based CI", "preds_single_cons", "preds")]
+# The per-zone-window final preds (full history for SG/NYIS/PJM, 2024 for FI/BE).
+COLS = [("Production-based CI", "preds_final_single_prod", "preds_final_e2_prod"),
+        ("Consumption-based CI", "preds_final_single_cons", "preds_final_e3_cons")]
 
 
 def _load(subdir: str, zone: str):
-    # Finland uses its 2023-window model for the consumption two-tier, matching the
-    # numbers reported elsewhere; production frames only have the full-window file.
-    fn = "FI_2023.npz" if (subdir == "preds" and zone == "FI") else f"{zone}.npz"
-    d = np.load(os.path.join(PRED, subdir, fn), allow_pickle=True)
+    d = np.load(os.path.join(PRED, subdir, f"{zone}.npz"), allow_pickle=True)
     t = (pd.to_datetime(d["origins"]) + pd.Timedelta(hours=H)).strftime("%Y-%m-%dT%H:%M:%S").tolist()
     return t, d["preds"][:, H - 1], d["y_true"][:, H - 1]
 

@@ -28,15 +28,18 @@ LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
          "US-MIDA-PJM": "PJM", "US-NY-NYIS": "NYIS"}
 SINGLE_C = "#E05312"   # single-tier
 TWOTIER_C = "#129FE0"  # two-tier
-# (single-tier csv, two-tier csv, output file)
+# (single-tier framework, two-tier framework, output file). Values come from the
+# per-zone-window final set (full history for SG/NYIS/PJM, 2024 for FI/BE).
 TARGETS = [
-    ("single_tier_prod", "e2_realsplit_testA_valsel", "results_framework_prod.pdf"),
-    ("single_tier_cons", "e3_realsplit_testA_valsel", "results_framework_cons.pdf"),
+    ("single_prod", "e2_prod", "results_framework_prod.pdf"),
+    ("single_cons", "e3_cons", "results_framework_cons.pdf"),
 ]
 
+_FINAL = pd.read_csv(os.path.join(OUT, "final_metrics.csv"))
 
-def _mape(csv: str) -> dict:
-    df = pd.read_csv(os.path.join(OUT, f"{csv}.csv")).set_index("zone")
+
+def _mape(framework: str) -> dict:
+    df = _FINAL[_FINAL["framework"] == framework].set_index("zone")
     return {z: float(df.loc[z, "test_mape"]) for z in ZONES}
 
 
