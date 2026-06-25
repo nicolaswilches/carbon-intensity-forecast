@@ -22,7 +22,9 @@ fold models are scaffolding, discarded after Job 1.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import pickle
+from dataclasses import dataclass, field, replace
+from pathlib import Path
 
 import keras
 import numpy as np
@@ -206,3 +208,43 @@ def predict_with_truth(
     _, y_norm, _, _ = t2.assemble_sequences(frame_n, art.tier2.config, 1, fs)
     y_true = art.tier2.normalizer.inverse_transform(y_norm, art.tier2.target_col)
     return preds, y_true, origins
+
+
+# --- persistence (save / load trained artifacts) --------------------------
+
+def save_e2(art: E2Artifacts, path: str | Path) -> Path:
+    """Persist a trained E2 model so it never has to be retrained.
+
+    Mirrors save_e3: Keras models written as .keras, everything else (normalizer,
+    config, column list, per-model metadata with the model field nulled) pickled.
+    E2 is production-only, so there are no flow models or partner-CI columns.
+    Reload with load_e2.
+    """
+    p = Path(path)
+    p.mkdir(parents=True, exist_ok=True)
+    art.tier2.model.save(p / "tier2.keras")
+    for name, a in art.final_models.items():
+        a.model.save(p / f"source__{name}.keras")
+    meta = dict(
+        zone=art.zone, source_cols=art.source_cols,
+        normalizer=art.normalizer, config=art.config,
+        source={n: replace(a, model=None) for n, a in art.final_models.items()},
+        tier2=replace(art.tier2, model=None),
+    )
+    with open(p / "meta.pkl", "wb") as f:
+        pickle.dump(meta, f)
+    return p
+
+
+def load_e2(path: str | Path) -> E2Artifacts:
+    """Reload an E2 model saved by save_e2 (models loaded uncompiled, for inference)."""
+    p = Path(path)
+    with open(p / "meta.pkl", "rb") as f:
+        meta = pickle.load(f)
+    final = {n: replace(a, model=keras.models.load_model(p / f"source__{n}.keras", compile=False))
+             for n, a in meta["source"].items()}
+    tier2 = replace(meta["tier2"], model=keras.models.load_model(p / "tier2.keras", compile=False))
+    return E2Artifacts(
+        zone=meta["zone"], final_models=final, tier2=tier2,
+        normalizer=meta["normalizer"], source_cols=meta["source_cols"], config=meta["config"],
+    )

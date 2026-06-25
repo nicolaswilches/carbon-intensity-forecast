@@ -39,6 +39,19 @@ SLICE_LO = "2026-05-25"          # generous lookback margin
 SLICE_HI = "2026-06-21 23:00"    # weather actuals coverage end
 H0, H1 = 1, 24                   # EM academic forecast horizon cap
 
+# Per-zone-window model resolution (final set): full-history dirs for the stable
+# grids, the validation-selected 2024-window seed for FI and BE.
+_FINAL = pd.read_csv("outputs/final_metrics.csv").set_index(["zone", "framework"])
+_FULL_DIR = {"single_prod": "models_single_prod",
+             "single_cons": "models_single_cons", "e3_cons": "models"}
+
+
+def model_dir(framework: str, zone: str) -> str:
+    r = _FINAL.loc[(zone, framework)]
+    if r["window"] == "full":
+        return f"outputs/{_FULL_DIR[framework]}/{zone}"
+    return f"outputs/models_train2024/{framework}/{zone}/seed{int(r['best_seed'])}"
+
 
 def load_single(path: str | Path) -> Tier2Artifacts:
     p = Path(path)
@@ -119,9 +132,9 @@ def main():
 
         # --- structural: each saved config, all hourly origins ---
         configs = {
-            "single_prod": ("single", f"outputs/models_single_prod/{z}"),
-            "single_cons": ("single", f"outputs/models_single_cons/{z}"),
-            "e3_cons":     ("e3",     f"outputs/models/{z}"),
+            "single_prod": ("single", model_dir("single_prod", z)),
+            "single_cons": ("single", model_dir("single_cons", z)),
+            "e3_cons":     ("e3",     model_dir("e3_cons", z)),
         }
         per_config_pred = {}
         for name, (kind, path) in configs.items():

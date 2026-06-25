@@ -30,7 +30,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 # Default to the single-tier consumption model: it is the report's best model, and
 # the horizon figures are captioned single-tier. (The two-tier preds live in
 # outputs/preds; override with PREDS_SUBDIR if needed.)
-PREDS = os.path.join(ROOT, "outputs", os.environ.get("PREDS_SUBDIR", "preds_single_cons"))
+PREDS = os.path.join(ROOT, "outputs", os.environ.get("PREDS_SUBDIR", "preds_final_single_cons"))
 FIGS = os.path.join(ROOT, "outputs", "figures")
 
 # Display order (best to worst) and the npz file backing each zone. The single-tier
