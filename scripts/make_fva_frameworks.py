@@ -57,7 +57,7 @@ def build_one(single_dir: str, two_dir: str, out_name: str) -> None:
         fig.add_trace(go.Scatter(x=t, y=two, mode="lines", name="two-tier",
                       line=dict(color=TWO_C, width=0.9), showlegend=first), row=r, col=1)
         first = False
-    P.style_report_fig(fig, span="column", height=560, legend=True)
+    P.style_report_fig(fig, span="column", height=504, legend=True)
     fig.update_layout(margin=dict(b=5))
     fig.update_xaxes(showticklabels=False)
     fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",
