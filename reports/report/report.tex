@@ -157,6 +157,7 @@ GFS~\cite{noaagfs} for forecasts) for weather, over January 2021 through May 202
 \begin{equation}
 \mathrm{CI}^{\mathrm{prod}}_t = \frac{\sum_i E_{i,t}\,\mathrm{CEF}_i}{\sum_i E_{i,t}}
 \end{equation}
+\vspace{0.5em}
 
 where $E_{i,t}$ is the generation of source $i$ in hour $t$ and $\mathrm{CEF}_i$ its
 emission factor from CarbonCast Table~1, in gCO$_2$eq/kWh. All carbon intensity
@@ -209,7 +210,6 @@ only zone trending upward (237 to 270). PJM eases down (443 to 371) but holds ne
     \label{fig:ci-evolution}
 \end{figure}
 
-
 % §4.2 Carbon intensity distributions
 \subsection{Carbon intensity distributions}
 
@@ -229,19 +229,19 @@ like Finland turns the same absolute miss into a large percentage.
     \label{fig:distribution}
 \end{figure}
 
-\begin{figure}[b]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{eda_distribution_shift.pdf}
-    \caption{Per-region carbon intensity distribution, 2021 vs. 2026 (January to May
-    of each year, matched for season).}
-    \label{fig:distribution-shift}
+    \includegraphics[width=\columnwidth]{eda_mix.pdf}
+    \caption{Generation mix by source for each region, 2021 (top bar) versus 2025
+    (bottom bar), as 100\% stacked bars (annual means). Each segment is labeled with
+    that source's share of generation; sources below 1\% are grouped as ``other''.}
+    \label{fig:mix-evolution}
 \end{figure}
 
 The distributions also move over the study period (Figure~\ref{fig:distribution-shift}), comparing January through May of 2021 against the same months of 2026. Finland shifts the most: its mean roughly halves (184 to 84) and the shape flips from near-symmetric to strongly right-skewed, as low-carbon hours become common. New York moves the other way, the whole distribution sliding upward (232 to 308). Belgium is the subtle case, its mean
 barely changes (190 to 188) while the spread widens (standard deviation 58 to 76),
 so the grid becomes more volatile rather than cleaner or dirtier. PJM eases down
 modestly (431 to 401), and Singapore barely moves, staying tight and high.
-
 
 
 % §4.3 Energy mix evolution per region
@@ -302,11 +302,10 @@ at very different error levels from one zone to the next.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{eda_mix.pdf}
-    \caption{Generation mix by source for each region, 2021 (top bar) versus 2025
-    (bottom bar), as 100\% stacked bars (annual means). Each segment is labeled with
-    that source's share of generation; sources below 1\% are grouped as ``other''.}
-    \label{fig:mix-evolution}
+    \includegraphics[width=\columnwidth]{eda_distribution_shift.pdf}
+    \caption{Per-region carbon intensity distribution, 2021 vs. 2026 (January to May
+    of each year, matched for season).}
+    \label{fig:distribution-shift}
 \end{figure}
 
 % §4.4 Net energy flow (imports and exports)
