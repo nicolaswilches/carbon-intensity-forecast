@@ -2,24 +2,14 @@
 
 \settopmatter{printacmref=false,printfolios=true}
 \renewcommand\footnotetextcopyrightpermission[1]{}
-% Drop the running header (title/author note) and show a centered page number.
 \pagestyle{plain}
 \renewcommand{\shortauthors}{}
 
 \usepackage{booktabs}
 \usepackage{graphicx}
-% Figures live in the repo's outputs/figures (relative to this file). Multiple
-% candidates so it resolves whether the compile root is this dir or the repo root.
-\graphicspath{{../../outputs/figures/}{outputs/figures/}{figures/}}
+\graphicspath{{../../outputs/figures/}{outputs/figures/}{figures/}}  % resolves from repo root or report dir
 
-% Keep each section's floats within that section, so a table or figure cannot drift
-% above an earlier section heading (e.g. Table 1 / Figure 1 rising above Data).
-%\usepackage[section]{placeins}
 \usepackage{float}
-% Float placement parameters: let LaTeX fill columns instead of forcing flushes.
-% A previous per-subsection \FloatBarrier plus [H]/[t]-only placement ejected floats
-% at every subsection and left large blank gaps; section-level placeins keeps figures
-% in their section while these fractions let a page hold more float + text.
 \renewcommand{\topfraction}{0.9}
 \renewcommand{\bottomfraction}{0.8}
 \renewcommand{\textfraction}{0.1}
@@ -54,8 +44,6 @@
 
 \begin{document}
 
-% acmart resets the page style inside \maketitle; reassert plain so every page has
-% just a centered folio and no running header.
 \thispagestyle{plain}
 \pagestyle{plain}
 
@@ -85,7 +73,7 @@ with the published CarbonCast result (6.0 versus 5.3 MAPE).
 
 \maketitle
 
-% Ethics Statement
+% ── Ethics Statement (IE University requirement) ─────────────────────────────
 \section*{Ethics Statement}
 This research uses publicly available data under authorized licenses: electricity
 generation, carbon intensity, and interconnector flow data from Electricity Maps
@@ -99,7 +87,7 @@ All code and trained models are released under the MIT license at
 \url{https://github.com/nicolaswilches/carbon-intensity-forecast}, supporting open
 and reproducible science. The authors declare no conflicts of interest.
 
-% 1. Introduction
+% ── §1. Introduction and Problem ─────────────────────────────────────────────
 \section{Introduction and Problem}
 In recent years, global electricity demand has risen sharply, growing by more than
 4\% in 2024 and projected to keep climbing through the rest of the decade~\cite{iea2024electricity}.
@@ -130,10 +118,8 @@ the role of energy interconnector flows (and finding that, at the studied horizo
 they do not improve accuracy), characterizing where forecasts succeed and fail across
 diverse grids, and providing a reproducible benchmark.
 Code and trained models are available at \url{https://github.com/nicolaswilches/carbon-intensity-forecast} under the MIT license.
-% / 1. Introduction
 
-
-% 2. Related Work
+% ── §2. Related Work ──────────────────────────────────────────────────────────
 \section{Related Work}
 \textbf{CarbonCast}~\cite{maji2022carboncast} is the closest
 reference. It is a two-tier model: Tier~1 is a set of
@@ -162,7 +148,7 @@ is consumption-based but closed. This work fills the empty corner: an open,
 reproducible model that targets consumption-based carbon intensity and models
 cross-border flows explicitly.
 
-% 3. Data
+% ── §3. Data ──────────────────────────────────────────────────────────────────
 \section{Data}
 
 We use Electricity Maps~\cite{electricitymaps2025forecast} (academic license) for hourly carbon intensity, power breakdown, and electricity flows, and Open-Meteo~\cite{openmeteo} (ERA5 reanalysis~\cite{hersbach2020era5} for history,
@@ -193,7 +179,7 @@ The five zones were chosen for structural diversity: a large multi-state US mark
 undergoing a nuclear-driven decarbonization (Finland), a small import-heavy
 European grid (Belgium), and a near-islanded gas-dominated grid (Singapore).
 
-% 4. EDA
+% ── §4. Exploratory Data Analysis ────────────────────────────────────────────
 \section{Exploratory Data Analysis}
 This section reports our initial evaluation of the extracted data across all five
 regions. We begin with the temporal evolution of carbon intensity in each region,
@@ -204,7 +190,7 @@ next examine each region's energy trade with its partners, measured as total imp
 and exports across all interconnectors. Finally, we look at how temporal patterns
 shape carbon intensity and how the main features correlate with it.
 
-% 4.1. Carbon intensity evolution per region
+% §4.1 Carbon intensity evolution per region
 \subsection{Carbon intensity evolution per region}
 
 Three distinct trajectories stand out. Finland falls steeply, from 224 in early
@@ -224,7 +210,7 @@ only zone trending upward (237 to 270). PJM eases down (443 to 371) but holds ne
 \end{figure}
 
 
-% 4.2 Carbon intensity distributions
+% §4.2 Carbon intensity distributions
 \subsection{Carbon intensity distributions}
 
 The five regions occupy clearly different carbon-intensity bands
@@ -258,7 +244,7 @@ modestly (431 to 401), and Singapore barely moves, staying tight and high.
 
 
 
-%  4.3. Energy mix evolution per region
+% §4.3 Energy mix evolution per region
 \subsection{Energy mix evolution per region}
 Figure~\ref{fig:mix-evolution} shows per-source generation share from 2021 to 2025.
 The five grids are not moving in the same direction or at the same speed, and in each
@@ -323,7 +309,7 @@ at very different error levels from one zone to the next.
     \label{fig:mix-evolution}
 \end{figure}
 
-% 4.4. Net energy flow (imports and exports)
+% §4.4 Net energy flow (imports and exports)
 \subsection{Net energy flow (imports and exports)}
 Belgium swings from net exporter ($-9\%$) to heavy net importer ($+30\%$),
 tracking its nuclear phase-out. Finland stays a net importer but leans on imports
@@ -341,6 +327,7 @@ Singapore only a small link to Peninsular Malaysia.
     \label{fig:net-import}
 \end{figure}
 
+% §4.5 Temporal patterns
 \subsection{Temporal patterns (local time)}
 Figure~\ref{fig:temporal-hd} shows the daily and weekly cycle. Belgium, PJM, and
 New York are most carbon-intense at night and on weekdays, the hours and days when
@@ -370,7 +357,7 @@ absolute intensity barely moves. The two US grids show a strong, recurring band 
 \end{figure}
 
 
-% 4.6. Feature relationships and correlations
+% §4.6 Feature relationships and correlations
 \subsection{Feature relationships and correlations}
 
 The correlations are consistent and interpretable across all five zones. Production intensity is the dominant
@@ -387,10 +374,10 @@ import-weighted partner intensity correlates 0.83 with the consumption-minus-pro
 \end{figure}
 
 
-% 5. Methodology
+% ── §5. Methodology ───────────────────────────────────────────────────────────
 \section{Methodology}
 
-% 5.1. Two-tier architecture 
+% §5.1 Two-tier architecture
 \subsection{Two-tier architecture}
 Following CarbonCast, the two-tier model couples per-source Tier~1 feedforward
 networks that forecast generation with a Tier~2 CNN-LSTM
@@ -413,13 +400,13 @@ the first tier and overstate its own accuracy. Out-of-fold forecasts instead car
 the same error profile Tier~2 meets at inference, where the chain is always the
 final Tier~1 models followed by Tier~2.
 
-% 5.2. Production and consumption targets
+% §5.2 Production and consumption targets
 \subsection{Production and consumption targets}
 The production-based variant (the faithful baseline) targets the domestic
 generation-mix intensity. The consumption-based variant targets the
 Electricity Maps reported consumption intensity and adds the cross-border channels.
 
-% 5.3. Single-tier baseline
+% §5.3 Single-tier baseline
 \subsection{Single-tier baseline}
 To test whether the two-tier structure earns its complexity, we compare against a
 single-tier model: the same Tier~2 network run standalone, with no Tier~1 forecast
@@ -427,11 +414,11 @@ channels, predicting carbon intensity directly from its own history plus weather
 and calendar. Because the network is identical, the comparison isolates the
 contribution of the two-tier design.
 
-% 5.4. Implementation details
+% §5.4 Implementation details
 \subsection{Implementation details}
 Tier~2 uses Conv1D(4, kernel\,4) $\to$ MaxPooling1D(2) $\to$ Conv1D(16, kernel\,4) $\to$ LSTM(24) $\to$ Dropout(0.1) $\to$ Dense(96). Tier~1 source and flow ANNs use a Dense(50 $\to$ 34 $\to$ 24 $\to$ 96) stack with ReLU activations. All networks use RMSE loss, Adam (learning rate 0.001, gradient clipping norm 1.0), batch size 32, and early stopping on validation loss with patience 10 over a maximum of 100 epochs. The Tier~2 input sequence spans 264 timesteps (168-hour lookback plus 96-hour forecast horizon). Tier~1 networks are trained independently per source and per interconnector.
 
-% 6. Experimental Setup
+% ── §6. Experimental Setup ────────────────────────────────────────────────────
 \section{Experimental Setup}
 \textbf{Splits.} Training 2021 through 2025, validation January through April 2026,
 Test~A May 2026, and a live Test~B (June 8 to 21, 2026) head-to-head against the
@@ -465,7 +452,7 @@ three random seeds and the model with the best validation score is kept
 (Section~\ref{sec:findings}).
 
 
-% 7. Iterative Findings and Modeling Decisions
+% ── §7. Iterative Findings and Modeling Decisions ────────────────────────────
 \section{Iterative Findings and Modeling Decisions}
 \label{sec:findings}
 Our approach was shaped by a sequence of findings from experiments, recorded here
@@ -508,7 +495,7 @@ slower-moving shift that still benefits from excluding the pre-nuclear-ramp peri
 The final design uses a single cutoff: 2024 onward for Finland and Belgium, full
 history for the three stable grids.
 
-% 7. Results
+% ── §8. Results ───────────────────────────────────────────────────────────────
 \section{Results}
 We evaluate four frameworks: a single-tier network and the two-tier
 (CarbonCast-style) pipeline, each trained on the production-based and the
@@ -551,7 +538,7 @@ models, Finland's production most of all, are visibly noisier.
 \end{figure*}
 
 
-% 8.1. Comparing the four frameworks
+% §8.1 Comparing the four frameworks
 \subsection{Comparing the four frameworks}
 
 Figures~\ref{fig:framework-prod} and~\ref{fig:framework-cons}, with
@@ -577,7 +564,6 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
     \end{tabular}
 \end{table}
 
-% Figure 10
 \begin{figure}[tbp]
     \centering
     \includegraphics[width=\columnwidth]{results_framework_prod.pdf}
@@ -586,7 +572,6 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
     \label{fig:framework-prod}
 \end{figure}
 
-% Figure 11
 \begin{figure}[tbp]
     \centering
     \includegraphics[width=\columnwidth]{results_framework_cons.pdf}
@@ -609,7 +594,7 @@ source data is missing or noisy, benchmarked against a fixed equation baseline
 rather than a learned single-tier model.
 
 
-% 8.2. Do cross-border flow inputs help?
+% §8.2 Do cross-border flow inputs help?
 \subsection{Do cross-border flow inputs help?}
 \label{sec:flowcompare}
 Contribution~2 asks whether the cross-border inputs that distinguish our model
@@ -651,7 +636,7 @@ encode physical coupling helps only if it can be predicted well, and on these gr
 over this horizon, it cannot.
 
 
-% 8.3. Error by forecast horizon
+% §8.3 Error by forecast horizon
 \subsection{Error by forecast horizon}
 Figures~\ref{fig:horizon-mape} and~\ref{fig:horizon-mae} trace per-zone error, as
 MAPE and MAE, across the full 1 to 96 hour
@@ -682,6 +667,7 @@ head-to-head (Section~\ref{sec:testb}) is no worse than the longer horizons.
     \label{fig:horizon-mae}
 \end{figure}
 
+% §8.4 Test B: live structural check and Electricity Maps head-to-head
 \subsection{A second window and the Electricity Maps head-to-head}
 \label{sec:testb}
 Test~A is a single held-out month. To check that the structural finding is not an
@@ -755,8 +741,10 @@ Section~\ref{sec:other-limits} lists this as a remaining limitation.
     \end{tabular}
 \end{table}
 
+% ── §9. Discussion and Limitations ───────────────────────────────────────────
 \section{Discussion and Limitations}
 
+% §9.1 Tier 1 forecast quality and the two-tier structure
 \subsection{Tier 1 forecast quality and the two-tier structure}
 A single-tier model that ignores Tier~1 entirely matches or beats the two-tier
 model. The causal chain is straightforward: the two-tier model passes Tier~1
@@ -829,6 +817,7 @@ single-tier baseline.
     \label{fig:tier1-pred}
 \end{figure}
 
+% §9.2 Other limitations
 \subsection{Other limitations}
 \label{sec:other-limits}
 
@@ -862,6 +851,7 @@ raw current-value flow features would help the single-tier model is not tested.
 24 hours rather than the advertised 72, so the head-to-head (Test~B) is restricted
 to the 1 to 24 hour band.
 
+% ── §10. Conclusion ───────────────────────────────────────────────────────────
 \section{Conclusion}
 \label{sec:conclusion}
 We built an open, reproducible deep learning framework for short-horizon
