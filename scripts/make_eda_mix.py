@@ -96,9 +96,10 @@ def build() -> None:
                 showlegend=first), row=i, col=1)
         fig.update_yaxes(autorange="reversed", row=i, col=1)  # May 2021 on top
 
-    fig.update_layout(barmode="stack", bargap=0.35,
+    fig.update_layout(barmode="stack", bargap=0.15,
                       uniformtext=dict(minsize=8, mode="hide"))
     P.style_report_fig(fig, span="column", height=720, legend=True)
+    fig.update_layout(margin=dict(b=9))
     fig.update_xaxes(range=[0, 100], showticklabels=False, showgrid=False)
     fig.update_yaxes(tickfont=dict(size=P.REPORT_FONT - 1))
     fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",

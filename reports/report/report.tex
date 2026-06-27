@@ -7,6 +7,7 @@
 
 \usepackage[top=1.2cm, bottom=1.2cm]{geometry}  % tighten vertical margins; left/right kept by acmart
 
+\usepackage{enumitem}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \graphicspath{{../../outputs/figures/}{outputs/figures/}{figures/}}  % resolves from repo root or report dir
@@ -234,9 +235,7 @@ like Finland turns the same absolute miss into a large percentage.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{eda_mix.pdf}
-    \caption{Generation mix by source for each region, 2021 (top bar) versus 2025
-    (bottom bar), as 100\% stacked bars (annual means). Each segment is labeled with
-    that source's share of generation; sources below 1\% are grouped as ``other''.}
+    \caption{Generation mix per region, 2021 (top) vs.\ 2025 (bottom), annual means as 100\% stacked bars. Sources below 1\% grouped as ``other''.}
     \label{fig:mix-evolution}
 \end{figure}
 
@@ -253,7 +252,7 @@ The five grids are not moving in the same direction or at the same speed, and in
 case the shift in the data lines up with a concrete policy or asset change we can name
 and source.
 
-\begin{itemize}
+\begin{itemize}[leftmargin=1em]
 \item \textbf{Belgium:} nuclear falls sharply, 52\% to 33\%, while solar nearly
 triples (5\% to 15\%) and wind grows (12\% to 18\%); gas holds near 20\%. This reflects the country's nuclear phase-out trajectory: the 2003 federal law capped
 reactor lifetimes, and although a 2022 government decision extended two reactors by
