@@ -113,8 +113,9 @@ their interconnector partners, producing a short-horizon (96 hour) forecast that
 can inform systems scheduling data center workloads by a region's carbon intensity.
 The contribution is not introducing consumption-based forecasting as a target,
 since operational systems already exist, but opening a closed method, measuring
-the role of energy interconnector flows, characterizing where forecasts succeed and
-fail across diverse grids, and providing a reproducible benchmark.
+the role of energy interconnector flows (and finding that, at the studied horizon,
+they do not improve accuracy), characterizing where forecasts succeed and fail across
+diverse grids, and providing a reproducible benchmark.
 Code and trained models are available at \url{https://github.com/nicolaswilches/carbon-intensity-forecast} under the MIT license.
 % / 1. Introduction
 
@@ -363,7 +364,7 @@ The correlations are consistent and interpretable across all five zones. Product
 predictor everywhere (0.86 to 1.00). Partner carbon intensity is strong (0.71 to
 0.81) in every connected grid and weak only in islanded Singapore (0.38),
 confirming it as a genuine consumption-based feature; for Belgium specifically the
-import-weighted partner intensity correlates 0.83 with the consumption-minus-production gap over about 42{,}800 importing hours. Higher renewable share lowers intensity everywhere, most extremely in Singapore ($-0.99$, solar displacing gas, reinforced by shortwave radiation at $-0.75$). In the large US markets total generation is positively correlated (0.68 to 0.73): high demand brings fossil peakers online. In the cold European grids low temperature raises intensity (Finland $-0.58$). The autocorrelation of carbon intensity shows daily peaks persisting past seven days, supporting the 168 hour lookback.
+import-weighted partner intensity correlates 0.83 with the consumption-minus-production gap over about 42{,}800 importing hours. Higher renewable share lowers intensity everywhere, most extremely in Singapore ($-0.99$, solar displacing gas, reinforced by shortwave radiation at $-0.75$). In the large US markets total generation is positively correlated (0.68 to 0.73): high demand brings fossil peakers online. In the cold European grids low temperature raises intensity (Finland $-0.58$). The autocorrelation of carbon intensity shows daily peaks persisting past seven days, consistent with the 168-hour lookback inherited from CarbonCast~\cite{maji2022carboncast}.
 
 \begin{figure}[H]
     \centering
@@ -584,7 +585,8 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
 The two-tier structure does not earn its complexity. For the consumption target
 the single-tier model wins in every zone, often by a wide margin. For the
 production target it wins or ties everywhere; the two-tier model is marginally
-ahead only in PJM, within the run-to-run noise band, while it is
+ahead only in PJM, within the run-to-run noise band (0.27 MAPE points, inside both
+models' seed standard deviation; Table~\ref{tab:structural}), while it is
 much worse in Finland. On PJM the two-tier production model reaches 6.04 MAPE,
 broadly consistent with the published CarbonCast lifecycle result (5.29).\footnote{Four confounders prevent a strict comparison: different test period (May~2026 versus the original 2021 evaluation), different data source (Electricity Maps versus the University of Chicago dataset), different training vintage (2021--2026 versus 2019--2021), and potentially different emission factors.} This is consistent with the Tier~1 diagnostic in
 Section~\ref{sec:findings}: the Tier~1 production forecasts are imperfect, and
@@ -676,7 +678,8 @@ the Electricity Maps consumption-based forecast and the matching weather forecas
 for each zone, then scored against the realized carbon intensity once it settled.
 Because the academic forecast is capped at roughly 24 hours
 (Section~\ref{sec:other-limits}), Test~B is evaluated on the 1 to 24 hour band, and
-we restrict the scored origins so each horizon ends on settled actuals.
+we restrict the scored origins so each horizon ends on settled actuals,
+yielding approximately 40 scored origins per zone.
 
 Table~\ref{tab:testb-struct} repeats the structural comparison on this second
 window. The result is the same as on Test~A: the single-tier consumption model
