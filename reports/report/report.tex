@@ -159,8 +159,9 @@ GFS~\cite{noaagfs} for forecasts) for weather, over January 2021 through May 202
 \end{equation}
 
 where $E_{i,t}$ is the generation of source $i$ in hour $t$ and $\mathrm{CEF}_i$ its
-emission factor from CarbonCast Table~1. We take the lifecycle (scope~3) factors as
-the primary target and keep the direct (scope~2) factors as a variant. We treat
+emission factor from CarbonCast Table~1, in gCO$_2$eq/kWh. All carbon intensity
+values throughout this paper are in gCO$_2$eq/kWh. We take the lifecycle (scope~3)
+factors as the primary target and keep the direct (scope~2) factors as a variant. We treat
 emission factors as fixed constants following CarbonCast; updating them to reflect
 capacity-vintage changes over 2022--2026 is left for future work. This signal
 ignores imports and exports by construction. The \emph{consumption-based} intensity,
@@ -814,18 +815,18 @@ single-tier baseline.
 \label{sec:other-limits}
 
 \textbf{Test set involvement in window selection.} The per-zone training windows
-(Finland 2023, Belgium 2024) were chosen by observing accuracy on both Test~A and
-Test~B (Section~\ref{sec:findings}). Neither test set is therefore a fully
-independent held-out evaluation for the window hypothesis. The window result is
-reported as a diagnostic and design finding, not as a validated generalization to
-unseen data.
+(Finland and Belgium both 2024-onward; stable grids full history) were chosen by
+observing accuracy on both Test~A and Test~B (Section~\ref{sec:findings}). Neither
+test set is therefore a fully independent held-out evaluation for the window
+hypothesis. The window result is reported as a diagnostic and design finding, not as
+a validated generalization to unseen data.
 
 \textbf{Weather optimism in the head-to-head.} Our Test~B models were replayed
-on actual realized weather while Electricity Maps used a real forecast. The
-magnitude of this advantage is unquantified; it is plausible that the Finland
-result --- our only outright win --- would not survive a fair weather-matched
-replay. A faithful replay on the captured weather forecasts is listed as a next
-step (Section~\ref{sec:conclusion}).
+on actual realized weather while Electricity Maps used a real forecast at issue
+time. Because Electricity Maps already leads in all five zones under this optimistic
+condition, a fair weather-matched replay would widen every gap further. The
+magnitude of this systematic bias is unquantified. A faithful replay on the
+captured weather forecasts is listed as a next step (Section~\ref{sec:conclusion}).
 
 \textbf{Flow ablation scope.} The cross-border flow ablation
 (Section~\ref{sec:flowcompare}) was run on the two-tier consumption model only,
