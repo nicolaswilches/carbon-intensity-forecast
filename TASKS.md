@@ -14,8 +14,27 @@ Report content-complete on `main`. Per-zone training window merged (PR #3).
 - [x] Poster content doc: `reports/poster/poster_content.md` (A0 layout + copy + figure plan).
 - [ ] USER-SIDE: sync `main` -> Overleaf, compile, verify layout (no local LaTeX).
 - [ ] HF Hub: upload models (incl E2, now saved) + preds; make repo public; link in README.
-- [ ] Poster: build A0 in Figma from the content doc; export chosen figures as SVG.
+- [ ] Poster: `reports/poster/poster.html` built; add real QR codes once repo public; print to A0 PDF from Chrome.
 - [ ] FUTURE: faithful GFS-weather head-to-head (drop perfect-weather caveat); longer Test B; broader per-zone-window study.
+
+## Report polish — adversarial review flags (see memory/project_report_flags.md)
+
+High:
+- [ ] H1: Soften CarbonCast reproduction language ("broadly consistent", add confounder footnote) — §abstract, §8.1, conclusion
+Medium:
+- [ ] M1: Add seed min/max or std to tab:structural and tab:flow tables
+- [ ] M2: Add implementation details paragraph (hyperparameters) to §5 Methodology
+- [ ] M3: Add 1-2 sentence mechanistic explanation for flat error-by-horizon in §8.3
+- [ ] M4: Make two-tier failure causal chain explicit in §9.1 Discussion
+- [ ] M5: Soften "EnsembleCI is strongest prior art" in §2 Related Work
+- [ ] M6: Add "descriptively associated with" qualifier to atlas heterogeneity claims
+Low:
+- [ ] L1: Add BE May 2026 nuclear outage data source or figure to §9.1
+- [ ] L2: Add code/data availability statement (GitHub URL + MIT license) to §1
+- [ ] L3: Fix incomplete sentence in §4.6 correlation subsection
+- [ ] L4: Soften NYIS "replaced almost entirely by gas" to match EIA citation scope
+- [ ] L5: Add sentence acknowledging fixed 2022 CEF values in §3
+- [ ] L6: Enumerate or describe the 20 external partner zones in §3
 
 Standing rule: commit + push report changes to main immediately (memory: feedback_report_autocommit).
 
