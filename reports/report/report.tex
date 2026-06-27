@@ -550,9 +550,7 @@ Figures~\ref{fig:framework-prod} and~\ref{fig:framework-cons}, with
 Table~\ref{tab:structural}, compare the single-tier and two-tier models on both targets, per zone. The single-tier model is the same Tier~2 network with no Tier~1 forecast channels. Production and consumption MAPE are computed on different target series, so the two are compared only within each target, not across.
 
 \begin{table}[H]
-    \caption{Structural comparison: MAPE (\%), Test A, validation-selected. Lower is
-    better; the better of each single/two-tier pair is bold. Subscripts show the
-    standard deviation across three training seeds.}
+    \caption{MAPE (\%), Test A, validation-selected. Subscripts show the standard deviation across three training seeds.}
     \label{tab:structural}
     \begin{tabular}{lrrrr}
     \toprule
@@ -572,14 +570,14 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{results_framework_prod.pdf}
-    \caption{Per-zone Test A accuracy (MAPE) of the single-tier and two-tier models on the production-based target.}
+    \caption{Per-zone Test A accuracy (MAPE) of models on production-based target.}
     \label{fig:framework-prod}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{results_framework_cons.pdf}
-    \caption{Per-zone Test A accuracy (MAPE) of the single-tier and two-tier models on the consumption-based target.}
+    \caption{Per-zone Test A accuracy (MAPE) of models on consumption-based target.}
     \label{fig:framework-cons}
 \end{figure}
 
