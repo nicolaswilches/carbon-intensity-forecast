@@ -45,21 +45,20 @@ def _mape(framework: str) -> dict:
 
 def build_one(single_csv: str, two_csv: str, out_name: str, legend: bool = True) -> None:
     s, t = _mape(single_csv), _mape(two_csv)
-    labels = [LABEL[z] for z in ZONES]
+    x = [LABEL[z] for z in ZONES]
     fig = go.Figure()
-    fig.add_trace(go.Bar(y=labels, x=[s[z] for z in ZONES], name="single-tier",
-                         orientation="h", marker_color=SINGLE_C,
+    fig.add_trace(go.Bar(x=x, y=[s[z] for z in ZONES], name="single-tier",
+                         marker_color=SINGLE_C,
                          text=[f"{s[z]:.1f}" for z in ZONES], textposition="outside",
                          textfont=dict(size=P.REPORT_FONT - 3), cliponaxis=False))
-    fig.add_trace(go.Bar(y=labels, x=[t[z] for z in ZONES], name="two-tier",
-                         orientation="h", marker_color=TWOTIER_C,
+    fig.add_trace(go.Bar(x=x, y=[t[z] for z in ZONES], name="two-tier",
+                         marker_color=TWOTIER_C,
                          text=[f"{t[z]:.1f}" for z in ZONES], textposition="outside",
                          textfont=dict(size=P.REPORT_FONT - 3), cliponaxis=False))
-    fig.update_xaxes(title_text="MAPE (%)")
-    fig.update_yaxes(autorange="reversed")
+    fig.update_yaxes(title_text="MAPE (%)")
     # bargroupgap=0 so the two bars in a region touch; bargap separates regions.
     fig.update_layout(barmode="group", bargap=0.35, bargroupgap=0.0)
-    P.style_report_fig(fig, span="column", height=240, legend=legend)
+    P.style_report_fig(fig, span="column", height=216, legend=legend)
     if legend:
         fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",
                                       y=1.04, yanchor="bottom"))
