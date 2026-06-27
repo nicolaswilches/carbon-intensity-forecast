@@ -105,7 +105,7 @@ footprint also depends on the electricity it imports from its neighbors and on h
 that imported power was generated. The signal a carbon-aware scheduler actually
 needs is \emph{consumption-based} carbon intensity, which accounts for the carbon
 embedded in imported electricity rather than only the \emph{production-based}
-intensity of locally generated power that most academic forecasters target.
+intensity of locally generated power that academic forecasting work has predominantly targeted~\cite{maji2022carboncast,yan2025ensembleci}.
 
 This project extends previous carbon intensity forecasting frameworks to the
 consumption-based target by modeling the net energy exchange between five zones and
@@ -160,8 +160,7 @@ GFS~\cite{noaagfs} for forecasts) for weather, over January 2021 through May 202
 
 where $E_{i,t}$ is the generation of source $i$ in hour $t$ and $\mathrm{CEF}_i$ its
 emission factor from CarbonCast Table~1, in gCO$_2$eq/kWh. All carbon intensity
-values throughout this paper are in gCO$_2$eq/kWh. We take the lifecycle (scope~3)
-factors as the primary target and keep the direct (scope~2) factors as a variant. We treat
+values throughout this paper are in gCO$_2$eq/kWh. We take the lifecycle (scope~3) factors as the target. We treat
 emission factors as fixed constants following CarbonCast; updating them to reflect
 capacity-vintage changes over 2022--2026 is left for future work. This signal
 ignores imports and exports by construction. The \emph{consumption-based} intensity,
@@ -254,10 +253,11 @@ and source.
 
 \begin{itemize}
 \item \textbf{Belgium:} nuclear falls sharply, 52\% to 33\%, while solar nearly
-triples (5\% to 15\%) and wind grows (12\% to 18\%); gas holds near 20\%. This tracks
-the country's legislated nuclear phase-out, the 2003 federal law that capped reactor
-lifetimes and barred new build; the IEA warned that retiring this firm, low-carbon
-capacity would raise the carbon intensity of Belgian electricity~\cite{iea2022belgium}, which is exactly what the data show. Firm nuclear is giving way to weather-driven renewables that gas must back up, so Belgium's intensity both rises and swings with wind and sunlight. It is the largest structural change in the set and the root of Belgium's forecasting difficulty later in the paper.
+triples (5\% to 15\%) and wind grows (12\% to 18\%); gas holds near 20\%. This reflects the country's nuclear phase-out trajectory: the 2003 federal law capped
+reactor lifetimes, and although a 2022 government decision extended two reactors by
+ten years, most capacity was already curtailed during our study window; the IEA warned
+that retiring this firm, low-carbon capacity would raise the carbon intensity of Belgian
+electricity~\cite{iea2022belgium}, which is exactly what the data show. Firm nuclear is giving way to weather-driven renewables that gas must back up, so Belgium's intensity both rises and swings with wind and sunlight. It is the largest structural change in the set and the root of Belgium's forecasting difficulty later in the paper.
 
 \item \textbf{Finland:} wind more than doubles (12\% to 27\%) and nuclear edges up
 (36\% to 39\%), while coal collapses (11\% to 2\%) and gas all but disappears (7\%
@@ -464,7 +464,7 @@ poor solution. On Belgium the seed-to-seed spread in percentage error exceeded t
 size of any plausible modeling improvement.
 
 \textbf{Seeding and validation-based selection.} We fixed the random seed for
-reproducibility and adopted a selection rule: train several seeds and keep the one
+reproducibility and adopted a selection rule: train three seeds and keep the one
 with the best \emph{validation} score, never the test score. This removes the seed
 lottery, because a divergent seed also scores poorly on validation.
 
@@ -605,11 +605,13 @@ across seeds, and compare on Test~A. Table~\ref{tab:flow} reports the result.
 
 \begin{table}[H]
     \caption{Cross-border inputs off versus on: consumption-based two-tier MAPE (\%) on
-    Test~A, averaged across seeds. Computed on the full-window models; the per-zone
-    window choice does not change the conclusion. The Finland flows-on/off difference
-    (12.03 vs.\ 12.63, i.e.\ 0.6 MAPE points) is smaller than the seed standard
-    deviation of either model (Table~\ref{tab:structural}), placing it within the
-    run-to-run noise band.}
+    Test~A, averaged across three seeds. Computed on the full-window models; the
+    per-zone window choice does not change the conclusion. The flows-off column is the
+    single-tier consumption model with no dynamic channels; its seed-averaged values
+    differ from the validation-selected values in Table~\ref{tab:structural} because
+    aggregation method and training window differ. The Finland flows-on/off difference
+    (0.6 MAPE points) is smaller than the seed standard deviation of either model
+    (Table~\ref{tab:structural}), placing it within the run-to-run noise band.}
     \label{tab:flow}
     \begin{tabular}{lrr}
     \toprule
@@ -827,6 +829,13 @@ time. Because Electricity Maps already leads in all five zones under this optimi
 condition, a fair weather-matched replay would widen every gap further. The
 magnitude of this systematic bias is unquantified. A faithful replay on the
 captured weather forecasts is listed as a next step (Section~\ref{sec:conclusion}).
+
+\textbf{Out-of-fold training on short windows.} Finland and Belgium train from
+2024-onward, giving roughly one calendar year of data. The leave-one-year-out
+out-of-fold scheme used to generate Tier~1 training forecasts for Tier~2 therefore
+reduces to a single train/predict split rather than a true cross-validation, making
+the out-of-fold forecasts less representative of Tier~1's inference-time error profile
+than on the stable grids with five years of history.
 
 \textbf{Flow ablation scope.} The cross-border flow ablation
 (Section~\ref{sec:flowcompare}) was run on the two-tier consumption model only,
