@@ -79,8 +79,8 @@ accuracy: the model is as good or better without them in four of five zones.
 
 On a held-out May 2026 test month, consumption-based accuracy ranges from under 1\% MAPE in near-islanded Singapore to roughly 6\% in the large US markets, with Belgium the hard case, a distribution shift that training on recent data only partly closes. Our central finding is that the two-tier structure does not earn its complexity: a single-tier network that forecasts carbon intensity directly matches or beats the two-tier
 model in every zone, because imperfect first-tier generation forecasts inject more
-noise than signal. On PJM the production-based two-tier model reproduces the
-published CarbonCast result (6.0 versus 5.3 MAPE), validating the reproduction.
+noise than signal. On PJM the production-based two-tier model is broadly consistent
+with the published CarbonCast result (6.0 versus 5.3 MAPE).
 \end{abstract}
 
 
@@ -115,6 +115,7 @@ The contribution is not introducing consumption-based forecasting as a target,
 since operational systems already exist, but opening a closed method, measuring
 the role of energy interconnector flows, characterizing where forecasts succeed and
 fail across diverse grids, and providing a reproducible benchmark.
+Code and trained models are available at \url{https://github.com/nicolaswilches/carbon-intensity-forecast} under the MIT license.
 % / 1. Introduction
 
 
@@ -126,8 +127,8 @@ per-source feedforward artificial neural networks (ANNs) that forecast generatio
 
 \textbf{EnsembleCI}~\cite{yan2025ensembleci} is an adaptive ensemble that improves on
 CarbonCast for production-based carbon intensity across eleven grids including PJM,
-but does not use interconnector flows. It is the strongest production-based prior
-art.
+but does not use interconnector flows. It is a strong production-based prior art,
+reporting lower MAPE than CarbonCast on PJM.
 
 \textbf{Electricity Maps operational forecast}~\cite{electricitymaps2025forecast} (productionized January 2025)
 provides flow-traced, consumption-based carbon intensity forecasts across more
@@ -159,7 +160,9 @@ GFS~\cite{noaagfs} for forecasts) for weather, over January 2021 through May 202
 
 where $E_{i,t}$ is the generation of source $i$ in hour $t$ and $\mathrm{CEF}_i$ its
 emission factor from CarbonCast Table~1. We take the lifecycle (scope~3) factors as
-the primary target and keep the direct (scope~2) factors as a variant. This signal
+the primary target and keep the direct (scope~2) factors as a variant. We treat
+emission factors as fixed constants following CarbonCast; updating them to reflect
+capacity-vintage changes over 2022--2026 is left for future work. This signal
 ignores imports and exports by construction. The \emph{consumption-based} intensity,
 our main target, is not recomputed: we use the flow-traced value Electricity Maps
 reports, which already accounts for the carbon embedded in imported electricity. The
@@ -167,7 +170,9 @@ cross-border information enters the forecasting model as input features, the
 per-partner carbon intensity and net interconnector flows introduced below, rather
 than as an additional term in a carbon-intensity formula. For each zone we also
 collect the carbon intensity history of its interconnector partners (twenty external
-zones), used as a consumption-based feature.
+zones, the direct physical neighbors identified by Electricity Maps' interconnector
+topology and derived automatically from the flow columns in the extracted data),
+used as a consumption-based feature.
 
 The five zones were chosen for structural diversity: a large multi-state US market
 (PJM), a smaller US market with heavy hydro imports (NYIS), a Nordic grid
@@ -283,7 +288,7 @@ easy to model.
 \item \textbf{US-NY-NYIS:} gas grows (48\% to 53\%) while both low-carbon sources
 recede, nuclear 25\% to 21\% and hydro 22\% to 18\%, with wind only 3\% to 5\%. The
 nuclear drop lines up with the 2021 retirement of Indian Point, whose roughly 2~GW of
-low-carbon output was replaced almost entirely by new gas plants~\cite{eia2021indianpoint}. Here the trend runs the wrong way: as nuclear
+low-carbon output was largely replaced by fossil gas generation~\cite{eia2021indianpoint}. Here the trend runs the wrong way: as nuclear
 capacity leaves and hydro's share slips, gas fills the gap and intensity climbs, with
 renewables not yet scaling fast enough to offset the lost low-carbon generation.
 \end{itemize}
@@ -353,7 +358,6 @@ absolute intensity barely moves. The two US grids show a strong, recurring band 
 % 4.6. Feature relationships and correlations
 \subsection{Feature relationships and correlations}
 
-To understand how predictors relate to our target variable, we visualized the 
 Consistent and interpretable signal. Production intensity is the dominant
 predictor everywhere (0.86 to 1.00). Partner carbon intensity is strong (0.71 to
 0.81) in every connected grid and weak only in islanded Singapore (0.38),
@@ -408,6 +412,9 @@ channels, predicting carbon intensity directly from its own history plus weather
 and calendar. Because the network is identical, the comparison isolates the
 contribution of the two-tier design.
 
+% 5.4. Implementation details
+\subsection{Implementation details}
+Tier~2 uses Conv1D(4, kernel\,4) $\to$ MaxPooling1D(2) $\to$ Conv1D(16, kernel\,4) $\to$ LSTM(24) $\to$ Dropout(0.1) $\to$ Dense(96). Tier~1 source and flow ANNs use a Dense(50 $\to$ 34 $\to$ 24 $\to$ 96) stack with ReLU activations. All networks use RMSE loss, Adam (learning rate 0.001, gradient clipping norm 1.0), batch size 32, and early stopping on validation loss with patience 10 over a maximum of 100 epochs. The Tier~2 input sequence spans 264 timesteps (168-hour lookback plus 96-hour forecast horizon). Tier~1 networks are trained independently per source and per interconnector.
 
 % 6. Experimental Setup
 \section{Experimental Setup}
@@ -537,7 +544,8 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
 
 \begin{table}[H]
     \caption{Structural comparison: MAPE (\%), Test A, validation-selected. Lower is
-    better; the better of each single/two-tier pair is bold.}
+    better; the better of each single/two-tier pair is bold. Subscripts show the
+    standard deviation across three training seeds.}
     \label{tab:structural}
     \begin{tabular}{lrrrr}
     \toprule
@@ -545,11 +553,11 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
     \cmidrule(lr){2-3}\cmidrule(lr){4-5}
     Zone & single & two-tier & single & two-tier \\
     \midrule
-    Singapore   & \textbf{0.68}  & 0.72  & \textbf{0.71}  & 0.90 \\
-    US-MIDA-PJM & 6.31  & \textbf{6.04}  & \textbf{5.93}  & 8.30 \\
-    US-NY-NYIS  & \textbf{6.37}  & 8.90  & \textbf{5.98}  & 7.03 \\
-    Finland     & \textbf{18.65} & 22.90 & \textbf{13.81} & 15.00 \\
-    Belgium     & \textbf{29.79} & 34.67 & \textbf{31.13} & 32.44 \\
+    Singapore   & \textbf{0.68}$_{\pm0.1}$  & 0.72$_{\pm0.1}$  & \textbf{0.71}$_{\pm0.1}$  & 0.90$_{\pm0.1}$ \\
+    US-MIDA-PJM & 6.31$_{\pm0.7}$  & \textbf{6.04}$_{\pm1.2}$  & \textbf{5.93}$_{\pm1.0}$  & 8.30$_{\pm0.4}$ \\
+    US-NY-NYIS  & \textbf{6.37}$_{\pm0.3}$  & 8.90$_{\pm1.1}$  & \textbf{5.98}$_{\pm0.8}$  & 7.03$_{\pm1.4}$ \\
+    Finland     & \textbf{18.65}$_{\pm2.2}$ & 22.90$_{\pm4.9}$ & \textbf{13.81}$_{\pm1.9}$ & 15.00$_{\pm15}$ \\
+    Belgium     & \textbf{29.79}$_{\pm3.4}$ & 34.67$_{\pm6.8}$ & \textbf{31.13}$_{\pm2.8}$ & 32.44$_{\pm7.2}$ \\
     \bottomrule
     \end{tabular}
 \end{table}
@@ -577,8 +585,7 @@ the single-tier model wins in every zone, often by a wide margin. For the
 production target it wins or ties everywhere; the two-tier model is marginally
 ahead only in PJM, within the run-to-run noise band, while it is
 much worse in Finland. On PJM the two-tier production model reaches 6.04 MAPE,
-reproducing the published CarbonCast lifecycle result (5.29) and validating our
-reproduction. This is consistent with the Tier~1 diagnostic in
+broadly consistent with the published CarbonCast lifecycle result (5.29).\footnote{Four confounders prevent a strict comparison: different test period (May~2026 versus the original 2021 evaluation), different data source (Electricity Maps versus the University of Chicago dataset), different training vintage (2021--2026 versus 2019--2021), and potentially different emission factors.} This is consistent with the Tier~1 diagnostic in
 Section~\ref{sec:findings}: the Tier~1 production forecasts are imperfect, and
 feeding them into Tier~2 adds noise rather than signal (Table~\ref{tab:tier1}). It
 does not contradict CarbonCast, whose two-tier advantage is staying accurate when
@@ -598,7 +605,10 @@ across seeds, and compare on Test~A. Table~\ref{tab:flow} reports the result.
 \begin{table}[H]
     \caption{Cross-border inputs off versus on: consumption-based two-tier MAPE (\%) on
     Test~A, averaged across seeds. Computed on the full-window models; the per-zone
-    window choice does not change the conclusion.}
+    window choice does not change the conclusion. The Finland flows-on/off difference
+    (12.03 vs.\ 12.63, i.e.\ 0.6 MAPE points) is smaller than the seed standard
+    deviation of either model (Table~\ref{tab:structural}), placing it within the
+    run-to-run noise band.}
     \label{tab:flow}
     \begin{tabular}{lrr}
     \toprule
@@ -629,6 +639,11 @@ Figures~\ref{fig:horizon-mape} and~\ref{fig:horizon-mae} trace per-zone error, a
 MAPE and MAE, across the full 1 to 96 hour
 horizon. Error does not simply grow with lead time; for every zone the curve stays
 roughly flat, so the day-ahead band is not markedly better than the four-day band.
+This behavior follows from two properties of the model and signal. First, the
+direct 96-step head predicts all horizons in a single forward pass rather than by
+chaining shorter windows, so forecast error cannot compound across steps. Second,
+carbon intensity carries a strong autocorrelation that persists well beyond one day
+(Section~4.6), giving the model a stable signal at the long end of the horizon.
 Belgium sits highest throughout, near 30\%, with the other four well below. Because
 the curves are nearly flat, the 1 to 24 hour band of the Electricity Maps
 head-to-head (Section~\ref{sec:testb}) is no worse than the longer horizons.
@@ -725,7 +740,12 @@ Section~\ref{sec:other-limits} lists this as a remaining limitation.
 
 \subsection{Tier 1 forecast quality and the two-tier structure}
 A single-tier model that ignores Tier~1 entirely matches or beats the two-tier
-model. Inspecting Tier~1 directly explains why. Table~\ref{tab:tier1} reports the
+model. The causal chain is straightforward: the two-tier model passes Tier~1
+generation forecasts as additional input channels to Tier~2, while the single-tier
+model uses no generation channels at all. If those Tier~1 forecasts are inaccurate,
+they inject noise rather than signal into Tier~2. The single-tier model, carrying
+no such noisy inputs, is insulated from Tier~1 error. That it wins is therefore
+consistent with, and predicted by, the Tier~1 error diagnostic that follows. Inspecting Tier~1 directly explains why. Table~\ref{tab:tier1} reports the
 normalized RMSE (RMSE over the mean) of the total-generation forecast by horizon,
 and Figures~\ref{fig:tier1-horizon} and~\ref{fig:tier1-pred} visualize it. The
 takeaway is the same in every view: the Tier~1 generation forecasts are not accurate
@@ -760,7 +780,8 @@ permanently retires capacity, both producing abrupt step changes in nuclear outp
 that no feature anticipates: the source network sees only past nuclear generation
 and the calendar, with no outage schedule or available-capacity signal. In May 2026,
 our Test~A month, Belgian nuclear sat at zero for a full outage the model cannot
-foresee, which distorts the entire generation mix and the carbon intensity derived
+foresee (confirmed from the Electricity Maps power-breakdown data used throughout
+this study), which distorts the entire generation mix and the carbon intensity derived
 from it. Feeding production this noisy into Tier~2 is why Belgium's two-tier model
 is far worse than its single-tier one, and the damage starts at the shortest
 horizon. Singapore is
@@ -819,16 +840,17 @@ to the 1 to 24 hour band.
 \label{sec:conclusion}
 We built an open, reproducible deep learning framework for short-horizon
 consumption-based carbon intensity forecasting and evaluated it across five
-structurally diverse grids. The framework reproduces the closed CarbonCast
+structurally diverse grids. The framework is broadly consistent with the closed CarbonCast
 method as a production-based baseline, with the PJM two-tier model landing at
 6.0 MAPE against the published 5.3, and extends it to a consumption-based target
 with explicit cross-border flow and partner carbon intensity inputs.
 
-Two results stand out. First, the per-region atlas shows wide, structurally
-explained variation across regions: a tight high-carbon island grid (Singapore) is trivial to
-forecast, the large US markets sit near 6\% MAPE, and the small import-heavy,
-rapidly decarbonizing European grids are hardest, with Belgium the clear failure
-case driven by a May 2026 distribution shift. Both transitioning grids use a 2024 onward training window, motivated by their
+Two results stand out. First, the per-region atlas shows wide variation across
+regions that is descriptively consistent with each grid's structural characteristics:
+a tight high-carbon island grid (Singapore) is trivial to forecast, the large US
+markets sit near 6\% MAPE, and the small import-heavy, rapidly decarbonizing
+European grids are hardest, with Belgium the clear failure case driven by a May 2026
+distribution shift. Both transitioning grids use a 2024 onward training window, motivated by their
 documented regime shifts: recency helps a grid in rapid transition, while the
 stable grids still do best on full history.
 Second, the structural comparison overturns the assumption behind the two-tier
