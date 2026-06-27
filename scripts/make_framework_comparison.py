@@ -43,32 +43,34 @@ def _mape(framework: str) -> dict:
     return {z: float(df.loc[z, "test_mape"]) for z in ZONES}
 
 
-def build_one(single_csv: str, two_csv: str, out_name: str) -> None:
+def build_one(single_csv: str, two_csv: str, out_name: str, legend: bool = True) -> None:
     s, t = _mape(single_csv), _mape(two_csv)
-    x = [LABEL[z] for z in ZONES]
+    labels = [LABEL[z] for z in ZONES]
     fig = go.Figure()
-    fig.add_trace(go.Bar(x=x, y=[s[z] for z in ZONES], name="single-tier",
-                         marker_color=SINGLE_C,
+    fig.add_trace(go.Bar(y=labels, x=[s[z] for z in ZONES], name="single-tier",
+                         orientation="h", marker_color=SINGLE_C,
                          text=[f"{s[z]:.1f}" for z in ZONES], textposition="outside",
                          textfont=dict(size=P.REPORT_FONT - 3), cliponaxis=False))
-    fig.add_trace(go.Bar(x=x, y=[t[z] for z in ZONES], name="two-tier",
-                         marker_color=TWOTIER_C,
+    fig.add_trace(go.Bar(y=labels, x=[t[z] for z in ZONES], name="two-tier",
+                         orientation="h", marker_color=TWOTIER_C,
                          text=[f"{t[z]:.1f}" for z in ZONES], textposition="outside",
                          textfont=dict(size=P.REPORT_FONT - 3), cliponaxis=False))
-    fig.update_yaxes(title_text="MAPE (%)")
+    fig.update_xaxes(title_text="MAPE (%)")
+    fig.update_yaxes(autorange="reversed")
     # bargroupgap=0 so the two bars in a region touch; bargap separates regions.
     fig.update_layout(barmode="group", bargap=0.35, bargroupgap=0.0)
-    P.style_report_fig(fig, span="column", height=300, legend=True)
-    fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",
-                                  y=1.04, yanchor="bottom"))
+    P.style_report_fig(fig, span="column", height=240, legend=legend)
+    if legend:
+        fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",
+                                      y=1.04, yanchor="bottom"))
     out = os.path.join(FIGS, out_name)
     fig.write_image(out)
     print("wrote", out)
 
 
 def build() -> None:
-    for single_csv, two_csv, out_name in TARGETS:
-        build_one(single_csv, two_csv, out_name)
+    build_one("single_prod", "e2_prod",   "results_framework_prod.pdf", legend=True)
+    build_one("single_cons", "e3_cons",   "results_framework_cons.pdf", legend=False)
 
 
 if __name__ == "__main__":
