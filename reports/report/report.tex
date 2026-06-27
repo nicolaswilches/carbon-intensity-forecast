@@ -529,14 +529,22 @@ Figure~\ref{fig:fva} shows how the single-tier and two-tier day-ahead forecasts 
 the actual across zones, on the production and consumption targets; the two-tier
 models, Finland's production most of all, are visibly noisier.
 
-\begin{figure*}[tbp]
+\begin{figure}[tbp]
     \centering
-    \includegraphics[width=\textwidth]{results_fva_frameworks.pdf}
-    \caption{Day-ahead (24 hour) forecast versus actual over Test A. Rows are zones; the
-    left column is the production-based target, the right the consumption-based target. In each cell the actual is gray, with the single-tier (orange) and two-tier (blue)
-    forecasts overlaid. The two columns are different series and not cross-comparable. The two-tier forecasts are visibly more erratic, most extreme for Finland.}
+    \includegraphics[width=\columnwidth]{results_fva_prod.pdf}
+    \caption{Day-ahead (24 hour) forecast versus actual over Test A, production-based target.
+    Rows are zones; actual is gray, single-tier (orange) and two-tier (blue) overlaid.
+    The two-tier forecasts are visibly more erratic, most extreme for Finland.}
+    \label{fig:fva-prod}
+\end{figure}
+
+\begin{figure}[tbp]
+    \centering
+    \includegraphics[width=\columnwidth]{results_fva_cons.pdf}
+    \caption{Day-ahead (24 hour) forecast versus actual over Test A, consumption-based target.
+    Same layout as Figure~\ref{fig:fva-prod}; series are not cross-comparable across the two figures.}
     \label{fig:fva}
-\end{figure*}
+\end{figure}
 
 
 % §8.1 Comparing the four frameworks

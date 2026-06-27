@@ -1,9 +1,9 @@
-"""Day-ahead forecast vs actual (Results), one single-column figure per target.
+"""Day-ahead forecast vs actual (Results), one full-width figure per target.
 
-Two 5x1 small-multiple stacks (rows are zones), one for the production-based target
-and one for the consumption-based target. Within each cell the actual is gray and
-the single-tier and two-tier forecasts overlay it, at the 24-hour-ahead horizon over
-Test A. Each figure is sized for \\columnwidth (the document's two-column layout).
+Two separate figures (production-based and consumption-based), each a 5x1
+small-multiple stack (rows = zones). Within each cell the actual is gray and
+the single-tier and two-tier forecasts overlay it, at the 24-hour-ahead horizon
+over Test A.
 
     .venv/bin/python scripts/make_fva_frameworks.py
 """
@@ -29,10 +29,10 @@ LABEL = {"BE": "BE", "FI": "FI", "SG": "SG",
          "US-MIDA-PJM": "PJM", "US-NY-NYIS": "NYIS"}
 H = 24  # day-ahead horizon (index H-1)
 ACTUAL_C, SINGLE_C, TWO_C = "#7F7F7F", "#E05312", "#129FE0"
-# Columns of the combined full-width grid: (title, single-tier dir, two-tier dir).
-# The per-zone-window final preds (full history for SG/NYIS/PJM, 2024 for FI/BE).
-COLS = [("Production-based CI", "preds_final_single_prod", "preds_final_e2_prod"),
-        ("Consumption-based CI", "preds_final_single_cons", "preds_final_e3_cons")]
+TARGETS = [
+    ("prod", "preds_final_single_prod", "preds_final_e2_prod",  "results_fva_prod.pdf"),
+    ("cons", "preds_final_single_cons", "preds_final_e3_cons", "results_fva_cons.pdf"),
+]
 
 
 def _load(subdir: str, zone: str):
@@ -41,31 +41,34 @@ def _load(subdir: str, zone: str):
     return t, d["preds"][:, H - 1], d["y_true"][:, H - 1]
 
 
-def build() -> None:
-    """One full-width figure: rows = zones, left column production, right consumption."""
-    titles = [f"{LABEL[z]} ({'prod' if c == 0 else 'cons'})"
-              for z in ZONES for c in range(2)]
-    fig = make_subplots(rows=len(ZONES), cols=2, subplot_titles=titles,
-                        vertical_spacing=0.045, horizontal_spacing=0.08)
+def build_one(single_dir: str, two_dir: str, out_name: str) -> None:
+    """5x1 figure for one target (production or consumption)."""
+    fig = make_subplots(rows=len(ZONES), cols=1,
+                        subplot_titles=[LABEL[z] for z in ZONES],
+                        vertical_spacing=0.055)
     first = True
     for r, z in enumerate(ZONES, start=1):
-        for c, (_, single_dir, two_dir) in enumerate(COLS, start=1):
-            t, single, actual = _load(single_dir, z)
-            _, two, _ = _load(two_dir, z)
-            fig.add_trace(go.Scatter(x=t, y=actual, mode="lines", name="actual",
-                          line=dict(color=ACTUAL_C, width=0.9), showlegend=first), row=r, col=c)
-            fig.add_trace(go.Scatter(x=t, y=single, mode="lines", name="single-tier",
-                          line=dict(color=SINGLE_C, width=0.9), showlegend=first), row=r, col=c)
-            fig.add_trace(go.Scatter(x=t, y=two, mode="lines", name="two-tier",
-                          line=dict(color=TWO_C, width=0.9), showlegend=first), row=r, col=c)
-            first = False
-    P.style_report_fig(fig, span="full", height=760, legend=True)
+        t, single, actual = _load(single_dir, z)
+        _, two, _ = _load(two_dir, z)
+        fig.add_trace(go.Scatter(x=t, y=actual, mode="lines", name="actual",
+                      line=dict(color=ACTUAL_C, width=0.9), showlegend=first), row=r, col=1)
+        fig.add_trace(go.Scatter(x=t, y=single, mode="lines", name="single-tier",
+                      line=dict(color=SINGLE_C, width=0.9), showlegend=first), row=r, col=1)
+        fig.add_trace(go.Scatter(x=t, y=two, mode="lines", name="two-tier",
+                      line=dict(color=TWO_C, width=0.9), showlegend=first), row=r, col=1)
+        first = False
+    P.style_report_fig(fig, span="column", height=560, legend=True)
     fig.update_xaxes(showticklabels=False)
     fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",
                                   y=1.03, yanchor="bottom"))
-    out = os.path.join(FIGS, "results_fva_frameworks.pdf")
+    out = os.path.join(FIGS, out_name)
     fig.write_image(out)
     print("wrote", out)
+
+
+def build() -> None:
+    for _, single_dir, two_dir, out_name in TARGETS:
+        build_one(single_dir, two_dir, out_name)
 
 
 if __name__ == "__main__":
