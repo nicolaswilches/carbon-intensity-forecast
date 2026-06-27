@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CarbonCast Poster — Nicolás Higuera Wilches</title>
+  <style>
+    @page { size: 841mm 1189mm; margin: 0; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #E05312;
+      --blue:   #129FE0;
+      --gray:   #7F7F7F;
+      --dark:   #1C1C2E;
+      --text:   #1A1A1A;
+      --muted:  #555555;
+      --border: #DDDDDD;
+      --bg-lt:  #F8F8F8;
+      --bg-acc: #FEF6F2;
+    }
+
+    html {
+      background: #888;
+    }
+
+    body {
+      width: 841mm;
+      height: 1189mm;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: white;
+      line-height: 1.35;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transform-origin: top center;
+    }
+
+    /* ── HEADER ───────────────────────────────────────────── */
+    .hdr {
+      background: var(--dark);
+      color: white;
+      padding: 7mm 14mm 6mm;
+      flex-shrink: 0;
+    }
+    .hdr-title {
+      font-size: 13.5mm;
+      font-weight: bold;
+      line-height: 1.15;
+      margin-bottom: 3.5mm;
+    }
+    .hdr-meta {
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      font-size: 4.8mm;
+    }
+    .hdr-author { flex: 1; }
+    .hdr-author .name { font-weight: bold; font-size: 5.3mm; }
+    .hdr-author .aff  { opacity: 0.8; }
+    .hdr-advisor {
+      border-left: 0.4mm solid rgba(255,255,255,0.3);
+      padding-left: 10mm;
+      margin-left: 10mm;
+    }
+    .hdr-advisor .lbl { font-size: 3.8mm; opacity: 0.6; margin-bottom: 1mm; }
+    .hdr-advisor .adv { font-weight: bold; font-size: 5mm; }
+
+    /* ── TAKEAWAY ─────────────────────────────────────────── */
+    .takeaway {
+      flex-shrink: 0;
+      background: var(--bg-acc);
+      border-left: 6mm solid var(--orange);
+      padding: 5mm 14mm;
+      font-size: 8mm;
+      font-weight: 600;
+      line-height: 1.3;
+      color: var(--dark);
+    }
+
+    /* ── BODY ─────────────────────────────────────────────── */
+    .body {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 13mm;
+      padding: 8mm 14mm 6mm;
+    }
+
+    .col { display: flex; flex-direction: column; gap: 6mm; }
+
+    /* ── SECTION ──────────────────────────────────────────── */
+    .sec { display: flex; flex-direction: column; gap: 2.5mm; }
+
+    .sec-title {
+      font-size: 6mm;
+      font-weight: bold;
+      color: var(--dark);
+      border-bottom: 0.7mm solid var(--orange);
+      padding-bottom: 1.2mm;
+      letter-spacing: 0.01em;
+    }
+
+    .sec-body {
+      font-size: 4.6mm;
+      line-height: 1.4;
+    }
+    .sec-body ul  { list-style: disc; padding-left: 5mm; }
+    .sec-body li  { margin-bottom: 1.3mm; }
+    .sec-body strong { color: var(--dark); }
+
+    /* ── FIGURE WRAPPER ───────────────────────────────────── */
+    .fig {
+      border: 0.3mm solid var(--border);
+      border-radius: 1.5mm;
+      overflow: hidden;
+      background: white;
+    }
+    .fig img { width: 100%; height: auto; display: block; }
+    .fig-cap {
+      font-size: 3.6mm;
+      color: var(--muted);
+      padding: 1.8mm 3mm;
+      background: var(--bg-lt);
+      border-top: 0.3mm solid var(--border);
+      line-height: 1.3;
+    }
+
+    /* ── ATLAS TABLE ──────────────────────────────────────── */
+    .atlas { border-collapse: collapse; width: 100%; }
+    .atlas th {
+      background: var(--dark);
+      color: white;
+      padding: 2mm 3.5mm;
+      font-size: 4.3mm;
+      text-align: left;
+    }
+    .atlas td {
+      padding: 2.3mm 3.5mm;
+      font-size: 4.5mm;
+      border-bottom: 0.2mm solid var(--border);
+    }
+    .atlas .big  { font-size: 6.5mm; font-weight: bold; color: var(--orange); }
+    .atlas .zone { font-weight: bold; }
+    .atlas .note { font-size: 3.6mm; color: var(--muted); }
+    .atlas tr.fail td { background: #FEF0EB; }
+
+    /* ── CALLOUT BOX ──────────────────────────────────────── */
+    .callout {
+      background: var(--bg-acc);
+      border-left: 3mm solid var(--orange);
+      padding: 2.8mm 4mm;
+      font-size: 4.4mm;
+      border-radius: 0 1mm 1mm 0;
+      line-height: 1.4;
+    }
+
+    /* ── FOOTER ───────────────────────────────────────────── */
+    .ftr {
+      flex-shrink: 0;
+      background: var(--bg-lt);
+      border-top: 0.8mm solid var(--border);
+      padding: 5mm 14mm;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 0.8fr;
+      gap: 10mm;
+    }
+    .ftr-title { font-size: 4.8mm; font-weight: bold; color: var(--dark); margin-bottom: 2mm; }
+    .ftr-body  { font-size: 3.7mm; line-height: 1.4; color: var(--muted); }
+    .ftr-body ul { list-style: disc; padding-left: 4mm; }
+    .ftr-body li { margin-bottom: 1mm; }
+
+    .qr-row { display: flex; gap: 5mm; margin-top: 2.5mm; }
+    .qr-box {
+      width: 20mm; height: 20mm;
+      border: 0.4mm solid var(--border);
+      border-radius: 1mm;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3mm; color: var(--muted); text-align: center;
+      line-height: 1.3;
+    }
+    .qr-lbl { font-size: 3mm; color: var(--muted); text-align: center; margin-top: 1mm; }
+
+    /* ── ARCH SVG helpers ─────────────────────────────────── */
+    .arch-wrap { padding: 3mm; }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════ HEADER ═══════════════════ -->
+  <div class="hdr">
+    <div class="hdr-title">Open, Reproducible Consumption-Based Carbon Intensity<br>Forecasting with Explicit Cross-Border Flow Modeling</div>
+    <div class="hdr-meta">
+      <div class="hdr-author">
+        <div class="name">Nicolás Higuera Wilches</div>
+        <div class="aff">IE University · School of Science and Technology</div>
+        <div class="aff">MSc Data Science and Business Analytics · Capstone 2026</div>
+      </div>
+      <div class="hdr-advisor">
+        <div class="lbl">Advisor</div>
+        <div class="adv">Prof. Bissan Ghaddar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════ TAKEAWAY ══════════════════ -->
+  <div class="takeaway">
+    A simple model that predicts carbon intensity directly beats the standard two-tier pipeline in every grid tested, and lands within a few percentage points of the closed operational forecast.
+  </div>
+
+  <!-- ═══════════════════════════════ BODY ═════════════════════ -->
+  <div class="body">
+
+    <!-- ─── LEFT COLUMN ──────────────────────────────────────── -->
+    <div class="col">
+
+      <!-- 1. Problem -->
+      <div class="sec">
+        <div class="sec-title">1 &nbsp; Problem and Gap</div>
+        <div class="sec-body">
+          <ul>
+            <li>Compute workloads can shift to cleaner grids and greener hours to cut emissions — but this requires accurate, local carbon intensity (CI) forecasts.</li>
+            <li><strong>Production-based CI</strong> counts only local generation. <strong>Consumption-based CI</strong> also accounts for imported electricity — a truer picture for consumers.</li>
+            <li>Most open forecasters target production-based CI. The one operational system that targets consumption-based CI (Electricity Maps) is <strong>closed-source</strong>.</li>
+            <li>We open the problem: a reproducible deep learning framework, five structurally diverse grids, explicit flow modeling, benchmarked head-to-head against the closed system.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 2. Approach + Architecture -->
+      <div class="sec">
+        <div class="sec-title">2 &nbsp; Approach</div>
+        <div class="sec-body" style="margin-bottom:2.5mm">
+          Five grids: <strong>PJM, NYIS, Finland, Belgium, Singapore.</strong>
+          We compare four framework variants on two CI targets (production and consumption).
+        </div>
+
+        <!-- Architecture SVG -->
+        <div class="fig">
+          <div class="arch-wrap">
+            <svg viewBox="0 0 660 240" xmlns="http://www.w3.org/2000/svg"
+                 font-family="Arial, Helvetica, sans-serif">
+              <defs>
+                <marker id="a-bl" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+                  <path d="M0,0 L0,7 L7,3.5 z" fill="#129FE0"/>
+                </marker>
+                <marker id="a-or" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+                  <path d="M0,0 L0,7 L7,3.5 z" fill="#E05312"/>
+                </marker>
+                <marker id="a-dk" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+                  <path d="M0,0 L0,7 L7,3.5 z" fill="#1C1C2E"/>
+                </marker>
+                <marker id="a-gy" markerWidth="7" markerHeight="7" refX="4" refY="3.5" orient="auto">
+                  <path d="M0,0 L0,7 L7,3.5 z" fill="#999"/>
+                </marker>
+              </defs>
+
+              <!-- ── TWO-TIER (left) ── -->
+              <text x="155" y="16" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#1C1C2E">Two-Tier (CarbonCast + Extension)</text>
+
+              <!-- Source ANN boxes -->
+              <text x="155" y="33" text-anchor="middle" font-size="9.5" fill="#129FE0" font-weight="bold">Tier 1 — Source ANNs</text>
+              <rect x="8"   y="37" width="73" height="24" rx="3" fill="#E8F4FD" stroke="#129FE0" stroke-width="1.5"/>
+              <text x="44"  y="53" text-anchor="middle" font-size="10" fill="#1C1C2E">Wind ANN</text>
+              <rect x="86"  y="37" width="73" height="24" rx="3" fill="#E8F4FD" stroke="#129FE0" stroke-width="1.5"/>
+              <text x="122" y="53" text-anchor="middle" font-size="10" fill="#1C1C2E">Solar ANN</text>
+              <rect x="164" y="37" width="73" height="24" rx="3" fill="#E8F4FD" stroke="#129FE0" stroke-width="1.5"/>
+              <text x="200" y="53" text-anchor="middle" font-size="10" fill="#1C1C2E">Fossil ANN</text>
+
+              <!-- Source → down arrows -->
+              <line x1="44"  y1="61" x2="44"  y2="79" stroke="#129FE0" stroke-width="1.5" marker-end="url(#a-bl)"/>
+              <line x1="122" y1="61" x2="122" y2="79" stroke="#129FE0" stroke-width="1.5" marker-end="url(#a-bl)"/>
+              <line x1="200" y1="61" x2="200" y2="79" stroke="#129FE0" stroke-width="1.5" marker-end="url(#a-bl)"/>
+
+              <!-- Flow ANN boxes (our extension) -->
+              <rect x="55"  y="80" width="105" height="24" rx="3" fill="#FEF0EB" stroke="#E05312" stroke-width="2"/>
+              <text x="107" y="95" text-anchor="middle" font-size="10" fill="#1C1C2E">Flow ANN (import)</text>
+              <rect x="165" y="80" width="120" height="24" rx="3" fill="#FEF0EB" stroke="#E05312" stroke-width="2"/>
+              <text x="225" y="95" text-anchor="middle" font-size="10" fill="#1C1C2E">Flow ANN (partner CI)</text>
+
+              <!-- "Our Extension" badge -->
+              <rect x="82" y="69" width="135" height="14" rx="2.5" fill="#E05312"/>
+              <text x="149" y="79" text-anchor="middle" font-size="9" font-weight="bold" fill="white">Our Extension</text>
+
+              <!-- Flow → down arrows -->
+              <line x1="107" y1="104" x2="107" y2="120" stroke="#E05312" stroke-width="1.5" marker-end="url(#a-or)"/>
+              <line x1="225" y1="104" x2="225" y2="120" stroke="#E05312" stroke-width="1.5" marker-end="url(#a-or)"/>
+
+              <!-- Tier 2 CNN-LSTM -->
+              <rect x="28" y="121" width="245" height="32" rx="4" fill="#1C1C2E"/>
+              <text x="150" y="140" text-anchor="middle" font-size="12" font-weight="bold" fill="white">Tier 2 — CNN-LSTM</text>
+
+              <!-- Output arrow -->
+              <line x1="150" y1="153" x2="150" y2="170" stroke="#1C1C2E" stroke-width="2" marker-end="url(#a-dk)"/>
+
+              <!-- Output box -->
+              <rect x="68"  y="171" width="164" height="27" rx="4" fill="#129FE0"/>
+              <text x="150" y="188" text-anchor="middle" font-size="11" font-weight="bold" fill="white">96h CI Forecast</text>
+
+              <!-- Noise annotation -->
+              <text x="150" y="215" text-anchor="middle" font-size="9" fill="#777">Tier 1 errors propagate into Tier 2</text>
+
+              <!-- ── DIVIDER ── -->
+              <line x1="320" y1="12" x2="320" y2="228" stroke="#DDD" stroke-width="0.8" stroke-dasharray="3 3"/>
+
+              <!-- ── SINGLE-TIER (right) ── -->
+              <text x="490" y="16" text-anchor="middle" font-size="12.5" font-weight="bold" fill="#1C1C2E">Single-Tier</text>
+
+              <!-- Raw features -->
+              <rect x="360" y="37" width="262" height="24" rx="3" fill="#F5F5F5" stroke="#AAA" stroke-width="1" stroke-dasharray="4 2"/>
+              <text x="491" y="53" text-anchor="middle" font-size="10" fill="#555">All raw features (direct input)</text>
+
+              <!-- Arrow down -->
+              <line x1="491" y1="61" x2="491" y2="118" stroke="#AAA" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#a-gy)"/>
+
+              <!-- Winner badge -->
+              <rect x="430" y="107" width="122" height="16" rx="3" fill="#E05312"/>
+              <text x="491" y="118" text-anchor="middle" font-size="9" font-weight="bold" fill="white">WINS IN EVERY ZONE</text>
+
+              <!-- CNN-LSTM direct -->
+              <rect x="360" y="121" width="262" height="32" rx="4" fill="#1C1C2E" stroke="#E05312" stroke-width="3"/>
+              <text x="491" y="136" text-anchor="middle" font-size="12" font-weight="bold" fill="white">CNN-LSTM</text>
+              <text x="491" y="148" text-anchor="middle" font-size="9" fill="#E05312" font-weight="bold">(direct — no Tier 1)</text>
+
+              <!-- Output arrow -->
+              <line x1="491" y1="153" x2="491" y2="170" stroke="#E05312" stroke-width="2" marker-end="url(#a-or)"/>
+
+              <!-- Output box -->
+              <rect x="409" y="171" width="164" height="27" rx="4" fill="#E05312"/>
+              <text x="491" y="188" text-anchor="middle" font-size="11" font-weight="bold" fill="white">96h CI Forecast</text>
+
+              <!-- Annotation -->
+              <text x="491" y="215" text-anchor="middle" font-size="9" fill="#E05312" font-weight="bold">No intermediate step to propagate error</text>
+            </svg>
+          </div>
+          <div class="fig-cap">
+            <strong style="color:var(--blue)">Two-tier:</strong> Tier 1 ANNs forecast generation and flows; Tier 2 CNN-LSTM turns those into CI.
+            <strong style="color:var(--orange)">Orange boxes = our flow extension.</strong>
+            &nbsp;&nbsp;
+            <strong style="color:var(--orange)">Single-tier:</strong> CNN-LSTM predicts CI directly from raw features, no intermediate step.
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Data & Setup -->
+      <div class="sec">
+        <div class="sec-title">3 &nbsp; Data and Setup</div>
+        <div class="sec-body">
+          <ul>
+            <li><strong>Data:</strong> Electricity Maps (academic license) — hourly CI, power breakdown, flows. Open-Meteo weather (ERA5 history, GFS forecast). Jan 2021 to May 2026, five zones.</li>
+            <li><strong>Split:</strong> train 2021-2025, validate Jan-Apr 2026, <strong>Test A</strong> May 2026 (full 1-96 h horizon).</li>
+            <li><strong>Test B (live collection):</strong> Jun 8-21 2026 — Electricity Maps forecast captured as issued (non-recoverable), enabling head-to-head on the 1-24 h band.</li>
+            <li>RMSE loss, Adam with gradient clipping, seed-averaged results.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div><!-- /left col -->
+
+    <!-- ─── RIGHT COLUMN ─────────────────────────────────────── -->
+    <div class="col">
+
+      <!-- 4. Atlas -->
+      <div class="sec">
+        <div class="sec-title">4 &nbsp; Headline Results — Per-Region Atlas (Test A)</div>
+        <table class="atlas">
+          <thead>
+            <tr>
+              <th>Zone</th>
+              <th>MAPE&nbsp;(Test A)</th>
+              <th>Grid character</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="zone">Singapore</td>
+              <td><span class="big">0.71%</span></td>
+              <td class="note">Tight gas island, stable mix</td>
+            </tr>
+            <tr>
+              <td class="zone">PJM</td>
+              <td><span class="big">5.93%</span></td>
+              <td class="note">Large US market, diverse sources</td>
+            </tr>
+            <tr>
+              <td class="zone">NYIS</td>
+              <td><span class="big">5.98%</span></td>
+              <td class="note">Large US market, diverse sources</td>
+            </tr>
+            <tr>
+              <td class="zone">Finland</td>
+              <td><span class="big">12.05%</span></td>
+              <td class="note">Small, fast-decarbonizing, import-heavy</td>
+            </tr>
+            <tr class="fail">
+              <td class="zone">Belgium</td>
+              <td><span class="big" style="color:#E05312">31.13%</span><br><span class="note">(2024 training window)</span></td>
+              <td class="note">Distribution shift, unmodeled nuclear outages — open failure case</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout" style="margin-top:2mm">
+          Accuracy spans two orders of magnitude. Structural grid characteristics — mix stability, interconnection, decarbonization pace — explain the spread.
+        </div>
+      </div>
+
+      <!-- 5. Finding 1 -->
+      <div class="sec">
+        <div class="sec-title">5 &nbsp; Finding 1 — Two-Tier Complexity Does Not Pay Off</div>
+        <div class="sec-body" style="margin-bottom:2mm">
+          Single-tier matches or beats two-tier in <strong>every zone</strong>, decisively on the consumption target.
+          We also reproduce CarbonCast: production two-tier PJM 6.04% vs. published 5.29%.
+        </div>
+        <div class="fig">
+          <img src="assets/fig_framework_cons-1.png" alt="Framework comparison — consumption CI">
+          <div class="fig-cap">
+            MAPE by zone and framework, consumption-based CI.
+            <strong style="color:var(--orange)">Orange = single-tier (ours).</strong>
+            <strong style="color:var(--blue)">Blue = two-tier.</strong>
+            Lower is better.
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Finding 2 + Why -->
+      <div class="sec">
+        <div class="sec-title">6 &nbsp; Finding 2 — Cross-Border Flows Do Not Help</div>
+        <div class="sec-body" style="margin-bottom:2mm">
+          Removing interconnector and partner-CI inputs leaves the model equal or better in four of five zones.
+          Belgium is actively hurt (MAPE 29.0 without flows vs. 58.5 with flows).
+        </div>
+        <div class="callout" style="margin-bottom:2mm">
+          <strong>Why:</strong> Tier 1 flow forecasts over a 96 h horizon are noisy — they add error, not signal.
+          The diagnostic below shows error grows with horizon and peaks where two-tier fails most.
+        </div>
+        <div class="fig">
+          <img src="assets/fig_tier1_error-1.png" alt="Tier 1 horizon NRMSE">
+          <div class="fig-cap">
+            Tier 1 total-generation forecast error (normalized RMSE) by horizon, per zone.
+            Belgium error reaches 18-25%, the highest in the study — matching its worst two-tier performance.
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Head-to-head -->
+      <div class="sec">
+        <div class="sec-title">7 &nbsp; Head-to-Head vs. Electricity Maps (Test B, 1-24 h)</div>
+        <div class="sec-body" style="margin-bottom:2mm">
+          Our open model lands within a few percentage points of the closed operational forecast, and <strong>beats it in Finland.</strong>
+        </div>
+        <div class="fig">
+          <img src="assets/fig_testb.png" alt="Test B: EM vs. ours">
+          <div class="fig-cap">
+            MAPE on Test B (Jun 8-21 2026, 1-24 h band).
+            <strong style="color:var(--gray)">Gray = Electricity Maps operational.</strong>
+            <strong style="color:var(--orange)">Orange = ours (single-tier, consumption).</strong>
+            <em>Note: our model is replayed on actual weather — an optimistic upper bound.</em>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /right col -->
+
+  </div><!-- /body -->
+
+  <!-- ═══════════════════════════════ FOOTER ════════════════════ -->
+  <div class="ftr">
+    <div>
+      <div class="ftr-title">Conclusions</div>
+      <div class="ftr-body">
+        <ul>
+          <li>An open, reproducible framework reaches near-operational accuracy on stable grids.</li>
+          <li>The two-tier decomposition and cross-border flow features do not improve a learned single-tier model — both add noise through imperfect Tier 1 forecasts.</li>
+          <li>Per-region heterogeneity is large and structurally explained. Belgium remains the open failure case: distribution shift and unmodeled nuclear outages require zone-specific mitigation.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="ftr-title">References</div>
+      <div class="ftr-body">
+        <ul>
+          <li>Maji et al. CarbonCast. BuildSys 2022.</li>
+          <li>Electricity Maps. Operational CI forecast, 2025.</li>
+          <li>Full reference list in the report.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="ftr-title">Code and Report</div>
+      <div class="ftr-body" style="margin-bottom:1.5mm">All code, pipelines, and trained models available openly.</div>
+      <div class="qr-row">
+        <div>
+          <div class="qr-box">QR<br>Repo</div>
+          <div class="qr-lbl">GitHub</div>
+        </div>
+        <div>
+          <div class="qr-box">QR<br>Report</div>
+          <div class="qr-lbl">PDF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function scaleToScreen() {
+      const PX_PER_MM = 3.7795;
+      const posterW = 841 * PX_PER_MM;
+      const scale = Math.min(1, (window.innerWidth - 40) / posterW);
+      document.body.style.transform = `scale(${scale})`;
+      document.documentElement.style.minHeight = (1189 * PX_PER_MM * scale + 40) + 'px';
+    }
+    scaleToScreen();
+    window.addEventListener('resize', scaleToScreen);
+  </script>
+</body>
+</html>
