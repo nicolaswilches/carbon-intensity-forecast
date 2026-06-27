@@ -49,21 +49,21 @@ def _stats_text(s: pd.Series, year: int) -> str:
 
 
 def comparison() -> None:
-    """Five-region comparison as vertical box plots.
+    """Five-region comparison as horizontal box plots (full text width).
 
-    Box plots avoid the density-axis dominance of overlaid histograms (Singapore's
-    tight spike crushed the other four), and the taller frame gives the carbon-
-    intensity axis room to separate the regions.
+    Horizontal orientation lets the value axis (gCO₂eq/kWh) span the full
+    column width, giving the wide Singapore-to-Belgium range more room to breathe.
     """
     fig = go.Figure()
-    for z in ZONES:
+    for z in reversed(ZONES):  # reversed so SG sits at top (highest CI first)
         s = _series(z)
         color = P.REGIONAL_PALETTE[z]
-        fig.add_trace(go.Box(y=s.values, name=LABEL[z], boxmean=True, boxpoints=False,
+        fig.add_trace(go.Box(x=s.values, name=LABEL[z], boxmean=True, boxpoints=False,
                              marker_color=color, fillcolor=_alpha(color, 0.4),
                              line=dict(color=color, width=1.4)))
-    P.style_report_fig(fig, span="column", height=344, legend=False,
-                       ylabel="gCO₂eq/kWh")
+    P.style_report_fig(fig, span="full", height=240, legend=False,
+                       xlabel="gCO₂eq/kWh")
+    fig.update_xaxes(showgrid=True, gridcolor="#E8E8E8")
     out = os.path.join(FIGS, "eda_distribution.pdf")
     fig.write_image(out)
     print("wrote", out)
