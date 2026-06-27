@@ -1,9 +1,11 @@
-\documentclass[sigconf,nonacm]{acmart}  % font size: 9pt default — e.g. [sigconf,nonacm,12pt]
+\documentclass[sigconf,nonacm,a4paper]{acmart}  % font size: 9pt default — e.g. [sigconf,nonacm,12pt]
 
 \settopmatter{printacmref=false,printfolios=true}
 \renewcommand\footnotetextcopyrightpermission[1]{}
 \pagestyle{plain}
 \renewcommand{\shortauthors}{}
+
+\usepackage[top=1.2cm, bottom=1.2cm]{geometry}  % tighten vertical margins; left/right kept by acmart
 
 \usepackage{booktabs}
 \usepackage{graphicx}
