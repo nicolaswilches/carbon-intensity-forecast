@@ -507,7 +507,7 @@ four and explains the result. All numbers are Test~A (May 2026), validation-sele
 
 \begin{table}[H]
     \caption{Test A (May 2026) per-zone accuracy of our best model, the consumption-based
-    single-tier network (validation-selected).}
+    single-tier network.}
     \label{tab:atlas}
     \begin{tabular}{lrrr}
     \toprule
@@ -522,30 +522,26 @@ four and explains the result. All numbers are Test~A (May 2026), validation-sele
     \end{tabular}
 \end{table}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{results_fva_prod.pdf}
+    \caption{Day-ahead (24 hour) forecast versus actual over Test A, production-based target.}
+    \label{fig:fva-prod}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{results_fva_cons.pdf}
+    \caption{Day-ahead (24 hour) forecast versus actual over Test A, consumption-based target.}
+    \label{fig:fva}
+\end{figure}
+
 Four of five zones forecast well: Singapore under 1\%, the two US markets near 6\%,
 and Finland at 14\% but with a small absolute error (7.1 on a low-carbon grid), so
 its percentage is denominator-inflated. Belgium is the genuine hard case.
 Figure~\ref{fig:fva} shows how the single-tier and two-tier day-ahead forecasts track
 the actual across zones, on the production and consumption targets; the two-tier
 models, Finland's production most of all, are visibly noisier.
-
-\begin{figure}[tbp]
-    \centering
-    \includegraphics[width=\columnwidth]{results_fva_prod.pdf}
-    \caption{Day-ahead (24 hour) forecast versus actual over Test A, production-based target.
-    Rows are zones; actual is gray, single-tier (orange) and two-tier (blue) overlaid.
-    The two-tier forecasts are visibly more erratic, most extreme for Finland.}
-    \label{fig:fva-prod}
-\end{figure}
-
-\begin{figure}[tbp]
-    \centering
-    \includegraphics[width=\columnwidth]{results_fva_cons.pdf}
-    \caption{Day-ahead (24 hour) forecast versus actual over Test A, consumption-based target.
-    Same layout as Figure~\ref{fig:fva-prod}; series are not cross-comparable across the two figures.}
-    \label{fig:fva}
-\end{figure}
-
 
 % §8.1 Comparing the four frameworks
 \subsection{Comparing the four frameworks}
