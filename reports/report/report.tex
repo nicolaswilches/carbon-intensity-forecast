@@ -70,10 +70,12 @@ extends it to a consumption-based target with interconnector flow and partner
 carbon intensity inputs, and compares both against a single-tier model that
 forecasts carbon intensity directly. We contribute a per-region accuracy atlas, a
 structural comparison of the two-tier design, and a characterization of where
-forecasts succeed and fail. On a live June 2026 window the open model lands within a
-few points of the operational Electricity Maps forecast in every zone and ahead of
-it in one. Turning the cross-border flow inputs off shows they do not improve
-accuracy: the model is as good or better without them in four of five zones.
+forecasts succeed and fail. On a live June 2026 window, with models replayed on actual rather than forecast
+weather (an optimistic upper bound, see Section~\ref{sec:testb}), the open model
+lands within a few points of the operational Electricity Maps forecast in every zone
+and ahead of it in one. Within the two-tier consumption framework, turning the
+cross-border flow inputs off shows they do not improve accuracy: the model is as
+good or better without them in four of five zones.
 
 On a held-out May 2026 test month, consumption-based accuracy ranges from under 1\% MAPE in near-islanded Singapore to roughly 6\% in the large US markets, with Belgium the hard case, a distribution shift that training on recent data only partly closes. Our central finding is that the two-tier structure does not earn its complexity: a single-tier network that forecasts carbon intensity directly matches or beats the two-tier
 model in every zone, because imperfect first-tier generation forecasts inject more
@@ -411,11 +413,13 @@ contribution of the two-tier design.
 \section{Experimental Setup}
 \textbf{Splits.} Training 2021 through 2025, validation January through April 2026,
 Test~A May 2026, and a live Test~B (June 8 to 21, 2026) head-to-head against the
-Electricity Maps operational forecast. Two transitioning grids use a shortened
-per-zone window for the distribution-shift reasons in Section~4.1: Finland from 2023
-and Belgium from 2024. The other three zones use the full 2021-2025 window. Each zone
-has its own model, so a per-zone window costs nothing for the stable zones, and the
-window choice is validated, not assumed (Section~\ref{sec:findings}).
+Electricity Maps operational forecast. Two transitioning grids use a shortened per-zone window for the distribution-shift
+reasons in Section~4.1: Finland from 2023 and Belgium from 2024. The other three
+zones use the full 2021-2025 window. Each zone has its own model, so a per-zone
+window costs nothing for the stable zones. The window boundaries were chosen by
+observing accuracy on both test sets (Section~\ref{sec:findings}), so they are an
+exploratory design decision informed by hindsight; the per-zone window result is
+reported descriptively, not as a pre-specified or independently validated claim.
 
 \textbf{Why two test sets.} The two windows answer different questions, and neither
 alone is enough. Test~A is a complete held-out month drawn from the historical
@@ -695,16 +699,20 @@ the same conclusion.
 
 
 Table~\ref{tab:testb-h2h} places our consumption-based models head to head with the
-Electricity Maps forecast, scored at the exact origins Electricity Maps issued. The
-open single-tier model beats the closed operational forecast in Finland and ties it
-in Singapore. Electricity Maps leads in PJM, New York, and Belgium, though with
-Belgium's 2024 window that gap closes to under two points (25.4 versus 23.5). One
-caveat keeps this honest: our models are replayed on the actual future weather,
-whereas Electricity Maps used a real weather forecast it could not perfect, so our
-column is an optimistic upper bound. Replaying on the captured weather forecasts
-would only widen the gap, so the conclusion is conservative as stated: an open,
-reproducible model lands within a few MAPE points of the operational baseline in
-every zone and ahead of it in one.
+Electricity Maps forecast, scored at the exact origins Electricity Maps issued. The open single-tier model beats the closed operational forecast in Finland.
+Singapore is close (0.65 versus 0.63) but the point estimate favors Electricity
+Maps; at three-seed averaging the margin is within run-to-run variance, so neither
+a win nor a tie can be claimed. Electricity Maps leads in PJM, New York, and
+Belgium, though with Belgium's 2024 window that gap closes to under two points
+(25.4 versus 23.5).
+
+One caveat qualifies all five numbers: our models are replayed on the actual future
+weather, whereas Electricity Maps used a real weather forecast it could not perfect,
+so our column is an optimistic upper bound. The size of this advantage is not
+quantified here; replaying on the captured weather forecasts would worsen our
+figures. The Finland result --- our only outright win --- is therefore a best-case
+upper bound and may not survive a weather-matched replay. Section~\ref{sec:other-limits}
+lists this as a remaining limitation.
 
 \begin{table}[H]
     \caption{Test~B head-to-head: 1 to 24 hour MAPE (\%) at the Electricity Maps
@@ -794,11 +802,32 @@ single-tier baseline.
 
 \subsection{Other limitations}
 \label{sec:other-limits}
-The Electricity Maps academic forecast horizon is 24 hours rather than the
-advertised 72, so the head-to-head comparison (Test~B) is restricted to the 1 to
-24 hour band.
+
+\textbf{Test set involvement in window selection.} The per-zone training windows
+(Finland 2023, Belgium 2024) were chosen by observing accuracy on both Test~A and
+Test~B (Section~\ref{sec:findings}). Neither test set is therefore a fully
+independent held-out evaluation for the window hypothesis. The window result is
+reported as a diagnostic and design finding, not as a validated generalization to
+unseen data.
+
+\textbf{Weather optimism in the head-to-head.} Our Test~B models were replayed
+on actual realized weather while Electricity Maps used a real forecast. The
+magnitude of this advantage is unquantified; it is plausible that the Finland
+result --- our only outright win --- would not survive a fair weather-matched
+replay. A faithful replay on the captured weather forecasts is listed as a next
+step (Section~\ref{sec:conclusion}).
+
+\textbf{Flow ablation scope.} The cross-border flow ablation
+(Section~\ref{sec:flowcompare}) was run on the two-tier consumption model only,
+the one framework built to exploit those channels as Tier~1 forecasts. Whether
+raw current-value flow features would help the single-tier model is not tested.
+
+\textbf{Forecast horizon cap.} The Electricity Maps academic forecast horizon is
+24 hours rather than the advertised 72, so the head-to-head (Test~B) is restricted
+to the 1 to 24 hour band.
 
 \section{Conclusion}
+\label{sec:conclusion}
 We built an open, reproducible deep learning framework for short-horizon
 consumption-based carbon intensity forecasting and evaluated it across five
 structurally diverse grids. The framework reproduces the closed CarbonCast
@@ -823,12 +852,13 @@ contradict CarbonCast, whose two-tier benefit is staying accurate when source
 data is missing, measured against a fixed equation baseline, not against a learned
 single-tier model.
 
-Two further results complete the picture. The flow on/off comparison shows the
+Two further results complete the picture. Within the two-tier consumption framework, the flow on/off comparison shows the
 cross-border inputs do not improve accuracy: the model is as good or better without
 them in four of five zones, for the same reason the second tier fails, since the
-flow channels are themselves noisy forecasts. And on a live June 2026 window the open
-model lands within a few MAPE points of the closed Electricity Maps operational
-forecast in every zone, beating it in Finland.
+flow channels are themselves noisy forecasts. And on a live June 2026 window, with
+models replayed on actual rather than forecast weather, the open model lands within
+a few MAPE points of the closed Electricity Maps operational forecast in every zone,
+beating it in Finland under those conditions.
 
 The remaining next steps are narrower than the contributions themselves: a faithful
 replay of the head-to-head on the captured weather forecasts rather than on actual
