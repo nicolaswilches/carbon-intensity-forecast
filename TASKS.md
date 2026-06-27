@@ -2,16 +2,22 @@
 
 Phase 1 deadline: 2026-07-03. Full weekly timeline in `memory/project_thesis.md`.
 
-## NOW — pending for next session (as of 2026-06-21)
+## NOW — status (as of 2026-06-27)
 
-- [x] Feature comparison (Contribution 2): shipped DIRECTIONAL result as final (no Colab full run). Report subsec "Do cross-border flow inputs help?" (tab:flow): flows DON'T help, off<=on in 4/5 (SG/PJM/NYIS/BE), FI marginal, BE catastrophic. Abstract "under way" replaced with finding
-- [x] Test B head-to-head vs EM (Contribution 4): pulled Jun 1-21 actuals, materialized June frames, scripts/score_test_b.py replays 3 saved configs (single prod/cons + E3 cons) on 1-24h, settled window ends Jun 18. outputs/test_b_{structural,headtohead}.csv. Report subsec sec:testb (2 tables). EM wins 3/5, we win FI + tie SG. CAVEAT: ours uses perfect weather (stated)
-- [x] References: verified IEA (460->1000 TWh by 2026 matches Electricity 2024), ERA5 (146/1999-2049/qj.3803), Radovanovic (TPWRS 38(2) 1270-1280), GFS ok; EnsembleCI = cite-only (TODO removed from report)
-- [ ] USER-SIDE: confirm Overleaf compiles (no local LaTeX). New: 3 tables + sec:testb/sec:flowablation/sec:other-limits labels
-- [ ] Uninstall launchd collector (com.carbonforecast.collect) — was due ~Jun 22; data window already used
-- [ ] FUTURE (not blocking): faithful GFS-weather head-to-head replay (removes perfect-weather caveat); longer Test B window; E2 two-tier prod on Test B (only config not saved locally); BE separate model (diagnosed, not built)
+Report content-complete on `main`. Per-zone training window merged (PR #3).
 
-Done 2026-06-21: full section-by-section report review (4-framework Results: single-tier wins both targets); references wired (.bib + \cite + bibliography); CI formula in Data; OOF rationale in Methodology; BE nuclear-outage failure mode; all figures reproducible+restyled (fig 9/10 full-width, single #E05312 / two #129FE0, reduced margins, subsection float barriers); feature comparison directional run (flows don't help); save_e3 wired into runs. Lesson: 8GB local OOMs E3 -> Colab for 5-zone runs; always save preds+models.
+- [x] Per-zone training window (advisor): **BE -> 2024** (better Test A 41.6->31.1 and Test B 33->25, ~matches EM); **FI kept full/2023** (its 2024 model failed Test B generalization, 17.7->31.2); SG/NYIS/PJM full. Built `train_all_frameworks.py` (resumable, all 4 frameworks, `TRAIN_START`), `notebooks/S07`, `save_e2`/`load_e2`, `make_final_results.py` (per-zone final set -> `final_metrics.csv` + `preds_final_*`), `make_train_window_comparison.py`. Report tables/figures/prose updated + new "How far to shorten" finding; Test B re-scored per zone. Verified figures use BE's reduced split.
+- [x] Test B head-to-head (Contribution 4) + feature comparison (Contribution 2: flows don't help) + references verified + CNN-LSTM term standardized + 4.3 sourced expansion + EDA opening tightened.
+- [x] Figures overhaul: split/merge 9/10, short zone codes, correlation cell height, calendar fig sizing, horizon split into MAPE/MAE, **fixed horizon data bug** (was plotting two-tier under a single-tier caption).
+- [x] Layout: removed running header, centered page numbers, float strategy (drop subsection FloatBarrier, `[tbp]`, loosened fractions).
+- [x] Delivery cleanups: LICENSE (MIT), `outputs/README` provenance, `evaluation/metrics.py` + tests (112 pass), gitignore generalized, removed stale CSVs. launchd collector uninstalled.
+- [x] Poster content doc: `reports/poster/poster_content.md` (A0 layout + copy + figure plan).
+- [ ] USER-SIDE: sync `main` -> Overleaf, compile, verify layout (no local LaTeX).
+- [ ] HF Hub: upload models (incl E2, now saved) + preds; make repo public; link in README.
+- [ ] Poster: build A0 in Figma from the content doc; export chosen figures as SVG.
+- [ ] FUTURE: faithful GFS-weather head-to-head (drop perfect-weather caveat); longer Test B; broader per-zone-window study.
+
+Standing rule: commit + push report changes to main immediately (memory: feedback_report_autocommit).
 
 ## Done (grilling phase, 2026-05-10 to 2026-05-12)
 
