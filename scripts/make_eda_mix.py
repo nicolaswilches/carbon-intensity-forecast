@@ -98,7 +98,7 @@ def build() -> None:
 
     fig.update_layout(barmode="stack", bargap=0.15,
                       uniformtext=dict(minsize=8, mode="hide"))
-    P.style_report_fig(fig, span="column", height=720, legend=True)
+    P.style_report_fig(fig, span="column", height=504, legend=True)
     fig.update_layout(margin=dict(b=9))
     fig.update_xaxes(range=[0, 100], showticklabels=False, showgrid=False)
     fig.update_yaxes(tickfont=dict(size=P.REPORT_FONT - 1))
