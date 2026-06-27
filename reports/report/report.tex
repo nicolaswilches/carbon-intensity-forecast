@@ -374,9 +374,13 @@ import-weighted partner intensity correlates 0.83 with the consumption-minus-pro
 Following CarbonCast, the two-tier model couples per-source Tier~1 feedforward
 networks that forecast generation with a Tier~2 CNN-LSTM
 that consumes those forecasts together with historical carbon intensity, weather,
-and calendar features to emit a 96 hour carbon intensity vector. We extend Tier~1
-with per-interconnector flow networks that forecast signed net flow, and we add
-partner carbon intensity as a Tier~2 channel.
+and calendar features to emit a 96-hour carbon intensity vector. Unlike the
+original CarbonCast, which iterates four 24-hour windows to reach 96 hours, the
+Tier~2 head predicts all 96 steps in a single forward pass. Iterating would
+propagate Tier~1 forecast error through each chaining step, compounding across
+the horizon; a direct multi-step head avoids this accumulation~\cite{taieb2016bias}.
+We extend Tier~1 with per-interconnector flow networks that forecast signed net
+flow, and we add partner carbon intensity as a Tier~2 channel.
 
 Tier~2 always consumes Tier~1 \emph{forecasts}, never actual future generation, so
 no future information leaks into the carbon-intensity prediction. The forecasts used
