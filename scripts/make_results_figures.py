@@ -62,7 +62,7 @@ def _horizon_one(metric: str, ylabel: str, out_name: str) -> None:
                                  line=dict(color=P.REGIONAL_PALETTE[z], width=P.LINE_WIDTH)))
     for h in (24, 48, 72):
         fig.add_vline(x=h, line=dict(color="rgba(0,0,0,0.12)", width=1))
-    P.style_report_fig(fig, span="column", height=321, legend=True)
+    P.style_report_fig(fig, span="column", height=257, legend=True)
     fig.update_xaxes(title_text="forecast horizon (hours ahead)")
     fig.update_yaxes(title_text=ylabel)
     # Horizontal legend above the axes (paper y > 1) so it never overlaps the lines;

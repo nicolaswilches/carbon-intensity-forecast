@@ -58,7 +58,7 @@ def build_one(single_csv: str, two_csv: str, out_name: str, legend: bool = True)
     fig.update_yaxes(title_text="MAPE (%)")
     # bargroupgap=0 so the two bars in a region touch; bargap separates regions.
     fig.update_layout(barmode="group", bargap=0.35, bargroupgap=0.0)
-    P.style_report_fig(fig, span="column", height=173, legend=legend)
+    P.style_report_fig(fig, span="column", height=216, legend=legend)
     if legend:
         fig.update_layout(legend=dict(orientation="h", x=0.5, xanchor="center",
                                       y=1.04, yanchor="bottom"))
