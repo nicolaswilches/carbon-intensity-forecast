@@ -4,14 +4,14 @@ Phase 1 deadline: 2026-07-03. Full weekly timeline in `memory/project_thesis.md`
 
 ## NOW — status (as of 2026-06-27)
 
-Report argument-complete and adversarial-reviewed on `main`. All review flags resolved.
+Report argument-complete, two adversarial review passes done. Repo clean on `main`.
 
-- [x] Per-zone training window (advisor): BE → 2024, FI → 2024, SG/NYIS/PJM full. All 4 frameworks. `final_metrics.csv` is ground truth.
-- [x] Two adversarial review passes complete — all critical/high/medium/low flags fixed (see archive below).
+- [x] Two adversarial review passes — all critical/high/medium/low flags fixed.
+- [x] Repo clean: stale uncommitted files committed (uv.lock pytz, docs/carboncast.pdf, poster.html).
 - [ ] USER-SIDE: sync `main` -> Overleaf, compile, verify layout (no local LaTeX).
 - [ ] HF Hub: upload models (incl E2, now saved) + preds; make repo public; link in README.
-- [ ] Poster: `reports/poster/poster.html` built; add real QR codes once repo public; print to A0 PDF from Chrome.
-- [ ] FUTURE: faithful GFS-weather head-to-head (drop perfect-weather caveat); longer Test B; broader per-zone-window study.
+- [ ] Poster: HTML committed (`reports/poster/poster.html`); add real QR codes once repo public; print to A0 PDF from Chrome.
+- [ ] FUTURE: faithful GFS-weather head-to-head; longer Test B; broader per-zone-window study.
 
 ## Report polish — adversarial review (complete as of 2026-06-27)
 
