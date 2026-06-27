@@ -4,37 +4,49 @@ Phase 1 deadline: 2026-07-03. Full weekly timeline in `memory/project_thesis.md`
 
 ## NOW — status (as of 2026-06-27)
 
-Report content-complete on `main`. Per-zone training window merged (PR #3).
+Report argument-complete and adversarial-reviewed on `main`. All review flags resolved.
 
-- [x] Per-zone training window (advisor): **BE -> 2024** (better Test A 41.6->31.1 and Test B 33->25, ~matches EM); **FI kept full/2023** (its 2024 model failed Test B generalization, 17.7->31.2); SG/NYIS/PJM full. Built `train_all_frameworks.py` (resumable, all 4 frameworks, `TRAIN_START`), `notebooks/S07`, `save_e2`/`load_e2`, `make_final_results.py` (per-zone final set -> `final_metrics.csv` + `preds_final_*`), `make_train_window_comparison.py`. Report tables/figures/prose updated + new "How far to shorten" finding; Test B re-scored per zone. Verified figures use BE's reduced split.
-- [x] Test B head-to-head (Contribution 4) + feature comparison (Contribution 2: flows don't help) + references verified + CNN-LSTM term standardized + 4.3 sourced expansion + EDA opening tightened.
-- [x] Figures overhaul: split/merge 9/10, short zone codes, correlation cell height, calendar fig sizing, horizon split into MAPE/MAE, **fixed horizon data bug** (was plotting two-tier under a single-tier caption).
-- [x] Layout: removed running header, centered page numbers, float strategy (drop subsection FloatBarrier, `[tbp]`, loosened fractions).
-- [x] Delivery cleanups: LICENSE (MIT), `outputs/README` provenance, `evaluation/metrics.py` + tests (112 pass), gitignore generalized, removed stale CSVs. launchd collector uninstalled.
-- [x] Poster content doc: `reports/poster/poster_content.md` (A0 layout + copy + figure plan).
+- [x] Per-zone training window (advisor): BE → 2024, FI → 2024, SG/NYIS/PJM full. All 4 frameworks. `final_metrics.csv` is ground truth.
+- [x] Two adversarial review passes complete — all critical/high/medium/low flags fixed (see archive below).
 - [ ] USER-SIDE: sync `main` -> Overleaf, compile, verify layout (no local LaTeX).
 - [ ] HF Hub: upload models (incl E2, now saved) + preds; make repo public; link in README.
 - [ ] Poster: `reports/poster/poster.html` built; add real QR codes once repo public; print to A0 PDF from Chrome.
 - [ ] FUTURE: faithful GFS-weather head-to-head (drop perfect-weather caveat); longer Test B; broader per-zone-window study.
 
-## Report polish — adversarial review flags (see memory/project_report_flags.md)
+## Report polish — adversarial review (complete as of 2026-06-27)
 
+### Pass 1 flags (all fixed)
+- [x] H1: Soften CarbonCast reproduction language; confounder footnote — §abstract, §8.1, conclusion
+- [x] M1: Seed std subscripts in tab:structural; variance note in tab:flow caption
+- [x] M2: Implementation details subsection (hyperparameters) in §5
+- [x] M3: Mechanistic explanation for flat error-by-horizon in §8.3
+- [x] M4: Two-tier causal chain explicit in §9.1
+- [x] M5: EnsembleCI softened to "strong" in §2
+- [x] M6: Atlas heterogeneity qualified as "descriptively consistent with" in conclusion
+- [x] L1–L6: BE outage source; GitHub URL + MIT; §4.6 fragment; NYIS softened; CEF note; partner zone description
+
+### Pass 2 flags (all fixed)
+Critical:
+- [x] C1: FI window in limitations was "2023" — corrected to "2024" (matches `final_metrics.csv`)
+- [x] C2: "Finland result — our only outright win" — removed; EM leads in all 5 zones on Test B
+- [x] C3: CI units (gCO₂eq/kWh) never stated — added in §3 at equation definition
 High:
-- [x] H1: Soften CarbonCast reproduction language ("broadly consistent", add confounder footnote) — §abstract, §8.1, conclusion
+- [x] H2: §2 gap paragraph still said "strongest prior work" — changed to "strongest academic baseline"
+- [x] H3: §4.6 opened with sentence fragment — rewritten as full sentence
+- [x] H4: §4.3 Finland "halves its carbon intensity over," — completed to "over the five-year window"
+- [x] H5: "competitive across all five" in abstract + conclusion — replaced with "with larger gaps in the two transitioning grids"
 Medium:
-- [x] M1: Add seed std subscripts to tab:structural; add seed-variance note to tab:flow caption
-- [x] M2: Add implementation details subsection (hyperparameters) to §5 Methodology
-- [x] M3: Add mechanistic explanation for flat error-by-horizon in §8.3
-- [x] M4: Make two-tier failure causal chain explicit in §9.1 Discussion
-- [x] M5: Soften "EnsembleCI is strongest prior art" in §2 Related Work
-- [x] M6: Add "descriptively consistent with" qualifier to atlas claims in conclusion
+- [x] M7: "most academic forecasters target" — backed with citations to CarbonCast + EnsembleCI
+- [x] M8: Dangling scope-2 "variant" mention removed (never reported)
+- [x] M9: Belgium nuclear framing updated — 2022 extension decision acknowledged
+- [x] M10: "several seeds" → "three seeds" in §7
+- [x] M11: OOF-on-short-window limitation added to §9.2
+- [x] M12: tab:flow caption explains why its values differ from tab:structural
 Low:
-- [x] L1: Cite EM power-breakdown data for BE May 2026 nuclear outage in §9.1
-- [x] L2: Add code/data availability statement (GitHub URL + MIT license) to §1
-- [x] L3: Removed incomplete sentence in §4.6 correlation subsection
-- [x] L4: Softened NYIS "replaced almost entirely by gas" to "largely replaced by fossil gas generation"
-- [x] L5: Added CEF fixed-constants note in §3
-- [x] L6: Added partner zone selection description in §3
+- [x] L7: §1 notes flow-modeling contribution is a null result ("finding they do not improve accuracy")
+- [x] L8: ~40 scored origins per zone stated in §8 Test B section
+- [x] L9: Noise-band claim in §8.1 linked to explicit delta and Table 2
+- [x] L10: 168h lookback attributed to CarbonCast inheritance in §4.6
 
 Standing rule: commit + push report changes to main immediately (memory: feedback_report_autocommit).
 
