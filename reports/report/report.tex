@@ -473,7 +473,7 @@ shortened window lowered Finland's consumption-based two-tier error on Test~A
 actively hurting the forecast. We use the 2023-onward window for Finland throughout
 the results.
 
-\textbf{How far to shorten: the 2024 window.} To probe the limit of this idea we
+\textbf{How far to shorten: the 2024 window.} To test the limit of this idea we
 trained every framework on a 2024-onward window for the two transitioning grids.
 Belgium improved across all four frameworks and, crucially, on both test windows:
 its consumption-based single-tier error fell from 41.6 to 31.1 on Test~A and from
@@ -487,7 +487,7 @@ sharper phase-out rewards the most recent data; Finland's slower shift needs mor
 history. The final design uses a per-zone window: 2024 for Belgium, 2023 for
 Finland, full 2021-2025 for the three stable grids.
 
-% 7. Results
+% 8. Results
 \section{Results}
 We evaluate four frameworks: a single-tier network and the two-tier
 (CarbonCast-style) pipeline, each trained on the production-based and the
@@ -495,6 +495,22 @@ consumption-based target. The two-tier production model is our CarbonCast
 reproduction. Table~\ref{tab:atlas} gives the accuracy of the best of the four, the
 consumption-based single-tier network, and the rest of this section compares all
 four and explains the result. All numbers are Test~A (May 2026), validation-selected.
+
+Four of five zones forecast well: Singapore under 1\%, the two US markets near 6\%,
+and Finland at 12\% but with a small absolute error (6.2 on a low-carbon grid), so
+its percentage is denominator-inflated. Belgium is the genuine hard case.
+Figure~\ref{fig:fva} shows how the single-tier and two-tier day-ahead forecasts track
+the actual across zones, on the production and consumption targets; the two-tier
+models, Finland's production most of all, are visibly noisier.
+
+\begin{figure*}[tbp]
+    \centering
+    \includegraphics[width=\textwidth]{results_fva_frameworks.pdf}
+    \caption{Day-ahead (24 hour) forecast versus actual over Test A. Rows are zones; the
+    left column is the production-based target, the right the consumption-based target. In each cell the actual is gray, with the single-tier (orange) and two-tier (blue)
+    forecasts overlaid. The two columns are different series and not cross-comparable. The two-tier forecasts are visibly more erratic, most extreme for Finland.}
+    \label{fig:fva}
+\end{figure*}
 
 \begin{table}[H]
     \caption{Test A (May 2026) per-zone accuracy of our best model, the consumption-based
@@ -512,22 +528,6 @@ four and explains the result. All numbers are Test~A (May 2026), validation-sele
     \bottomrule
     \end{tabular}
 \end{table}
-
-Four of five zones forecast well: Singapore under 1\%, the two US markets near 6\%,
-and Finland at 12\% but with a small absolute error (6.2 on a low-carbon grid), so
-its percentage is denominator-inflated. Belgium is the genuine hard case.
-Figure~\ref{fig:fva} shows how the single-tier and two-tier day-ahead forecasts track
-the actual across zones, on the production and consumption targets; the two-tier
-models, Finland's production most of all, are visibly noisier.
-
-\begin{figure*}[tbp]
-    \centering
-    \includegraphics[width=\textwidth]{results_fva_frameworks.pdf}
-    \caption{Day-ahead (24 hour) forecast versus actual over Test A. Rows are zones; the
-    left column is the production-based target, the right the consumption-based target. In each cell the actual is gray, with the single-tier (orange) and two-tier (blue)
-    forecasts overlaid. The two columns are different series and not cross-comparable. The two-tier forecasts are visibly more erratic, most extreme for Finland.}
-    \label{fig:fva}
-\end{figure*}
 
 
 % 8.1. Comparing the four frameworks
@@ -556,7 +556,7 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
 \end{table}
 
 % Figure 10
-\begin{figure}[tbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{results_framework_prod.pdf}
     \caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
@@ -565,7 +565,7 @@ Table~\ref{tab:structural}, compare the single-tier and two-tier models on both 
 \end{figure}
 
 % Figure 11
-\begin{figure}[tbp]
+\begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{results_framework_cons.pdf}
     \caption{Per-zone Test A accuracy (MAPE) of the single-tier (orange) and two-tier
