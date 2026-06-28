@@ -131,7 +131,9 @@ per-source feedforward artificial neural networks (ANNs) that forecast generatio
 \textbf{EnsembleCI}~\cite{yan2025ensembleci} is an adaptive ensemble that improves on
 CarbonCast for production-based carbon intensity across eleven grids including PJM,
 but does not use interconnector flows. It is a strong production-based prior art,
-reporting lower MAPE than CarbonCast on PJM.
+reporting lower MAPE than CarbonCast on PJM. A direct quantitative comparison is not
+included: EnsembleCI evaluates on a different time period and targets production-based
+intensity, so a head-to-head would conflate target, data source, and model differences.
 
 \textbf{Electricity Maps operational forecast}~\cite{electricitymaps2025forecast} (productionized January 2025)
 provides flow-traced, consumption-based carbon intensity forecasts across more
@@ -173,9 +175,10 @@ reports, which already accounts for the carbon embedded in imported electricity.
 cross-border information enters the forecasting model as input features, the
 per-partner carbon intensity and net interconnector flows introduced below, rather
 than as an additional term in a carbon-intensity formula. For each zone we also
-collect the carbon intensity history of its interconnector partners (twenty external
-zones, the direct physical neighbors identified by Electricity Maps' interconnector
-topology and derived automatically from the flow columns in the extracted data),
+collect the carbon intensity history of its interconnector partners (approximately twenty
+external zones across all five study regions, the direct physical neighbors identified
+by Electricity Maps' interconnector topology and derived automatically from the flow
+columns in the extracted data),
 used as a consumption-based feature.
 
 The five zones were chosen for structural diversity: a large multi-state US market
@@ -628,7 +631,9 @@ across seeds, and compare on Test~A. Table~\ref{tab:flow} reports the result.
 \end{table}
 
 The cross-border inputs do not help. Switching them off leaves the model as good or
-better in four of five zones, and the lone exception, Finland, improves by a margin
+better in four of five zones (on full-window seed-averaged models; the per-zone window
+choice does not change this conclusion, as noted in Table~\ref{tab:flow}), and the
+lone exception, Finland, improves by a margin
 inside the run-to-run noise band. In Belgium the flow channels are actively harmful,
 nearly doubling the error. Belgium is the most interconnected zone in this study,
 so noise from multiple poorly-predicted cross-border flow channels accumulates there
@@ -645,11 +650,13 @@ Figures~\ref{fig:horizon-mape} and~\ref{fig:horizon-mae} trace per-zone error, a
 MAPE and MAE, across the full 1 to 96 hour
 horizon. Error does not simply grow with lead time; for every zone the curve stays
 roughly flat, so the day-ahead band is not markedly better than the four-day band.
-This behavior follows from two properties of the model and signal. First, the
-direct 96-step head predicts all horizons in a single forward pass rather than by
-chaining shorter windows, so forecast error cannot compound across steps. Second,
-carbon intensity carries a strong autocorrelation that persists well beyond one day
+This behavior follows from two properties of the model and signal. First, carbon
+intensity carries a strong autocorrelation that persists well beyond one day
 (Section~4.6), giving the model a stable signal at the long end of the horizon.
+Second, the direct 96-step head predicts all horizons in a single forward pass rather
+than by chaining shorter windows, so forecast error cannot compound across steps ---
+an architecture that would otherwise inflate error at longer horizons even on a stable
+signal.
 Belgium sits highest throughout, near 30\%, with the other four well below. Because
 the curves are nearly flat, the 1 to 24 hour band of the Electricity Maps
 head-to-head (Section~\ref{sec:testb}) is no worse than the longer horizons.
