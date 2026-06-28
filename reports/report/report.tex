@@ -630,7 +630,9 @@ across seeds, and compare on Test~A. Table~\ref{tab:flow} reports the result.
 The cross-border inputs do not help. Switching them off leaves the model as good or
 better in four of five zones, and the lone exception, Finland, improves by a margin
 inside the run-to-run noise band. In Belgium the flow channels are actively harmful,
-nearly doubling the error. The reason mirrors the two-tier result above: the flow and
+nearly doubling the error. Belgium is the most interconnected zone in this study,
+so noise from multiple poorly-predicted cross-border flow channels accumulates there
+more severely than in the other zones. The reason mirrors the two-tier result above: the flow and
 partner-CI channels are themselves forecasts, and the Tier~1 flow forecasts are noisy
 enough that the future block carries more noise than signal. A feature designed to
 encode physical coupling helps only if it can be predicted well, and on these grids,
@@ -709,12 +711,14 @@ A different test month, the same conclusion.
 
 
 Table~\ref{tab:testb-h2h} places our consumption-based models head to head with the
-Electricity Maps forecast, scored at the exact origins Electricity Maps issued. Electricity Maps leads in all five zones. The gap is negligible in Singapore
+Electricity Maps forecast, scored at the exact origins Electricity Maps issued. These snapshot origins (one every six hours) are a subset of the hourly scored origins in Table~\ref{tab:testb-struct}, which is why the per-zone MAPE values differ slightly between the two tables for the same models. Electricity Maps leads in all five zones. The gap is negligible in Singapore
 (0.65 versus 0.63), close in Belgium (25.4 versus 23.5) and PJM (4.33 versus
 3.17), wider in New York (6.36 versus 3.82), and largest in Finland (31.18 versus
 20.74). Finland's degradation on this window reflects the 2024 training cutoff: the
-model sees less pre-test history, which limits generalisation to a volatile Nordic
-June. The structural finding --- single-tier beating two-tier --- still holds in
+model sees less pre-test history, and June 2026 may represent a larger distribution
+shift from that window than May 2026 did. Whether this is a seasonal effect or a
+longer temporal distance from training would require a sustained live-window study
+to separate. The structural finding --- single-tier beating two-tier --- still holds in
 four of five zones on Test~B (Table~\ref{tab:testb-struct}).
 
 One caveat qualifies all five numbers: our models are replayed on the actual future
