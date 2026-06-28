@@ -29,7 +29,8 @@ OUT    = os.path.join(ROOT, "outputs")
 FIGS   = os.path.join(ROOT, "outputs", "figures", "poster")
 
 ZONES = ["SG", "US-NY-NYIS", "US-MIDA-PJM", "FI", "BE"]
-LABEL = {"SG": "SG", "US-NY-NYIS": "NYIS", "US-MIDA-PJM": "PJM", "FI": "FI", "BE": "BE"}
+LABEL = {"SG": "Singapore", "US-NY-NYIS": "New York", "US-MIDA-PJM": "PJM",
+         "FI": "Finland", "BE": "Belgium"}
 
 # Poster dimensions (96dpi): col 1/2 = 886px, col 3 = 1180px
 W_NARROW = 886   # cols 1 and 2
