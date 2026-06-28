@@ -816,18 +816,14 @@ single-tier baseline.
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{tier1_horizon_error.pdf}
-    \caption{Tier 1 total-generation forecast error (normalized RMSE) by horizon, per
-    region, Test A. This error is large and grows with horizon; it is the noise that
-    propagates into Tier 2 and limits the two-tier framework.}
+    \caption{Tier~1 total-generation normalized RMSE by zone and horizon, Test~A. Error grows with lead time and propagates into Tier~2.}
     \label{fig:tier1-horizon}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{tier1_pred_vs_actual_pjm.pdf}
-    \caption{Tier 1 day-ahead (24h) forecast versus actual gas production,
-    US-MIDA-PJM, Test A. A concrete instance of the Tier 1 miss that, once fed into
-    Tier 2, degrades the two-tier forecast.}
+    \caption{Tier~1 day-ahead gas forecast vs.\ actual, PJM, Test~A. A concrete instance of the Tier~1 miss that degrades the two-tier forecast.}
     \label{fig:tier1-pred}
 \end{figure}
 

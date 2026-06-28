@@ -114,7 +114,7 @@ def main():
     for z in ZONES:
         fig.add_trace(go.Scatter(x=hours, y=results[z], mode="lines", name=LABEL[z],
                                  line=dict(color=P.REGIONAL_PALETTE[z], width=1.6)))
-    P.style_report_fig(fig, span="column", height=340, legend=True,
+    P.style_report_fig(fig, span="column", height=306, legend=True,
                        xlabel="forecast horizon (hours ahead)",
                        ylabel="total-gen nRMSE (%)")
     fig.write_image(os.path.join(FIGS, "tier1_horizon_error.pdf"))
@@ -128,7 +128,7 @@ def main():
     fig.add_trace(go.Scatter(x=t, y=gas_pjm["forecast"], mode="lines",
                              name="forecast (24h-ahead)",
                              line=dict(color=P.REGIONAL_PALETTE["US-MIDA-PJM"], width=1.2)))
-    P.style_report_fig(fig, span="column", height=300, legend=True, ylabel="gas generation (MW)")
+    P.style_report_fig(fig, span="column", height=270, legend=True, ylabel="gas generation (MW)")
     fig.write_image(os.path.join(FIGS, "tier1_pred_vs_actual_pjm.pdf"))
     print("wrote tier1_pred_vs_actual_pjm.pdf", flush=True)
 
