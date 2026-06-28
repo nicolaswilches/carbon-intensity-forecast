@@ -112,13 +112,15 @@ def fig1_ci_evolution() -> None:
     print("wrote", out)
 
 
-# ── Figure 10: forecast vs actual (consumption single-tier) ──────────────────
+# ── Figure 10: forecast vs actual (consumption, single-tier + two-tier) ──────
 
 def fig10_fva_cons() -> None:
     H = 24
+    PREDS_TWO = os.path.join(ROOT, "outputs", "preds_final_e3_cons")
+    TWO_C = "#129FE0"
 
-    def _load(zone: str):
-        d = np.load(os.path.join(PREDS, f"{zone}.npz"), allow_pickle=True)
+    def _load(subdir: str, zone: str):
+        d = np.load(os.path.join(subdir, f"{zone}.npz"), allow_pickle=True)
         t = (pd.to_datetime(d["origins"]) + pd.Timedelta(hours=H)).strftime(
             "%Y-%m-%dT%H:%M:%S").tolist()
         return t, d["preds"][:, H - 1], d["y_true"][:, H - 1]
@@ -128,11 +130,14 @@ def fig10_fva_cons() -> None:
                         vertical_spacing=0.04)
     first = True
     for r, z in enumerate(ZONES, start=1):
-        t, preds, actual = _load(z)
+        t, single, actual = _load(PREDS, z)
+        _, two, _         = _load(PREDS_TWO, z)
         fig.add_trace(go.Scatter(x=t, y=actual, mode="lines", name="actual",
                       line=dict(color=ACTUAL_C, width=1.4), showlegend=first), row=r, col=1)
-        fig.add_trace(go.Scatter(x=t, y=preds, mode="lines", name="single-tier forecast",
+        fig.add_trace(go.Scatter(x=t, y=single, mode="lines", name="single-tier",
                       line=dict(color=SINGLE_C, width=1.4), showlegend=first), row=r, col=1)
+        fig.add_trace(go.Scatter(x=t, y=two, mode="lines", name="two-tier",
+                      line=dict(color=TWO_C, width=1.4), showlegend=first), row=r, col=1)
         first = False
 
     _style(fig, W_WIDE, 1100)
