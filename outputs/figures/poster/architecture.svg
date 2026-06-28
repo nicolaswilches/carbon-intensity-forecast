@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 380"
+     width="900" height="380">
+
+  <defs>
+    <marker id="arrowhead" markerWidth="7" markerHeight="5"
+            refX="6" refY="2.5" orient="auto">
+      <polygon points="0 0, 7 2.5, 0 5" fill="#6B6B6B"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect width="900" height="380" fill="#FAF8F5"/>
+
+  <!-- ── INPUT BOX (left) ───────────────────────────────────── -->
+  <rect x="18" y="100" width="90" height="80" rx="5" fill="#F0EFED" stroke="#B0ADA8" stroke-width="1.2" />
+  <text font-family="Inter" font-size="12" font-weight="400" fill="#6B6B6B" text-anchor="middle" x="63" y="125"><tspan x="63" dy="0">Historical</tspan><tspan x="63" dy="15">source</tspan><tspan x="63" dy="15">mix</tspan></text>
+
+  <!-- arrow: input → tier1 -->
+  <line x1="108" y1="140" x2="148" y2="140" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+  <!-- ── TIER 1 DASHED BOX ─────────────────────────────────── -->
+  <rect x="150" y="52" width="230" height="176" rx="10" fill="none" stroke="#0072B2" stroke-width="1.4" stroke-dasharray="6 3" />
+  <text x="265" y="44" dy="0" font-family="Inter" font-size="13" font-weight="600" fill="#0072B2" text-anchor="middle">Tier 1</text>
+
+  <!-- non-renewables label -->
+  <text x="178" y="102" dy="0" font-family="Inter" font-size="11" font-weight="400" fill="#6B6B6B" text-anchor="start">Non-</text>
+  <text x="178" y="116" dy="0" font-family="Inter" font-size="11" font-weight="400" fill="#6B6B6B" text-anchor="start">renewables</text>
+
+  <!-- renewables label -->
+  <text x="178" y="178" dy="0" font-family="Inter" font-size="11" font-weight="400" fill="#6B6B6B" text-anchor="start">Renewables</text>
+
+  <!-- ANN box 1 -->
+  <rect x="228" y="88" width="60" height="36" rx="5" fill="#EEF5FB" stroke="#0072B2" stroke-width="1.2" />
+  <text x="258" y="112" dy="0" font-family="Inter" font-size="13" font-weight="600" fill="#0072B2" text-anchor="middle">ANN</text>
+
+  <!-- ANN box 2 -->
+  <rect x="228" y="160" width="60" height="36" rx="5" fill="#EEF5FB" stroke="#0072B2" stroke-width="1.2" />
+  <text x="258" y="184" dy="0" font-family="Inter" font-size="13" font-weight="600" fill="#0072B2" text-anchor="middle">ANN</text>
+
+  <!-- arrows into ANN boxes -->
+  <line x1="220" y1="106" x2="228" y2="106" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+  <line x1="220" y1="178" x2="228" y2="178" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+  <!-- arrows out of ANN boxes → right edge of tier1 -->
+  <line x1="288" y1="106" x2="378" y2="130" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+  <line x1="288" y1="178" x2="378" y2="150" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+  <!-- ── MIDDLE LABEL ───────────────────────────────────────── -->
+  <text font-family="Inter" font-size="11" font-weight="400" fill="#6B6B6B" text-anchor="middle" x="435" y="122"><tspan x="435" dy="0">Individual</tspan><tspan x="435" dy="14">source</tspan><tspan x="435" dy="14">production</tspan><tspan x="435" dy="14">forecasts</tspan></text>
+
+  <!-- arrow: tier1 right → tier2 left -->
+  <line x1="490" y1="140" x2="528" y2="140" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+  <!-- ── TIER 2 DASHED BOX ─────────────────────────────────── -->
+  <rect x="530" y="90" width="160" height="100" rx="10" fill="none" stroke="#E05312" stroke-width="1.4" stroke-dasharray="6 3" />
+  <text x="610" y="82" dy="0" font-family="Inter" font-size="13" font-weight="600" fill="#E05312" text-anchor="middle">Tier 2</text>
+
+  <!-- CNN-LSTM box -->
+  <rect x="550" y="108" width="120" height="64" rx="5" fill="#FEF2EE" stroke="#E05312" stroke-width="1.2" />
+  <text x="610" y="136" dy="0" font-family="Inter" font-size="13" font-weight="600" fill="#E05312" text-anchor="middle">CNN</text>
+  <text x="610" y="153" dy="0" font-family="Inter" font-size="13" font-weight="600" fill="#E05312" text-anchor="middle">LSTM</text>
+
+  <!-- arrow: tier2 → output -->
+  <line x1="690" y1="140" x2="728" y2="140" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+  <!-- ── OUTPUT LABEL ───────────────────────────────────────── -->
+  <text font-family="Inter" font-size="12" font-weight="400" fill="#1A1A1A" text-anchor="middle" x="790" y="122"><tspan x="790" dy="0">96-hour</tspan><tspan x="790" dy="15">carbon</tspan><tspan x="790" dy="15">intensity</tspan><tspan x="790" dy="15">forecast</tspan></text>
+
+  <!-- ── BOTTOM INPUT: weather ─────────────────────────────── -->
+  <rect x="150" y="290" width="160" height="44" rx="5" fill="#F0EFED" stroke="#B0ADA8" stroke-width="1.2" />
+  <text font-family="Inter" font-size="12" font-weight="400" fill="#6B6B6B" text-anchor="middle" x="230" y="307"><tspan x="230" dy="0">96-hour weather</tspan><tspan x="230" dy="16">forecasts</tspan></text>
+
+  <!-- weather → tier1 (up) -->
+  <line x1="210" y1="290" x2="240" y2="228" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+  <!-- weather → tier2 (up) -->
+  <line x1="280" y1="290" x2="590" y2="190" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+  <!-- ── BOTTOM INPUT: historical CI ───────────────────────── -->
+  <rect x="530" y="290" width="160" height="44" rx="5" fill="#F0EFED" stroke="#B0ADA8" stroke-width="1.2" />
+  <text font-family="Inter" font-size="12" font-weight="400" fill="#6B6B6B" text-anchor="middle" x="610" y="307"><tspan x="610" dy="0">Historical carbon</tspan><tspan x="610" dy="16">intensity</tspan></text>
+
+  <!-- historical CI → tier2 (up) -->
+  <line x1="610" y1="290" x2="610" y2="190" stroke="#6B6B6B" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+</svg>
