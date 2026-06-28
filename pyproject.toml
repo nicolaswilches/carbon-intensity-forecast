@@ -20,6 +20,8 @@ dependencies = [
     "pytz>=2024.1",
     "tensorflow>=2.16,<2.20",
     "keras>=3.0",
+    "qrcode>=8.2",
+    "pillow>=12.2.0",
 ]
 
 [project.optional-dependencies]
