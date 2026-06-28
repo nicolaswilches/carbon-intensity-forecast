@@ -56,7 +56,7 @@ We present an open, reproducible deep learning framework for short-horizon (96
 hour) consumption-based carbon intensity forecasting that explicitly models
 cross-border electricity flows, evaluated across five structurally diverse energy grid
 zones: US-MIDA-PJM (US Mid-Atlantic grid), US-NY-NYIS (New York grid), Finland, Belgium, and Singapore. The framework
-reproduces the closed CarbonCast method as a production-based baseline,
+reproduces the CarbonCast method as a production-based baseline,
 extends it to a consumption-based target with interconnector flow and partner
 carbon intensity inputs, and compares both against a single-tier model that
 forecasts carbon intensity directly. We contribute a per-region accuracy atlas, a
@@ -681,10 +681,10 @@ yielding approximately 40 scored origins per zone.
 
 Table~\ref{tab:testb-struct} repeats the structural comparison on this second
 window. The result is the same as on Test~A: the single-tier consumption model
-beats the two-tier model in four of five zones, decisively so in Finland, where the
-two-tier model is again unstable. New York is the one zone where the two-tier model
-edges ahead, by a margin inside the run-to-run noise band. A different test month,
-the same conclusion.
+beats the two-tier model in three of five zones (Singapore, PJM, and Belgium).
+Finland is essentially tied (31.73 vs 31.58 MAPE), within the run-to-run noise band.
+New York is the clearest exception, where the two-tier model edges ahead by 1.0 MAPE point.
+A different test month, the same conclusion.
 
 \begin{table}[H]
     \caption{Test~B (June 2026) MAPE (\%) on the 1 to 24 hour band, every hourly
@@ -855,7 +855,7 @@ to the 1 to 24 hour band.
 \label{sec:conclusion}
 We built an open, reproducible deep learning framework for short-horizon
 consumption-based carbon intensity forecasting and evaluated it across five
-structurally diverse grids. The framework is broadly consistent with the closed CarbonCast
+structurally diverse grids. The framework is broadly consistent with the CarbonCast
 method as a production-based baseline, with the PJM two-tier model landing at
 6.0 MAPE against the published 5.3, and extends it to a consumption-based target
 with explicit cross-border flow and partner carbon intensity inputs.
