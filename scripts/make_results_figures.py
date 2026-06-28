@@ -59,10 +59,10 @@ def _horizon_one(metric: str, ylabel: str, out_name: str) -> None:
             yv = np.nanmean(ae, axis=0)
         hours = np.arange(1, preds.shape[1] + 1)
         fig.add_trace(go.Scatter(x=hours, y=yv, mode="lines", name=LABEL[z],
-                                 line=dict(color=P.REGIONAL_PALETTE[z], width=P.LINE_WIDTH)))
+                                 line=dict(color=P.REGIONAL_PALETTE[z], width=P.LINE_WIDTH * 1.1)))
     for h in (24, 48, 72):
         fig.add_vline(x=h, line=dict(color="rgba(0,0,0,0.12)", width=1))
-    P.style_report_fig(fig, span="column", height=231, legend=True)
+    P.style_report_fig(fig, span="column", height=254, legend=True)
     fig.update_xaxes(title_text="forecast horizon (hours ahead)",
                      tickmode="array", tickvals=[24, 48, 72, 96],
                      ticktext=["24", "48", "72", "96"])
